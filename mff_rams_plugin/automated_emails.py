@@ -1,6 +1,6 @@
 from uber.config import c
 from uber.automated_emails import MarketplaceEmailFixture
-from uber.utils import before,days_before
+from uber.utils import before, days_before
 
 
 MarketplaceEmailFixture(
