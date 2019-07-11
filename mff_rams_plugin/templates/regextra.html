@@ -93,7 +93,7 @@
     }
 
     if ($(':radio[name=fursuiting]')) {
-        $(':radio[name=fursuiting]').parents('.form-group').insertBefore($.field('promo_code').parents('.form-group'));
+        $(':radio[name=fursuiting]').removeAttr('required').parents('.form-group').insertBefore($.field('promo_code').parents('.form-group'));
         $(":radio[value={{ c.NO_SUIT }}]").parents('label').removeClass('btn-default').addClass('btn-danger');
         $(":radio[value={{ c.SUIT }}]").parents('label').removeClass('btn-default').addClass('btn-success');
     }
