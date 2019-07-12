@@ -1,3 +1,4 @@
+import math
 from datetime import timedelta
 
 from residue import CoerceUTF8 as UnicodeText, UTCDateTime
@@ -6,9 +7,12 @@ from sqlalchemy.types import Integer
 from sqlalchemy.ext.hybrid import hybrid_property
 
 from uber.models import Session
+from sqlalchemy import or_
 from uber.config import c
 from uber.utils import localized_now, localize_datetime
 from uber.models.types import DefaultColumn as Column
+from residue import CoerceUTF8 as UnicodeText, UTCDateTime
+from sqlalchemy.types import Integer
 from uber.decorators import cost_property, presave_adjustment
 
 
@@ -46,16 +50,18 @@ class Group:
         return self.table_fee if self.table_fee \
             else c.TABLE_PRICES[int(self.tables)]
 
-    @property
-    def dealer_badges_remaining(self):
-        """
-        This overrides a function in the main plugin which controls how many
-        badges a Dealer group may purchase. We do not have any restrictions on
-        dealer badges so this just returns an arbitrary number, allowing a
-        Dealer to add up to that many badges at a time.
-        :return:
-        """
-        return 10
+    @hybrid_property
+    def is_dealer(self):
+        return bool(
+            self.tables
+            and self.tables != '0'
+            and self.tables != '0.0'
+            and (not self.registered or self.amount_paid or self.cost
+                 or self.status != c.UNAPPROVED))
+
+    @is_dealer.expression
+    def is_dealer(cls):
+        return and_(cls.tables > 0, or_(cls.amount_paid > 0, cls.cost > 0, cls.status != c.UNAPPROVED))
 
     @property
     def dealer_payment_due(self):
@@ -76,6 +82,10 @@ class Group:
     def tables_repr(self):
         return c.TABLE_OPTS[int(self.tables) - 1][1] if self.tables \
             else "No Table"
+
+    @property
+    def dealer_max_badges(self):
+        return c.MAX_DEALERS or min(math.ceil(self.tables) * 3, 12)
 
 
 @Session.model_mixin
