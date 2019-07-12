@@ -7,12 +7,9 @@ from sqlalchemy.types import Integer
 from sqlalchemy.ext.hybrid import hybrid_property
 
 from uber.models import Session
-from sqlalchemy import or_
 from uber.config import c
 from uber.utils import localized_now, localize_datetime
 from uber.models.types import Choice, DefaultColumn as Column
-from residue import CoerceUTF8 as UnicodeText, UTCDateTime
-from sqlalchemy.types import Integer
 from uber.decorators import cost_property, presave_adjustment
 
 
@@ -49,19 +46,6 @@ class Group:
     def table_cost(self):
         return self.table_fee if self.table_fee \
             else c.TABLE_PRICES[int(self.tables)]
-
-    @hybrid_property
-    def is_dealer(self):
-        return bool(
-            self.tables
-            and self.tables != '0'
-            and self.tables != '0.0'
-            and (not self.registered or self.amount_paid or self.cost
-                 or self.status != c.UNAPPROVED))
-
-    @is_dealer.expression
-    def is_dealer(cls):
-        return and_(cls.tables > 0, or_(cls.amount_paid > 0, cls.cost > 0, cls.status != c.UNAPPROVED))
 
     @property
     def dealer_payment_due(self):
