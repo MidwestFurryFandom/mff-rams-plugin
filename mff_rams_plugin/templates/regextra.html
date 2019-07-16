@@ -1,3 +1,4 @@
+{%- import 'macros.html' as macros -%}
 {% if c.PAGE_PATH == '/registration/form' %}
     {% if attendee.times_printed < 1 or attendee.print_pending %}
         <script type="text/javascript">
@@ -75,7 +76,6 @@
         $.field('badge_printed_name').prop('maxlength', 30);
         $("label[for='badge_printed_name']").removeClass('optional-field');
         $('p:contains("Badge names have a maximum of 20 characters.")').text("Badge names have a maximum of 30 characters.");
-    });
 
     // We don't use amount_extra so we don't want this to do anything
     donationChanged = function() {};
@@ -91,6 +91,13 @@
         $.field('promo_code').attr("placeholder", "A discount code or an agent code");
         $('<p class="help-text"><em>If you have a discount code, enter it now. Agent codes may be added via the link you receive in your confirmation email.</em></p>').insertAfter($.field('promo_code'));
     }
+
+    if ($(':radio[name=fursuiting]')) {
+        $(':radio[name=fursuiting]').removeAttr('required').parents('.form-group').insertBefore($.field('promo_code').parents('.form-group'));
+        $(":radio[value={{ c.NO_SUIT }}]").parents('label').removeClass('btn-default').addClass('btn-danger');
+        $(":radio[value={{ c.SUIT }}]").parents('label').removeClass('btn-default').addClass('btn-success');
+    }
+    });
 </script>
 
-{# {% include 'art_show_link.html' %} #}
+{{ macros.form_group(attendee, 'fursuiting', type='radio_buttons', label="Do you plan on fursuiting at " + c.EVENT_NAME + "?", help="This is just to help us prepare; it's okay if your plans change!", is_required=True) }}
