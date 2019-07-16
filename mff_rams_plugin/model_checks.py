@@ -5,6 +5,12 @@ from uber.config import c
 from uber.model_checks import ignore_unassigned_and_placeholders
 
 
+@prereg_validation.Attendee
+def need_fursuit_option(attendee):
+    if not attendee.fursuiting:
+        return "Please tell us if you are planning to suit or not."
+
+
 @validation.Attendee
 def need_comped_reason(attendee):
     if attendee.paid == c.NEED_NOT_PAY and not attendee.comped_reason:

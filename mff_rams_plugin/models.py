@@ -1,11 +1,15 @@
+import math
 from datetime import timedelta
+
+from residue import CoerceUTF8 as UnicodeText, UTCDateTime
+from sqlalchemy import and_, or_
+from sqlalchemy.types import Integer
+from sqlalchemy.ext.hybrid import hybrid_property
+
 from uber.models import Session
-from sqlalchemy import or_
 from uber.config import c
 from uber.utils import localized_now, localize_datetime
-from uber.models.types import DefaultColumn as Column
-from residue import CoerceUTF8 as UnicodeText, UTCDateTime
-from sqlalchemy.types import Integer
+from uber.models.types import Choice, DefaultColumn as Column
 from uber.decorators import cost_property, presave_adjustment
 
 
@@ -44,17 +48,6 @@ class Group:
             else c.TABLE_PRICES[int(self.tables)]
 
     @property
-    def dealer_badges_remaining(self):
-        """
-        This overrides a function in the main plugin which controls how many
-        badges a Dealer group may purchase. We do not have any restrictions on
-        dealer badges so this just returns an arbitrary number, allowing a
-        Dealer to add up to that many badges at a time.
-        :return:
-        """
-        return 10
-
-    @property
     def dealer_payment_due(self):
         if self.approved:
             return self.approved + timedelta(c.DEALER_PAYMENT_DAYS)
@@ -74,10 +67,15 @@ class Group:
         return c.TABLE_OPTS[int(self.tables) - 1][1] if self.tables \
             else "No Table"
 
+    @property
+    def dealer_max_badges(self):
+        return c.MAX_DEALERS or min(math.ceil(self.tables) * 3, 12)
+
 
 @Session.model_mixin
 class Attendee:
     comped_reason = Column(UnicodeText, default='', admin_only=True)
+    fursuiting = Column(Choice(c.FURSUITING_OPTS))
 
     @presave_adjustment
     def save_group_cost(self):
