@@ -97,6 +97,19 @@
         $(":radio[value={{ c.NO_SUIT }}]").parents('label').removeClass('btn-default').addClass('btn-danger');
         $(":radio[value={{ c.SUIT }}]").parents('label').removeClass('btn-default').addClass('btn-success');
     }
+    
+    // Don't actually presell presold one-day badges
+    {% if c.PAGE_PATH == '/registration/register' %}
+    $(function () {
+          {% if c.AT_THE_DOOR_BADGE_OPTS %}
+              {% for type in c.PRESOLD_ONEDAY_BADGE_TYPES %}
+                  if ("{{ c.PRESOLD_ONEDAY_BADGE_TYPES[type] }}" !== moment().format('dddd')) {
+                      $.field('badge_type').find("option[value='{{ type }}']").remove();
+                  }
+              {% endfor %}
+          {% endif %}
+      });
+   {% endif %}
     });
 </script>
 
