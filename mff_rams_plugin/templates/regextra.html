@@ -98,7 +98,7 @@
         $(":radio[value={{ c.SUIT }}]").parents('label').removeClass('btn-default').addClass('btn-success');
     }
 
-    {% if attendee and attendee.badge_type == c.STAFF_BADGE or c.STAFF_RIBBON|string in attendee.ribbon_ints|string %}
+    {% if attendee and (attendee.badge_type == c.STAFF_BADGE or c.STAFF_RIBBON|string in attendee.ribbon_ints|string) %}
     // Hide staffing checkbox for staff to avoid confusion
     if ($.field('staffing')) {
         $("label[for='staffing']").parents('.form-group').hide();
