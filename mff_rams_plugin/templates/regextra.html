@@ -8,8 +8,8 @@
         </script>
 
         <div id="print_pending" class="form-group">
-            <label for="print_pending" class="col-sm-2 control-label">Ready to Print</label>
-            <div class="col-sm-6">
+            <label for="print_pending" class="col-sm-3 control-label">Ready to Print</label>
+            <div class="col-sm-6 form-control-static">
                 {{ attendee.print_pending|yesno }}
             </div>
         </div>
@@ -34,7 +34,7 @@
     </script>
 
     <div id="comped_reason" class="form-group">
-        <label for="comped_reason" class="col-sm-2 control-label">Reason for Comped Badge</label>
+        <label for="comped_reason" class="col-sm-3 control-label">Reason for Comped Badge</label>
         <div class="col-sm-6">
             <input type="text" class="form-control" name="comped_reason" value="{{ attendee.comped_reason }}" placeholder="Enter your reason for giving this attendee a comped badge." />
         </div>
@@ -89,7 +89,9 @@
     if ($.field('promo_code')) {
         $("label[for='promo_code']").text("Registration Code");
         $.field('promo_code').attr("placeholder", "A discount code or an agent code");
+        {% if not admin_area %}
         $('<p class="help-text"><em>If you have a discount code, enter it now. Agent codes may be added via the link you receive in your confirmation email.</em></p>').insertAfter($.field('promo_code'));
+        {% endif %}
     }
 
     if ($(':radio[name=fursuiting]')) {
@@ -113,4 +115,4 @@
     });
 </script>
 
-{{ macros.form_group(attendee, 'fursuiting', type='radio_buttons', label="Do you plan on fursuiting at " + c.EVENT_NAME + "?", help="This is just to help us prepare; it's okay if your plans change!", is_required=True) }}
+{{ macros.form_group(attendee, 'fursuiting', type='radio_buttons', label="Do you plan on fursuiting at " + c.EVENT_NAME + "?", help="This is just to help us prepare; it's okay if your plans change!" if not admin_area else "", is_required=True) }}
