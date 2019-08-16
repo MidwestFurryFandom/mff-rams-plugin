@@ -109,6 +109,20 @@ class Attendee:
             self.for_review += "Automated message: Badge marked for free reprint " \
                                "because we think this is a preregistered attendee who wanted a different badge name."
 
+    @presave_adjustment
+    def _staffing_badge_and_ribbon_adjustments(self):
+        if self.badge_type == c.STAFF_BADGE or c.STAFF_RIBBON in self.ribbon_ints:
+            self.ribbon = remove_opt(self.ribbon_ints, c.VOLUNTEER_RIBBON)
+
+        elif self.staffing and self.badge_type != c.STAFF_BADGE \
+                and c.STAFF_RIBBON not in self.ribbon_ints and c.VOLUNTEER_RIBBON not in self.ribbon_ints:
+            self.ribbon = add_opt(self.ribbon_ints, c.VOLUNTEER_RIBBON)
+
+        if self.badge_type == c.STAFF_BADGE or c.STAFF_RIBBON in self.ribbon_intsm:
+            self.staffing = True
+            if not self.overridden_price and self.paid in [c.NOT_PAID, c.PAID_BY_GROUP]:
+                self.paid = c.NEED_NOT_PAY
+
     @cost_property
     def badge_cost(self):
         registered = self.registered_local if self.registered else None
