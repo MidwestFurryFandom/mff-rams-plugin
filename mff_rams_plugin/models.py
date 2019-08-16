@@ -150,3 +150,8 @@ class Attendee:
     @property
     def paid_for_a_shirt(self):
         return self.badge_type in [c.SPONSOR_BADGE, c.SHINY_BADGE]
+
+    @property
+    def staffing_or_will_be(self):
+        return self.staffing or self.badge_type == c.STAFF_BADGE \
+               or c.VOLUNTEER_RIBBON in self.ribbon_ints or c.STAFF_RIBBON in self.ribbon_ints
