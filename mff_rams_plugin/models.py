@@ -8,7 +8,7 @@ from sqlalchemy.ext.hybrid import hybrid_property
 
 from uber.models import Session
 from uber.config import c
-from uber.utils import localized_now, localize_datetime
+from uber.utils import add_opt, localized_now, localize_datetime, remove_opt
 from uber.models.types import Choice, DefaultColumn as Column
 from uber.decorators import cost_property, presave_adjustment
 
@@ -110,7 +110,7 @@ class Attendee:
                                "because we think this is a preregistered attendee who wanted a different badge name."
 
     @presave_adjustment
-    def _staffing_badge_and_ribbon_adjustments(self):
+    def staffing_badge_and_ribbon_adjustments(self):
         if self.badge_type == c.STAFF_BADGE or c.STAFF_RIBBON in self.ribbon_ints:
             self.ribbon = remove_opt(self.ribbon_ints, c.VOLUNTEER_RIBBON)
 
@@ -118,7 +118,7 @@ class Attendee:
                 and c.STAFF_RIBBON not in self.ribbon_ints and c.VOLUNTEER_RIBBON not in self.ribbon_ints:
             self.ribbon = add_opt(self.ribbon_ints, c.VOLUNTEER_RIBBON)
 
-        if self.badge_type == c.STAFF_BADGE or c.STAFF_RIBBON in self.ribbon_intsm:
+        if self.badge_type == c.STAFF_BADGE or c.STAFF_RIBBON in self.ribbon_ints:
             self.staffing = True
             if not self.overridden_price and self.paid in [c.NOT_PAID, c.PAID_BY_GROUP]:
                 self.paid = c.NEED_NOT_PAY
