@@ -73,9 +73,16 @@ class Group:
 
 
 @Session.model_mixin
+class MarketplaceApplication:
+    MATCHING_DEALER_FIELDS = ['categories', 'categories_text', 'description', 'special_needs', 'tax_number']
+
+    tax_number = Column(UnicodeText)
+
+
+@Session.model_mixin
 class Attendee:
     comped_reason = Column(UnicodeText, default='', admin_only=True)
-    fursuiting = Column(Choice(c.FURSUITING_OPTS))
+    fursuiting = Column(Choice(c.FURSUITING_OPTS), nullable=True)
 
     @presave_adjustment
     def save_group_cost(self):

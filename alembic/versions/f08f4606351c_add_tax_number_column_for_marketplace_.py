@@ -1,21 +1,21 @@
-"""Initial migration
+"""Add tax number column for marketplace apps
 
-Revision ID: 6fd3a80ca4e0
-Revises: 1ed43776064f
-Create Date: 2018-05-08 23:18:35.150928
+Revision ID: f08f4606351c
+Revises: 0f7426266803
+Create Date: 2019-08-27 23:57:55.936896
 
 """
 
 
 # revision identifiers, used by Alembic.
-revision = '6fd3a80ca4e0'
-down_revision = '1ed43776064f'
-branch_labels = ('mff_rams_plugin',)
+revision = 'f08f4606351c'
+down_revision = '0f7426266803'
+branch_labels = None
 depends_on = None
 
 from alembic import op
 import sqlalchemy as sa
-import residue
+
 
 
 try:
@@ -52,19 +52,8 @@ sqlite_reflect_kwargs = {
 
 
 def upgrade():
-    op.add_column('attendee', sa.Column('comped_reason', residue.CoerceUTF8(), server_default='', nullable=False))
-    op.add_column('group', sa.Column('location', residue.CoerceUTF8(), server_default='', nullable=False))
-    op.add_column('group', sa.Column('power', sa.Integer(), server_default='0', nullable=False))
-    op.add_column('group', sa.Column('power_fee', sa.Integer(), server_default='0', nullable=False))
-    op.add_column('group', sa.Column('power_usage', residue.CoerceUTF8(), nullable=False))
-    op.add_column('group', sa.Column('table_fee', sa.Integer(), server_default='0', nullable=False))
-    # ### end Alembic commands ###
+    op.add_column('marketplace_application', sa.Column('tax_number', sa.Unicode(), server_default='', nullable=False))
 
 
 def downgrade():
-    op.drop_column('group', 'table_fee')
-    op.drop_column('group', 'power_usage')
-    op.drop_column('group', 'power_fee')
-    op.drop_column('group', 'power')
-    op.drop_column('group', 'location')
-    op.drop_column('attendee', 'comped_reason')
+    op.drop_column('marketplace_application', 'tax_number')
