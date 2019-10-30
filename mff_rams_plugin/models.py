@@ -24,6 +24,16 @@ class SessionMixin:
 
 
 @Session.model_mixin
+class ArtShowApplication:
+    @property
+    def incomplete_reason(self):
+        if self.status not in [c.APPROVED, c.PAID]:
+            return self.status_label
+        if self.attendee.placeholder and self.attendee.badge_status != c.NOT_ATTENDING:
+            return "Missing registration info"
+
+
+@Session.model_mixin
 class Group:
     power = Column(Integer, default=0)
     power_fee = Column(Integer, default=0)
