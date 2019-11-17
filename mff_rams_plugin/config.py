@@ -15,11 +15,25 @@ c.MENU.append_menu_item(
         MenuItem(name='Daily Attendance', href='../mff_reports/attendance_graph'),
         MenuItem(name='Print Adult Badges (Single Queue)',
                  href='../kiosk_printing/print_badges'),
-        MenuItem(name='Print Adult Badges (Even Queue)',
-                 href='../kiosk_printing/print_badges?evenOdd=e'),
-        MenuItem(name='Print Adult Badges (Odd Queue)',
-                 href='../kiosk_printing/print_badges?evenOdd=o'),
-        MenuItem(name='Print Minor Badges',
+        MenuItem(name='Print Adult Badges (1 of 2)',
+                 href='../kiosk_printing/print_badges?printerNumber=1&numberOfPrinters=2'),
+        MenuItem(name='Print Adult Badges (2 of 2)',
+                 href='../kiosk_printing/print_badges?printerNumber=2&numberOfPrinters=2'),
+        MenuItem(name='Print Adult Badges (1 of 3)',
+                 href='../kiosk_printing/print_badges?printerNumber=1&numberOfPrinters=3'),
+        MenuItem(name='Print Adult Badges (2 of 3)',
+                 href='../kiosk_printing/print_badges?printerNumber=2&numberOfPrinters=3'),
+        MenuItem(name='Print Adult Badges (3 of 3)',
+                 href='../kiosk_printing/print_badges?printerNumber=3&numberOfPrinters=3'),
+        MenuItem(name='Print Adult Badges (1 of 4)',
+                 href='../kiosk_printing/print_badges?printerNumber=1&numberOfPrinters=4'),
+        MenuItem(name='Print Adult Badges (2 of 4)',
+                 href='../kiosk_printing/print_badges?printerNumber=2&numberOfPrinters=4'),
+        MenuItem(name='Print Adult Badges (3 of 4)',
+                 href='../kiosk_printing/print_badges?printerNumber=3&numberOfPrinters=4'),
+		MenuItem(name='Print Adult Badges (4 of 4)',
+                 href='../kiosk_printing/print_badges?printerNumber=4&numberOfPrinters=4'),
+		MenuItem(name='Print Minor Badges',
                  href='../kiosk_printing/print_badges?minor=True'),
     ])
 )
@@ -90,3 +104,4 @@ class ExtraConfig:
             elif self.ONE_DAY_BADGE_AVAILABLE:
                 opts.append((self.ONE_DAY_BADGE, 'Single Day Badge (${})'.format(self.ONEDAY_BADGE_PRICE)))
         return opts
+		
