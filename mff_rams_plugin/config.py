@@ -1,4 +1,4 @@
-from sideboard.lib import parse_config
+from sideboard.lib import parse_config, request_cached_property
 from collections import defaultdict
 from datetime import timedelta
 
@@ -72,7 +72,7 @@ class ExtraConfig:
     def DEALER_POWER_OPTS(self):
         return [(0, 'No power'), (1, 'Default power')]
 
-    @property
+    @request_cached_property
     @dynamic
     def AT_THE_DOOR_BADGE_OPTS(self):
         """
