@@ -121,7 +121,7 @@ class RegistrationDataOneYear:
             "event_end_date": self.end_date.strftime("%d-%m-%Y"),
         }
 
-@all_renderable(c.PEOPLE, c.STATS)
+@all_renderable()
 class Root:
     def index(self, session):
         pass
