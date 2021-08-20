@@ -50,7 +50,7 @@ class RegistrationDataOneYear:
             .filter(
             (
                 (Attendee.paid == c.PAID_BY_GROUP) &  # if they're paid by group
-                (Group.amount_paid >= Group.cost)  # make sure they've paid something, or are comped
+                (Group.amount_paid >= Group.cost * 100)  # make sure they've paid something, or are comped
             ) | (  # OR
                 (Attendee.badge_status == c.COMPLETED_STATUS)
                 # if they're an attendee, make sure they're check-in-able
