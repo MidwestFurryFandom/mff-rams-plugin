@@ -66,12 +66,12 @@
         <td>{% if group.power >= 1 %}Yes
             {% else %}No{% endif %}
            </td>
-        <td>${{ group.cost }}</td>
-        <td>${{ group.amount_unpaid }}
+        <td>{{ group.cost|format_currency }}</td>
+        <td>{{ group.amount_unpaid|format_currency }}
             {% if group.amount_unpaid and group.dealer_payment_is_late %}
             (PAYMENT OVERDUE: {{ group.dealer_payment_due|datetime_local }})
             {% endif %}</td>
-        <td>${{ group.amount_paid }}</td>
+        <td>{{ (group.amount_paid / 100)|format_currency }}</td>
         <td>{{ group.admin_notes }}</td>
     </tr>
 {% endfor %}

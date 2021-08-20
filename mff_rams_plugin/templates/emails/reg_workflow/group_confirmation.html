@@ -3,7 +3,7 @@
 <body>
 
 <p>Your {{ group.is_dealer|yesno("Dealer registration,group") }} for {{ group.name }} has been preregistered for
-{{ c.EVENT_NAME }} this coming {{ event_dates() }} and your payment of ${{ group.amount_paid }} has been received.</p>
+{{ c.EVENT_NAME }} this coming {{ event_dates() }} and your payment of {{ (group.amount_paid / 100)|format_currency }} has been received.</p>
 
 {% if group.is_dealer %}
 <p>Your group will have a {{ group.tables_repr }} in the Dealers Den. The Dealers Den manager will continue to be in touch with you to keep you informed of Dealers Den rules and procedures.
