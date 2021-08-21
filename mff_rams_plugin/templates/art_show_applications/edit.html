@@ -7,21 +7,23 @@
 <div class="panel panel-default">
   <div class="panel-body">
     <h2>{{ c.EVENT_NAME }} Art Show Application</h2>
-      {% if app.status in [c.APPROVED, c.PAID] %}
-        {% if app.status == c.APPROVED %}Congratulations, your application has been approved!{% endif %}
-        {% if not app.incomplete_reason and app.is_unpaid %}
-          In order to complete your application, please pay {{ app.attendee.amount_unpaid|format_currency }} using the button below.
+      {% if app.status == c.APPROVED %}
+        {% if app.is_unpaid %}Congratulations, your application has been approved!{% endif %}
+        {% if not app.incomplete_reason and app.amount_unpaid %}
+          {% if app.is_unpaid %}In order to complete your application, p{% else %}P{% endif %}lease pay {{ app.attendee.amount_unpaid|format_currency }} using the button below.
           {% if app.attendee.badge_cost %}This total includes the cost of your badge, if you have not paid for it
           already.{% endif %}<br/><br/>
           <div style="text-align:center">
-              {{ stripe_form('process_art_show_payment', charge) }}
+              {{ stripe_form('process_art_show_payment', app.attendee) }}
           </div><br/><br/>
         {% elif app.attendee.placeholder and app.attendee.badge_status != c.NOT_ATTENDING %}
           Before completing your application, please finish filling out your information
           <a href="../preregistration/confirm?id={{ app.attendee_id }}" target="_blank">here</a>. Afterwards, you will
           be able to pay for your application on this page.
+        {% elif not app.attendee %}
+          There is no attendee record assigned to this application. Please contact us via via {{ c.ART_SHOW_EMAIL|email_only|email_to_link }} for help.
         {% else %}
-        <br/><br/>{% include 'art_pieces_form.html' %}
+        <br/><br/>{% include 'art_show_common/art_pieces_form.html' %}
         {% endif %}
       {% elif app.status != c.UNAPPROVED %}
       Unfortunately, since your application has been {{ app.status_label|lower }}, you may no longer edit it. However,
