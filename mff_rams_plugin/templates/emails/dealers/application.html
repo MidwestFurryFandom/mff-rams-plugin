@@ -5,7 +5,8 @@
 ({{ group.name }}) has successfully submitted a Dealer application for {{ c.EVENT_NAME }}
 this coming {{ event_dates() }}. Below is a copy of your application. You may
 <a href="{{ c.URL_BASE }}/preregistration/group_members?id={{ group.id }}">update it here</a> or
-<a href="{{ c.URL_BASE }}/preregistration/confirm?id={{ group.leader.id }}">view your badge here</a>.
+<a href="{{ c.URL_BASE }}/preregistration/confirm?id={{ group.leader.id }}">view your badge here</a>{% if c.ATTENDEE_ACCOUNTS_ENABLED %}
+after logging into your account{% endif %}.
 <ul>
     <li><strong>Dealer Table Name</strong>: {{ group.name }}</li>
     <li><strong>Tables</strong>: {{ group.tables_repr }} ({{ group.table_cost|format_currency }}) </li>
