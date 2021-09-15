@@ -34,12 +34,22 @@
     <p>
       Congratulations! Your registration was successful.
     </p>
-    <p>
-      Your credit card was successfully charged for
-      <strong>${{ total_cost }}</strong>, and you will receive a confirmation
-      email sent to you shortly. If you paid for other registrations, those
-      attendees will get their own confirmation email.
-    </p>
+    {% if total_cost|int > 0 %}
+        <p>
+            Your credit card was successfully charged for
+            <strong>{{ total_cost|format_currency }}</strong>, and you will receive a confirmation
+            email sent to you shortly. If you paid for other registrations, those
+            attendees will get their own confirmation email.
+        </p>
+    {% else %}
+        <p>
+            You will receive a confirmation email sent to you shortly.
+            {% if preregs|length > 1 %}All attendees will get their own confirmation email.{% endif %}
+        </p>
+    {% endif %}
+    {% if c.ATTENDEE_ACCOUNTS_ENABLED %}
+    <p>You can view and manage your account's registrations <a href="../preregistration/homepage">here</a>.</p>
+    {% endif %}
   </div>
 </div>
 
@@ -48,6 +58,10 @@
     <a href="index">
       <button class="btn btn-primary">Add Another Registration</button>
     </a>
+    {% if c.ATTENDEE_ACCOUNTS_ENABLED %}
+    <a href="../preregistration/homepage" class="btn btn-info">Manage Your Registrations</a>
+    <a href="../preregistration/logout" class="btn btn-danger">Log Out</a>
+    {% endif %}
 
 {% include "preregistration/disclaimers.html" %}
 

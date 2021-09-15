@@ -2,7 +2,7 @@
 <head></head>
 <body>
 {{ group.name }} has been approved as a {{ c.EVENT_NAME }} Dealer for this coming {{ event_dates() }}!
-You can pay the ${{ group.cost }} you owe using the credit card button
+You can pay the {{ group.cost|format_currency }} you owe using the credit card button
 <a href="{{ c.URL_BASE }}/preregistration/group_members?id={{ group.id }}">on this page</a>.
 Payment is expected by: {{ group.dealer_payment_due|datetime_local }} or your application may be removed and your tables filled by another applicant.
 
@@ -16,9 +16,9 @@ Payment is expected by: {{ group.dealer_payment_due|datetime_local }} or your ap
 <p>
 This registration includes:
 <ul>
-    <li> {{ group.tables_repr }} (${{ group.table_cost|round(2) }}) </li>
-    <li> {{ group.badges }} badge{{ group.badges|pluralize }} (${{ group.badge_cost|round(2) }}) </li>
-    <li> {% if group.power is greaterthan 0 %}Power at the table for ${{ group.power_cost|round(2) }} {% else %}No power {% endif %}</li>
+    <li> {{ group.tables_repr }} ({{ group.table_cost|format_currency }}) </li>
+    <li> {{ group.badges }} badge{{ group.badges|pluralize }} ({{ group.badge_cost|format_currency }}) </li>
+    <li> {% if group.power is greaterthan 0 %}Power at the table for {{ group.power_cost|format_currency }} {% else %}No power {% endif %}</li>
 </ul>
 </p>
 
