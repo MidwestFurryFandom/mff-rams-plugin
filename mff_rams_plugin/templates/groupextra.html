@@ -13,6 +13,7 @@
     };
     {% endif %}
     $(function () {
+        $("#table_prices").hide(); // never show the table prices, since they duplicate the dropdown and the fn is wrong
         // Position new field(s)
         if ($('#power-fields').length) {
             var powerOpt = function() {
