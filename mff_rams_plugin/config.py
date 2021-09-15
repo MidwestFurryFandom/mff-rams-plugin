@@ -51,7 +51,8 @@ class ExtraConfig:
                 (2, 'Double Table'),
                 (3, 'Triple Table'),
                 (4, 'Quad Table'),
-                (5, '10x10 Booth')]
+                (5, '10x10 Booth'),
+                (6, '12x12 Suite')]
 
     @property
     def ADMIN_TABLE_OPTS(self):
