@@ -1,0 +1,31 @@
+{% extends "./preregistration/preregbase.html" %}
+{% block title %}Registration Held for {{ c.EVENT_NAME }}{% endblock %}
+{% block backlink %}{% endblock %}
+{% block content %}
+
+{% include 'prereg_masthead.html' %}
+<div class="panel panel-default">
+  <div class="panel-body">
+    <h2> Registration Held </h2>
+
+    <p>
+      Your personal information matches our registration system's internal registration hold list. 
+      Reasons may include ineligible to attend, past due balance, or you are actually unaffected 
+      entirely and just a close match. Those ineligible to attend should be aware of that status, 
+      as they are are individually contacted prior to the event. Anyone else is invited to continue 
+      their registration, and we will be in touch to discuss the concern, or verify there is no issue.
+    </p>
+
+    <table style="width:auto" align="center">
+      <tr>
+        {%- set next_page = 'hotel?id=' + id if c.PREREG_REQUEST_HOTEL_INFO_OPEN else 'index' -%}
+        <td><a href="{{ next_page }}">Continue with registration</a></td>
+        <td> &nbsp;&nbsp;&nbsp;&nbsp; </td>
+        <td><a href="delete?id={{ attendee.id }}">Cancel</a></td>
+      </tr>
+    </table>
+
+  </div>
+</div>
+
+{% endblock %}
