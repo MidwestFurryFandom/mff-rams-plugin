@@ -10,8 +10,9 @@
         <thead>
             <tr>
             <th>Attendee</th>
-            <th>Badge Type</th>
+            <th>Email</th>
             <th>Ribbons</th>
+            <th>Badge Type</th>
             <th>Badge Status</th>
             <th>Add Account</th>
             </tr>
@@ -29,13 +30,10 @@
               {{ attendee.ribbon_labels }}
             </td>
             <td>
-                {{ attendee.badge_type_label }}
+              {{ attendee.badge_type_label }}
             </td>
             <td>
-              {{ attendee.ribbon_labels }}
-            </td>
-            <td>
-                {{ attendee.badge_status_label }}
+              {{ attendee.badge_status_label }}
             </td>
             <td>
                 <form class="form form-inline" method="post" action="orphaned_attendees">
