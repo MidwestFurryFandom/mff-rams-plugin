@@ -11,6 +11,7 @@
             <tr>
             <th>Attendee</th>
             <th>Badge Type</th>
+            <th>Ribbons</th>
             <th>Badge Status</th>
             <th>Add Account</th>
             </tr>
@@ -23,6 +24,9 @@
             </td>
             <td>
               {{ attendee.badge_type_label }}
+            </td>
+            <td>
+              {{ attendee.ribbon_labels }}
             </td>
             <td>
                 {{ attendee.badge_status_label }}
