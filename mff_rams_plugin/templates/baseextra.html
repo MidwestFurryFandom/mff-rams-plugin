@@ -8,18 +8,6 @@
     </script>
 {% endif %}
 
-{% if c.PAGE_PATH == '/registration/form' %}
-    <script type="text/javascript">
-        $(function () {
-            $('#reprint_fee').insertAfter($.field('badge_status').parents('.form-group'));
-        });
-    </script>
-
-    <div id="reprint_fee" class="form-group">
-    {% include "badge_printing/reprint_fee.html" %}
-    </div>
-{% endif %}
-
 <script type="text/javascript">
     $(function() {
         {% if '/groups/' not in c.PAGE_PATH and '/group_admin/' not in c.PAGE_PATH %}
