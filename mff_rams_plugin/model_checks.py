@@ -66,6 +66,16 @@ def badge_printed_name(attendee):
     if not attendee.badge_printed_name:
         return 'Please enter a name for your custom-printed badge.'
 
+@validation.Attendee
+def not_in_range(attendee):
+    # Staff always keep their badge number regardless of their badge type.
+    if c.STAFF_RIBBON not in attendee.ribbon_ints:
+        lower_bound, upper_bound = c.BADGE_RANGES[attendee.badge_type_real]
+        if attendee.badge_num and not (lower_bound <= attendee.badge_num <= upper_bound):
+            return 'Badge number {} is out of range for badge type {} ({} - {})'.format(attendee.badge_num, 
+                                                                                        c.BADGES[attendee.badge_type_real], 
+                                                                                        lower_bound, 
+                                                                                        upper_bound)
 
 @prereg_validation.Group
 def dealer_wares(group):
