@@ -79,7 +79,7 @@
 <div class="form-group">
     <label for="power_usage" class="col-sm-3 control-label">Power Usage</label>
     <div class="col-sm-6">
-        <textarea class="form-control" name="power_usage" id="power_usage" placeholder="Please provide a listing of what devices you will be using." rows="4">{{ group.power_usage }}</textarea>
+        <textarea{% if page_ro %} readonly{% endif %} class="form-control" name="power_usage" id="power_usage" placeholder="Please provide a listing of what devices you will be using." rows="4">{{ group.power_usage }}</textarea>
     </div>
 </div>
 {% if not c.PAGE_PATH == '/group_admin/form' and (group and group.power or attendee and attendee.badge_type == c.PSEUDO_DEALER_BADGE) %}
@@ -94,6 +94,9 @@
     </div>
 </div>
 </div>
+{% if group.status == c.APPROVED %}
+    <button type="submit" class="btn btn-primary" value="Update Application">Update Application</button>
+{% endif %}
 {% endif %}
 
 {% if c.PAGE_PATH == '/group_admin/form' and group.is_dealer or new_dealer %}
