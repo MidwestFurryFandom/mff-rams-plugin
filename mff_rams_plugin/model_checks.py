@@ -14,7 +14,7 @@ def need_fursuit_option(attendee):
 @validation.Attendee
 def need_comped_reason(attendee):
     if attendee.paid == c.NEED_NOT_PAY and not attendee.comped_reason and (
-                c.STAFF_RIBBON not in attendee.ribbon_ints or attendee.badge_type == c.STAFF_BADGE):
+                c.STAFF_RIBBON not in attendee.ribbon_ints and attendee.badge_type != c.STAFF_BADGE):
         return 'You must enter a reason for comping this attendee\'s badge.'
 
 
