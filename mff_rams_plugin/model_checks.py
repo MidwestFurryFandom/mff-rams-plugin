@@ -67,6 +67,18 @@ def badge_printed_name(attendee):
         return 'Please enter a name for your custom-printed badge.'
 
 
+@validation.Attendee
+def not_in_range(attendee):
+    # Staff always keep their badge number regardless of their badge type.
+    if c.STAFF_RIBBON not in attendee.ribbon_ints:
+        lower_bound, upper_bound = c.BADGE_RANGES[attendee.badge_type_real]
+        if attendee.badge_num and not (lower_bound <= attendee.badge_num <= upper_bound):
+            return 'Badge number {} is out of range for badge type {} ({} - {})'.format(attendee.badge_num, 
+                                                                                        c.BADGES[attendee.badge_type_real], 
+                                                                                        lower_bound, 
+                                                                                        upper_bound)
+
+
 @prereg_validation.Group
 def dealer_wares(group):
     pass
@@ -85,10 +97,28 @@ def power_usage(group):
         return 'Please provide a list of what powered devices you ' \
                'expect to use.'
 
+
 @prereg_validation.Group
 def ibt_num(group):
     if group.is_dealer and group.tax_number and not re.match("^[0-9-]*$", group.tax_number):
         return 'Please use only numbers and hyphens for your IBT number.'
+
+
+@prereg_validation.Group
+def dealer_categories(group):
+    if group.is_dealer and not group.categories:
+        if group.status == c.APPROVED:
+            # Categories are read-only for approved dealers, which erroneously unsets them
+            # I am 1000% going to regret this
+            group.categories = group.orig_value_of('categories')
+        else:
+            return "Please select at least one category your wares fall under."
+
+
+@prereg_validation.Group
+def edit_only_correct_statuses(group):
+    if group.status not in [c.APPROVED, c.WAITLISTED, c.UNAPPROVED]:
+        return "You cannot change your {} after it has been {}.".format(c.DEALER_APP_TERM, group.status_label)
 
 
 @prereg_validation.Group
@@ -113,8 +143,6 @@ def no_edit_post_approval(group):
             no_change.append('region')
         if group.orig_value_of('zip_code') != group.zip_code:
             no_change.append('postal code')
-        if group.orig_value_of('tax_number') != group.tax_number:
-            no_change.append('IBT number')
 
         if no_change:
             return "You cannot change the following information after your application has been approved: {}.".format(', '.join(no_change))

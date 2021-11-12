@@ -1,21 +1,5 @@
 {%- import 'macros.html' as macros -%}
 {% if c.PAGE_PATH == '/registration/form' %}
-    {% if attendee.times_printed < 1 or attendee.print_pending %}
-        <script type="text/javascript">
-            $(function () {
-                $('#print_pending').insertAfter($.field('badge_status').parents('.form-group'));
-            });
-        </script>
-
-        <div id="print_pending" class="form-group">
-            <label for="print_pending" class="col-sm-3 control-label">Ready to Print</label>
-            <div class="col-sm-6 form-control-static">
-                {{ attendee.print_pending|yesno }}
-            </div>
-        </div>
-    {% endif %}
-
-
     <script type="text/javascript">
         $(function () {
             var showOrHideCompedReason = function() {
