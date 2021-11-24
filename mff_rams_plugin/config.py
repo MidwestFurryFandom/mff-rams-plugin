@@ -13,28 +13,6 @@ c.MENU.append_menu_item(
     MenuItem(name='Midwest FurFest', submenu=[
         MenuItem(name='Comped Badges', href='../mff_reports/comped_badges'),
         MenuItem(name='Daily Attendance', href='../mff_reports/attendance_graph'),
-        MenuItem(name='Print Adult Badges (Single Queue)',
-                 href='../badge_printing/print_next_badge'),
-        MenuItem(name='Print Adult Badges (1 of 2)',
-                 href='../badge_printing/print_next_badge?printerNumber=1&numberOfPrinters=2'),
-        MenuItem(name='Print Adult Badges (2 of 2)',
-                 href='../badge_printing/print_next_badge?printerNumber=2&numberOfPrinters=2'),
-        MenuItem(name='Print Adult Badges (1 of 3)',
-                 href='../badge_printing/print_next_badge?printerNumber=1&numberOfPrinters=3'),
-        MenuItem(name='Print Adult Badges (2 of 3)',
-                 href='../badge_printing/print_next_badge?printerNumber=2&numberOfPrinters=3'),
-        MenuItem(name='Print Adult Badges (3 of 3)',
-                 href='../badge_printing/print_next_badge?printerNumber=3&numberOfPrinters=3'),
-        MenuItem(name='Print Adult Badges (1 of 4)',
-                 href='../badge_printing/print_next_badge?printerNumber=1&numberOfPrinters=4'),
-        MenuItem(name='Print Adult Badges (2 of 4)',
-                 href='../badge_printing/print_next_badge?printerNumber=2&numberOfPrinters=4'),
-        MenuItem(name='Print Adult Badges (3 of 4)',
-                 href='../badge_printing/print_next_badge?printerNumber=3&numberOfPrinters=4'),
-		MenuItem(name='Print Adult Badges (4 of 4)',
-                 href='../badge_printing/print_next_badge?printerNumber=4&numberOfPrinters=4'),
-		MenuItem(name='Print Minor Badges',
-                 href='../badge_printing/print_next_badge?minor=True'),
     ])
 )
 
