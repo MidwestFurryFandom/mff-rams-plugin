@@ -186,7 +186,7 @@ class Root:
             'Description',
             'Special Needs',
             'Admin Notes',
-            'Power Reqeusted',
+            'Power Requested',
             'Power Request Info',
             'Location'
         ])
