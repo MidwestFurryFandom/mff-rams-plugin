@@ -117,6 +117,11 @@
                     <div class="col-sm-6 col-sm-offset-3 alert alert-warning">Please refer to our <a href="https://www.furfest.org/covid-19" target="_blank">Covid-19 Policy</a> 
                         for information regarding current attendee requirements for FurFest 2021. Non-compliance of the Covid-19 
                         policy will result in badge rescindment.</div>
+                    {% if kiosk_mode %}
+                    <div class="text-center">
+                        <a class="btn btn-success btn-xl" href="../preregistration/form" role="button">Register for {{ c.EVENT_NAME_AND_YEAR }}</a>
+                    </div>
+                    {% else %}
                     {% if c.ATTENDEE_ACCOUNTS_ENABLED %}
                     {% if logged_in_account %}
                     <div class="text-center">
@@ -143,6 +148,20 @@
                         </div>
                         <br><br>
                     </div>
+                    {% endif %}
+                    {% if kiosk_mode %}
+                    <p class="text-right">
+                        <a class="btn btn-link btn-lg" href="../landing/index?exit_kiosk=True" role="button">
+                            Exit Kiosk Mode
+                        </a>
+                    </p>
+                    {% elif c.AT_THE_CON and c.ATTENDEE_ACCOUNTS_ENABLED %}
+                    <p class="text-right">
+                        <a class="btn btn-link btn-lg" href="../registration/register?kiosk_mode=True" role="button">
+                            Enter Kiosk Mode
+                        </a>
+                    </p>
+                    {% endif %}
                     <p class="text-right">
                         <a class="btn btn-link btn-lg" href="../accounts/homepage" role="button">
                             Admin Login
