@@ -75,10 +75,11 @@ class ExtraConfig:
                 day = max(localized_now(), self.EPOCH)
                 while day.date() <= self.ESCHATON.date():
                     day_name = day.strftime('%A')
-                    price = self.BADGE_PRICES['single_day'].get(day_name) or self.DEFAULT_SINGLE_DAY
-                    badge = getattr(self, day_name.upper())
-                    if getattr(self, day_name.upper() + '_AVAILABLE', None):
-                        opts.append((badge, day_name + ' Badge (${})'.format(price)))
+                    if day_name in ["Friday", "Saturday", "Sunday"]:
+                        price = self.BADGE_PRICES['single_day'].get(day_name) or self.DEFAULT_SINGLE_DAY
+                        badge = getattr(self, day_name.upper())
+                        if getattr(self, day_name.upper() + '_AVAILABLE', None):
+                            opts.append((badge, day_name + ' Badge (${})'.format(price)))
                     day += timedelta(days=1)
             elif self.ONE_DAY_BADGE_AVAILABLE:
                 opts.append((self.ONE_DAY_BADGE, 'Single Day Badge (${})'.format(self.ONEDAY_BADGE_PRICE)))
