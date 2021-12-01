@@ -13,28 +13,6 @@ c.MENU.append_menu_item(
     MenuItem(name='Midwest FurFest', submenu=[
         MenuItem(name='Comped Badges', href='../mff_reports/comped_badges'),
         MenuItem(name='Daily Attendance', href='../mff_reports/attendance_graph'),
-        MenuItem(name='Print Adult Badges (Single Queue)',
-                 href='../badge_printing/print_next_badge'),
-        MenuItem(name='Print Adult Badges (1 of 2)',
-                 href='../badge_printing/print_next_badge?printerNumber=1&numberOfPrinters=2'),
-        MenuItem(name='Print Adult Badges (2 of 2)',
-                 href='../badge_printing/print_next_badge?printerNumber=2&numberOfPrinters=2'),
-        MenuItem(name='Print Adult Badges (1 of 3)',
-                 href='../badge_printing/print_next_badge?printerNumber=1&numberOfPrinters=3'),
-        MenuItem(name='Print Adult Badges (2 of 3)',
-                 href='../badge_printing/print_next_badge?printerNumber=2&numberOfPrinters=3'),
-        MenuItem(name='Print Adult Badges (3 of 3)',
-                 href='../badge_printing/print_next_badge?printerNumber=3&numberOfPrinters=3'),
-        MenuItem(name='Print Adult Badges (1 of 4)',
-                 href='../badge_printing/print_next_badge?printerNumber=1&numberOfPrinters=4'),
-        MenuItem(name='Print Adult Badges (2 of 4)',
-                 href='../badge_printing/print_next_badge?printerNumber=2&numberOfPrinters=4'),
-        MenuItem(name='Print Adult Badges (3 of 4)',
-                 href='../badge_printing/print_next_badge?printerNumber=3&numberOfPrinters=4'),
-		MenuItem(name='Print Adult Badges (4 of 4)',
-                 href='../badge_printing/print_next_badge?printerNumber=4&numberOfPrinters=4'),
-		MenuItem(name='Print Minor Badges',
-                 href='../badge_printing/print_next_badge?minor=True'),
     ])
 )
 
@@ -97,10 +75,11 @@ class ExtraConfig:
                 day = max(localized_now(), self.EPOCH)
                 while day.date() <= self.ESCHATON.date():
                     day_name = day.strftime('%A')
-                    price = self.BADGE_PRICES['single_day'].get(day_name) or self.DEFAULT_SINGLE_DAY
-                    badge = getattr(self, day_name.upper())
-                    if getattr(self, day_name.upper() + '_AVAILABLE', None):
-                        opts.append((badge, day_name + ' Badge (${})'.format(price)))
+                    if day_name in ["Friday", "Saturday", "Sunday"]:
+                        price = self.BADGE_PRICES['single_day'].get(day_name) or self.DEFAULT_SINGLE_DAY
+                        badge = getattr(self, day_name.upper())
+                        if getattr(self, day_name.upper() + '_AVAILABLE', None):
+                            opts.append((badge, day_name + ' Badge (${})'.format(price)))
                     day += timedelta(days=1)
             elif self.ONE_DAY_BADGE_AVAILABLE:
                 opts.append((self.ONE_DAY_BADGE, 'Single Day Badge (${})'.format(self.ONEDAY_BADGE_PRICE)))

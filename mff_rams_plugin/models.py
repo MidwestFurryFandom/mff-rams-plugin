@@ -100,23 +100,6 @@ class Attendee:
             self.comped_reason = "Automated: Not Attending badge status."
 
     @presave_adjustment
-    def print_ready_before_event(self):
-        if c.PRE_CON:
-            if self.badge_status == c.COMPLETED_STATUS \
-                    and not self.is_not_ready_to_checkin \
-                    and self.times_printed < 1 \
-                    and self.ribbon != c.STAFF_RIBBON:
-                self.print_pending = True
-
-    @presave_adjustment
-    def reprint_prereg_name_change(self):
-        if self.times_printed >= 1 and not self.orig_value_of('checked_in') and \
-                        self.orig_value_of('badge_printed_name') != self.badge_printed_name:
-            self.print_pending = True
-            self.for_review += "Automated message: Badge marked for free reprint " \
-                               "because we think this is a preregistered attendee who wanted a different badge name."
-
-    @presave_adjustment
     def staffing_badge_and_ribbon_adjustments(self):
         if self.badge_type == c.STAFF_BADGE or c.STAFF_RIBBON in self.ribbon_ints:
             self.ribbon = remove_opt(self.ribbon_ints, c.VOLUNTEER_RIBBON)
