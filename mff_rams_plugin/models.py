@@ -159,3 +159,60 @@ class Attendee:
     def staffing_or_will_be(self):
         return self.staffing or self.badge_type == c.STAFF_BADGE \
                or c.VOLUNTEER_RIBBON in self.ribbon_ints or c.STAFF_RIBBON in self.ribbon_ints
+
+    @property
+    def merch_items(self):
+        """
+        Here is the business logic surrounding shirts:
+        - People who kick in enough to get a shirt get an event shirt.
+        - People with staff badges get a configurable number of staff shirts.
+        - Volunteers who meet the requirements get a complementary event shirt
+            (NOT a staff shirt).
+
+        If the c.SEPARATE_STAFF_SWAG setting is true, then this excludes staff
+        merch; see the staff_merch property.
+
+        This property returns a list containing strings and sub-lists of each
+        donation tier with multiple sub-items, e.g.
+            [
+                'tshirt',
+                'Supporter Pack',
+                [
+                    'Swag Bag',
+                    'Badge Holder'
+                ],
+                'Season Pass Certificate'
+            ]
+        """
+        merch = []
+        for amount, desc in sorted(c.DONATION_TIERS.items()):
+            if amount and self.amount_extra >= amount:
+                merch.append(desc)
+                items = c.DONATION_TIER_ITEMS.get(amount, [])
+                if len(items) == 1:
+                    merch[-1] = items[0]
+                elif len(items) > 1:
+                    merch.append(items)
+
+        if self.num_event_shirts_owed == 1 and not self.paid_for_a_shirt:
+            merch.append('A T-shirt')
+        elif self.num_event_shirts_owed > 1:
+            merch.append('A 2nd T-Shirt')
+
+        if merch and self.volunteer_event_shirt_eligible and not self.volunteer_event_shirt_earned:
+            merch[-1] += (
+                ' (this volunteer must work at least {} hours or they will be reported for picking up their shirt)'
+                .format(c.HOURS_FOR_SHIRT))
+        
+        if self.badge_type == c.SPONSOR_BADGE:
+            merch.append('Sponsor merch')
+        if self.badge_type == c.SHINY_BADGE:
+            merch.append('Shiny Sponsor merch')
+
+        if not c.SEPARATE_STAFF_MERCH:
+            merch.extend(self.staff_merch_items)
+
+        if self.extra_merch:
+            merch.append(self.extra_merch)
+
+        return merch
