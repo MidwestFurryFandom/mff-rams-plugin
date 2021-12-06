@@ -118,7 +118,7 @@
                     {% if c.POST_CON %}
                       <div class="col-sm-6 col-sm-offset-3 alert alert-warning"> 
                         We hope you enjoyed {{ c.EVENT_NAME_AND_YEAR }}! 
-                        We look forward to seeing you {% if c.EVENT_YEAR %}} in {{ c.EVENT_YEAR|add:"1" }}! {% else %} next year! {% endif %}
+                        We look forward to seeing you {% if c.EVENT_YEAR %} in {{ c.EVENT_YEAR|int +1 }}! {% else %} next year! {% endif %}
                         Watch our website (<a href="https://www.furfest.org">https://www.furfest.org</a>) and our Twitter (<a href="https://twitter.com/Furfest">@Furfest</a>) for announcements.
                       </div>
                     {% else %}
