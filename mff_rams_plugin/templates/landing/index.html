@@ -143,8 +143,11 @@
                     </div>
                         {% include 'preregistration/login.html' %}
                     {% endif %}
+                      {% if not c.POST_CON %}
                         <br><h2 class="text-center">or</h2><br/>
+                      {% endif %}
                     {% endif %}
+                    {% if not c.POST_CON %}
                     <div class="text-center">
                         <div class="btn-group">
                         <a class="btn btn-primary btn-lg" href="../preregistration/form" role="button">
@@ -158,6 +161,7 @@
                         </div>
                         <br><br>
                     </div>
+                    {% endif %}
                     {% endif %}
                     {% if kiosk_mode %}
                     <p class="text-right">
