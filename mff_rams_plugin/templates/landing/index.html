@@ -114,9 +114,19 @@
             <div class="row-fluid">
                 <div class="col-xs-12">
                     <h1 class="text-center">{{ c.EVENT_NAME_AND_YEAR }} Registration<br><br></h1>
-                    <div class="col-sm-6 col-sm-offset-3 alert alert-warning">Please refer to our <a href="https://www.furfest.org/covid-19" target="_blank">Covid-19 Policy</a> 
+
+                    {% if c.POST_CON %}
+                      <div class="col-sm-6 col-sm-offset-3 alert alert-warning"> 
+                        We hope you enjoyed {{ c.EVENT_NAME_AND_YEAR }}! 
+                        We look forward to seeing you {% if c.EVENT_YEAR %}} in {{ c.EVENT_YEAR|add:"1" }}! {% else %} next year! {% endif %}
+                        Watch our website (<a href="https://www.furfest.org">https://www.furfest.org</a>) and our Twitter (<a href="https://twitter.com/Furfest">@Furfest</a>) for announcements.
+                      </div>
+                    {% else %}
+                      <div class="col-sm-6 col-sm-offset-3 alert alert-warning">Please refer to our <a href="https://www.furfest.org/covid-19" target="_blank">Covid-19 Policy</a> 
                         for information regarding current attendee requirements for FurFest 2021. Non-compliance of the Covid-19 
                         policy will result in badge rescindment.</div>
+                    {% endif %}
+
                     {% if kiosk_mode %}
                     <div class="text-center">
                         <a class="btn btn-success btn-xl" href="../preregistration/form" role="button">Register for {{ c.EVENT_NAME_AND_YEAR }}</a>
