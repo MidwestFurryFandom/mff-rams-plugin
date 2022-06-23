@@ -185,6 +185,7 @@ class Root:
             'Wares - Other',
             'Description',
             'Special Needs',
+            'Review Notes',
             'Admin Notes',
             'Power Requested',
             'Power Request Info',
@@ -207,6 +208,7 @@ class Root:
                     group.categories_text,
                     group.description,
                     group.special_needs,
+                    group.review_notes,
                     group.admin_notes,
                     group.power,
                     group.power_usage,
@@ -274,8 +276,9 @@ class Root:
             'Wares - Other',
             'Description',
             'Special Needs',
+            'Review Notes',
             'Admin Notes',
-            'Power Reqeusted',
+            'Power Requested',
             'Power Request Info'
         ])
         dealer_groups = session.query(Group).filter(Group.tables > 0).all()
@@ -292,6 +295,7 @@ class Root:
                     group.categories_text,
                     group.description,
                     group.special_needs,
+                    group.review_notes,
                     group.admin_notes,
                     group.power,
                     group.power_usage

@@ -10,7 +10,7 @@
 
 <script type="text/javascript">
     $(function() {
-        {% if '/groups/' not in c.PAGE_PATH and '/group_admin/' not in c.PAGE_PATH %}
+        {% if '/groups/' not in c.PAGE_PATH and '/group_admin/' not in c.PAGE_PATH and '/reg_admin/' not in c.PAGE_PATH %}
         if ($("form[action*='delete']")) {
                 $("form[action*='delete']").hide();
             }
