@@ -49,7 +49,7 @@ class ExtraConfig:
 
     @property
     def DEALER_POWER_OPTS(self):
-        return [(int(v), k) for k, v in config['dealer_power'].items()]
+        return [(int(v), k) for k, v in config['integer_enums']['dealer_power'].items()]
 
     @request_cached_property
     @dynamic
