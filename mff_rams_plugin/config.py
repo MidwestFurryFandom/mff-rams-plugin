@@ -1,6 +1,7 @@
 from sideboard.lib import parse_config, request_cached_property
 from collections import defaultdict
 from datetime import timedelta
+from pockets.autolog import log
 
 from uber.config import c, Config, dynamic
 from uber.menu import MenuItem
@@ -16,6 +17,70 @@ c.MENU.append_menu_item(
     ])
 )
 
+def set_credentials():
+    import boto3
+    import base64
+    import json
+    from botocore.exceptions import ClientError
+
+    region_name = c.AWS_REGION
+
+    # Create a Secrets Manager client
+    aws_session = boto3.session.Session(
+        aws_access_key_id=c.AWS_ACCESS_KEY,
+        aws_secret_access_key=c.AWS_SECRET_KEY
+    )
+
+    client = aws_session.client(
+        service_name=c.AWS_SECRET_SERVICE_NAME,
+        region_name=region_name
+    )
+
+    def get_secret(client, secret_name):
+        try:
+            get_secret_value_response = client.get_secret_value(
+                SecretId=secret_name
+            )
+        except ClientError as e:
+            if e.response['Error']['Code'] == 'DecryptionFailureException':
+                # Secrets Manager can't decrypt the protected secret text using the provided KMS key.
+                log.error("Retrieving secret error: Wrong KMS key ({}).".format(str(e)))
+                return
+            elif e.response['Error']['Code'] == 'InternalServiceErrorException':
+                # An error occurred on the server side.
+                log.error("Retrieving secret error: Server error ({}).".format(str(e)))
+                return
+            elif e.response['Error']['Code'] == 'InvalidParameterException':
+                # You provided an invalid value for a parameter.
+                log.error("Retrieving secret error: Invalid parameter ({}).".format(str(e)))
+                return
+            elif e.response['Error']['Code'] == 'InvalidRequestException':
+                # You provided a parameter value that is not valid for the current state of the resource.
+                log.error("Retrieving secret error: Invalid parameter ({}).".format(str(e)))
+                return
+            elif e.response['Error']['Code'] == 'ResourceNotFoundException':
+                # We can't find the resource that you asked for.
+                log.error("Retrieving secret error: Resource not found ({}).".format(str(e)))
+                return
+        
+        # Decrypts secret using the associated KMS key.
+        if 'SecretString' in get_secret_value_response:
+            secret = json.loads(get_secret_value_response['SecretString'])
+        else:
+            return
+
+        return secret
+
+    signnow_secret = get_secret(client, c.AWS_SIGNNOW_SECRET_NAME)
+    if signnow_secret:
+        c.SIGNNOW_USERNAME = signnow_secret.get('username', '') or c.SIGNNOW_USERNAME
+        c.SIGNNOW_PASSWORD = signnow_secret.get('password', '') or c.SIGNNOW_PASSWORD
+        c.SIGNNOW_CLIENT_ID = signnow_secret.get('client_id', '') or c.SIGNNOW_CLIENT_ID
+        c.SIGNNOW_CLIENT_SECRET = signnow_secret.get('client_secret', '') or c.SIGNNOW_CLIENT_SECRET
+    else:
+        log.error("Error getting SignNow secret: {}".format(signnow_secret))
+
+set_credentials()
 
 @Config.mixin
 class ExtraConfig:
@@ -85,3 +150,4 @@ class ExtraConfig:
                 opts.append((self.ONE_DAY_BADGE, 'Single Day Badge (${})'.format(self.ONEDAY_BADGE_PRICE)))
         return opts
 		
+set_credentials()
