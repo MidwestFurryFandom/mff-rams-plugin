@@ -58,10 +58,12 @@
 <div id="power-fields">
 <div class="form-group">
     <label for="power_level" class="col-sm-3 control-label">Power Level</label>
-    {% call macros.read_only_if(page_ro, c.DEALER_POWER_OPTS[group.power][1], check_dealer_editable=(group, 'power')) %}
+    {% call macros.read_only_if(page_ro, c.DEALER_POWER_OPTS[group.power or 0][1], check_dealer_editable=(group, 'power')) %}
     <div class="col-sm-6">
         <select name="power" id="power" class="form-control">
-            {{ options(c.DEALER_POWER_OPTS, group.power) }}
+            <option value=""{% if new_dealer or attendee and attendee.badge_type == c.PSEUDO_DEALER_BADGE %} selected="selected"{% endif %}>Select a Power Level</option>
+            <option value="0">No power</option>
+            {{ options(c.DEALER_POWER_OPTS[1:], None if new_dealer or attendee and attendee.badge_type == c.PSEUDO_DEALER_BADGE else group.power) }}
         </select>
     </div>
     {% endcall %}
