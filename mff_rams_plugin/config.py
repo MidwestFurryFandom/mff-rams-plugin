@@ -49,7 +49,12 @@ class ExtraConfig:
 
     @property
     def DEALER_POWER_OPTS(self):
-        return [(int(v), k) for k, v in config['integer_enums']['dealer_power'].items()]
+        power_opts = []
+        for count, desc in sorted(c.DEALER_POWERS.items()):
+            price_info = ": ${}".format(c.POWER_PRICES[count])\
+                if c.POWER_PRICES.get(count) else ""
+            power_opts.append((count, 'Tier {}{} {}'.format(count, price_info, desc)))
+        return power_opts
 
     @request_cached_property
     @dynamic
