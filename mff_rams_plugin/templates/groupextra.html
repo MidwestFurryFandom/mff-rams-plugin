@@ -35,7 +35,9 @@
             powerOpt();
         }
 
-        $.field('review_notes').parents('.form-group').insertBefore($.field('website').parents('.form-group'))
+        if ($.field('review_notes')) {
+            $.field('review_notes').parents('.form-group').insertBefore($.field('website').parents('.form-group'))
+        }
 
         if ($("#moretables").length) {
             // Hide reference to requesting more than four tables and list of prices.
@@ -55,15 +57,16 @@
     });
 </script>
 {% if group and group.is_dealer or new_dealer or attendee and attendee.badge_type == c.PSEUDO_DEALER_BADGE %}
+{% set new_new_dealer = (new_dealer or attendee and attendee.badge_type == c.PSEUDO_DEALER_BADGE) and not message and not edit_id %}
 <div id="power-fields">
 <div class="form-group">
     <label for="power_level" class="col-sm-3 control-label">Power Level</label>
     {% call macros.read_only_if(page_ro, c.DEALER_POWER_OPTS[group.power or 0][1], check_dealer_editable=(group, 'power')) %}
     <div class="col-sm-6">
         <select name="power" id="power" class="form-control">
-            <option value=""{% if new_dealer or attendee and attendee.badge_type == c.PSEUDO_DEALER_BADGE %} selected="selected"{% endif %}>Select a Power Level</option>
+            <option value="">Select a Power Level</option>
             <option value="0">No power</option>
-            {{ options(c.DEALER_POWER_OPTS[1:], None if new_dealer or attendee and attendee.badge_type == c.PSEUDO_DEALER_BADGE else group.power) }}
+            {{ options(c.DEALER_POWER_OPTS[1:], None if new_new_dealer else group.power) }}
         </select>
     </div>
     {% endcall %}
