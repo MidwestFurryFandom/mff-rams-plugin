@@ -74,7 +74,7 @@
         $("label[for='promo_code']").text("Registration Code");
         $.field('promo_code').attr("placeholder", "A discount code or an agent code");
         {% if not admin_area %}
-        $('<p class="help-text"><em>If you have a discount code, enter it now. Agent codes may be added via the link you receive in your confirmation email.</em></p>').insertAfter($.field('promo_code'));
+        $('<p class="help-text"><em>If you have a discount code, enter it now. Agent codes may be added to your badge after logging in.</em></p>').insertAfter($.field('promo_code'));
         {% endif %}
     }
 
