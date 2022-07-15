@@ -79,6 +79,14 @@ def set_credentials():
         c.SIGNNOW_CLIENT_SECRET = signnow_secret.get('client_secret', '') or c.SIGNNOW_CLIENT_SECRET
     else:
         log.error("Error getting SignNow secret: {}".format(signnow_secret))
+	
+    auth0_secret = get_secret(client, c.AWS_AUTH0_SECRET_NAME)
+    if auth0_secret:
+	c.AUTH_DOMAIN = auth0_secret('auth0_domain', '') or c.AUTH_DOMAIN
+	c.AUTH_CLIENT_ID = auth0_secret('auth0_client_id', '') or c.AUTH_CLIENT_ID
+	c.AUTH_CLIENT_SECRET = auth0_secret('auth0_client_secret', '') or c.AUTH_CLIENT_SECRET
+    else:
+	log.error("Error getting Auth0 secret: {}".format(signnow_secret))
 
 set_credentials()
 
