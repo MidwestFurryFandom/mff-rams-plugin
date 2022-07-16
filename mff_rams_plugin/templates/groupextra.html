@@ -61,12 +61,12 @@
 <div id="power-fields">
 <div class="form-group">
     <label for="power_level" class="col-sm-3 control-label">Power Level</label>
-    {% call macros.read_only_if(page_ro, c.DEALER_POWER_OPTS[group.power or 0][1], check_dealer_editable=(group, 'power')) %}
+    {% call macros.read_only_if(page_ro, c.PREREG_DEALER_POWER_OPTS[group.power or 0][1], check_dealer_editable=(group, 'power')) %}
     <div class="col-sm-6">
         <select name="power" id="power" class="form-control">
             <option value="">Select a Power Level</option>
             <option value="0">No power</option>
-            {{ options(c.DEALER_POWER_OPTS[1:], None if new_new_dealer else group.power) }}
+            {{ options(c.PREREG_DEALER_POWER_OPTS[1:], None if new_new_dealer else group.power) }}
         </select>
     </div>
     {% endcall %}
@@ -85,7 +85,7 @@
     <div class="col-sm-6">
         <input type="text" name="tax_number"  class="form-control" placeholder="1234-5678" value="{{ group.tax_number }}" pattern="[0-9]{4}-[0-9]{4}" title="1234-5678" />
     </div>
-    {% if not c.PAGE_PATH == '/group_admin/form' and (group or attendee and attendee.badge_type == c.PSEUDO_DEALER_BADGE) %}
+    {% if not admin_area and (group or attendee and attendee.badge_type == c.PSEUDO_DEALER_BADGE) %}
     <div class="clearfix"></div>
     <p class="help-block col-sm-9 col-sm-offset-3">
         If you have an Illinois Business license please provide the number here. Note that this number is in the format 1234-5678; it is not your Federal Tax ID or any other Tax ID number you may have.
@@ -100,7 +100,7 @@
     <div class="col-sm-6">
         <textarea name="review_notes" class="form-control" rows="4">{{ group.review_notes }}</textarea>
     </div>
-    {% if not c.PAGE_PATH == '/group_admin/form' and (group or attendee and attendee.badge_type == c.PSEUDO_DEALER_BADGE) %}
+    {% if not admin_area and (group or attendee and attendee.badge_type == c.PSEUDO_DEALER_BADGE) %}
     <div class="clearfix"></div>
     <p class="help-block col-sm-9 col-sm-offset-3">
         Please provide any additional information which you feel could assist in our selection process. This could include additional links other than your website or more detailed merchandise descriptions. If your website includes merchandise which may be in violation of our Intellectual Property rules, please confirm that you will not be bringing this merchandise for sale at MFF.
@@ -110,11 +110,25 @@
 </div>
 {% endif %}
 
-{% if c.PAGE_PATH == '/group_admin/form' and group.is_dealer or new_dealer %}
+{% if c.PAGE_PATH == '/preregistration/group_members' and group.status == c.APPROVED and group.power_fee %}
+<li id="power_cost">
+    {{ group.power_fee|format_currency }} for tier {{ group.power }} power ({{ c.DEALER_POWER_OPTS[group.power] if group.default_power_cost else "custom" }})
+</li>
+
+<script type="text/javascript">
+    $(function () {
+        $('#power_cost').insertAfter($('div.alert.alert-success ul li').first());
+    });
+</script>
+{% endif %}
+
+{% if admin_area and group.is_dealer or new_dealer %}
 <script type="text/javascript">
     $(function () {
         // Position new field(s)
-        $.field('location').parents('.form-group').insertBefore($.field('wares').parents('.form-group'))
+        $.field('location').parents('.form-group').insertBefore($.field('wares').parents('.form-group'));
+        $.field('power_fee').parents('.form-group').insertAfter($.field('cost').parents('.form-group'));
+        $('#power-fields').insertAfter($.field('power_fee').parents('.form-group'));
     });
 </script>
 
@@ -122,6 +136,17 @@
     <label for="location" class="col-sm-3 control-label">Table Assignment</label>
     <div class="col-sm-6">
         <input type="text" name="location" value="{{ group.location }}" class="form-control" placeholder="Dealer's table location" />
+    </div>
+</div>
+
+<div class="form-group">
+    <label for="power_fee" class="col-sm-3 control-label">Power Fee</label>
+    <div class="col-sm-6">
+        <div class="input-group">
+        <span class="input-group-addon">$</span>
+        <input type="number" name="power_fee" value="{{ group.power_fee }}" placeholder="{{ group.default_power_cost|default('Please set a power fee.', true) }}" class="form-control" />
+        <span class="input-group-addon">.00</span>
+        </div>
     </div>
 </div>
 {% endif %}
