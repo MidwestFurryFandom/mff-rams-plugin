@@ -18,7 +18,12 @@ This registration includes:
 <ul>
     <li> {{ group.tables_repr }} ({{ group.table_cost|format_currency }}) </li>
     <li> {{ group.badges }} badge{{ group.badges|pluralize }} ({{ group.badge_cost|format_currency }}) </li>
-    <li> {% if group.power is greaterthan 0 %}Power at the table for {{ group.power_cost|format_currency }} {% else %}No power {% endif %}</li>
+    <li> 
+        {% if group.power > 0 %}
+        Tier {{ group.power }} power ({{ c.DEALER_POWER_OPTS[group.power] if group.default_power_cost else "custom" }})
+        for {{ group.power_fee|format_currency }} 
+        {% else %}No power {% endif %}
+    </li>
 </ul>
 </p>
 

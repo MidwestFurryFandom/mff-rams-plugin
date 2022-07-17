@@ -12,13 +12,14 @@ after logging into your account{% endif %}.
     <li><strong>Tables</strong>: {{ group.tables_repr }} ({{ group.table_cost|format_currency }}) </li>
     <li><strong>Badges</strong>: {{ group.badges }} badge{{ group.badges|pluralize }} ({{ group.badge_cost|format_currency }}) </li>
     {% if group.power %}
-    <li><strong>Power Cost</strong>: {{ group.power_cost|format_currency }}
+    <li><strong>Power</strong>: {{ c.PREREG_DEALER_POWER_OPTS[group.power] }}
     {% endif %}
-    <li><strong>Total Price</strong> {{ group.cost|format_currency }}</li>
+    <li><strong>Total Price</strong>: {{ group.cost|format_currency }}{% if not group.default_power_cost %} plus custom power fee{% endif %}</li>
     <li><strong>Description</strong>: {{ group.description }}</li>
     {% if group.special_needs %}<li><strong>Table Requests and Special Requests</strong>: {{ group.special_needs }}</li>{% endif %}
     <li><strong>Website URL</strong>: {{ group.website }}</li>
     {% if group.address %}<li><strong>Address and Phone Number</strong>: {{ group.address }}</li>{% endif %}
+    {% if group.review_notes %}<li><strong>Review Notes</strong>: {{ group.address }}</li>{% endif %}
 </ul>
 
 {% if c.AFTER_DEALER_REG_DEADLINE %}

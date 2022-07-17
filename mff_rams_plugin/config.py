@@ -49,7 +49,7 @@ class ExtraConfig:
             {int(k): v for k, v in config['power_prices'].items()})
 
     @property
-    def DEALER_POWER_OPTS(self):
+    def PREREG_DEALER_POWER_OPTS(self):
         power_opts = []
         for count, desc in sorted(c.DEALER_POWERS.items()):
             price_info = ": ${}".format(c.POWER_PRICES[count])\

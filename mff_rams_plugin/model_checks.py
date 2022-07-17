@@ -100,8 +100,7 @@ def selected_power(group):
 @prereg_validation.Group
 def power_usage(group):
     if group.power and not group.power_usage:
-        return 'Please provide a list of what powered devices you ' \
-               'expect to use.'
+        return 'Please provide a list of what powered devices you expect to use.'
 
 
 @prereg_validation.Group
@@ -113,12 +112,7 @@ def ibt_num(group):
 @prereg_validation.Group
 def dealer_categories(group):
     if group.is_dealer and not group.categories:
-        if group.status == c.APPROVED:
-            # Categories are read-only for approved dealers, which erroneously unsets them
-            # I am 1000% going to regret this
-            group.categories = group.orig_value_of('categories')
-        else:
-            return "Please select at least one category your wares fall under."
+        return "Please select at least one category your wares fall under."
 
 
 @prereg_validation.Group
@@ -127,28 +121,7 @@ def edit_only_correct_statuses(group):
         return "You cannot change your {} after it has been {}.".format(c.DEALER_APP_TERM, group.status_label)
 
 
-@prereg_validation.Group
-def no_edit_post_approval(group):
-    if group.status == c.APPROVED:
-        no_change = []
-        if group.orig_value_of('categories') != group.categories:
-            no_change.append('categories')
-        if group.orig_value_of('categories_text') != group.categories_text:
-            no_change.append('other category description')
-        if group.orig_value_of('special_needs') != group.special_needs:
-            no_change.append('special requests')
-        if group.orig_value_of('country') != group.country:
-            no_change.append('country')
-        if group.orig_value_of('address1') != group.address1:
-            no_change.append('street address')
-        if group.orig_value_of('address2') != group.address2:
-            no_change.append('street address line 2')
-        if group.orig_value_of('city') != group.city:
-            no_change.append('city')
-        if group.orig_value_of('region') != group.region:
-            no_change.append('region')
-        if group.orig_value_of('zip_code') != group.zip_code:
-            no_change.append('postal code')
-
-        if no_change:
-            return "You cannot change the following information after your application has been approved: {}.".format(', '.join(no_change))
+@validation.Group
+def no_approval_without_power_fee(group):
+    if group.status == c.APPROVED and group.auto_recalc and not group.power_fee and group.default_power_cost == None:
+        return "Please set a power fee. To provide free power, turn off automatic recalculation."

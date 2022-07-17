@@ -38,15 +38,22 @@ class Group:
         if self.leader and self.leader.badge_type == c.GUEST_BADGE and self.status == c.UNAPPROVED:
             self.status = c.APPROVED
 
+    @presave_adjustment
+    def set_power_fee(self):
+        if self.auto_recalc:
+            self.power_fee = self.default_power_cost or self.power_fee
+
+        if self.power_fee == None:
+            self.power_fee = 0
+
     @cost_property
-    def power_cost(self):
-        return self.power_fee if self.power_fee \
-            else c.POWER_PRICES[int(self.power)]
+    def default_power_cost(self):
+        return c.POWER_PRICES.get(int(self.power), None)
 
     @cost_property
     def table_cost(self):
         return self.table_fee if self.table_fee \
-            else c.TABLE_PRICES[int(self.tables)]
+            else c.TABLE_PRICES.get(int(self.tables), None)
 
     @property
     def dealer_payment_due(self):
