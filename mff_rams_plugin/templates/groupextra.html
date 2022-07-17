@@ -64,8 +64,8 @@
     {% call macros.read_only_if(page_ro, c.PREREG_DEALER_POWER_OPTS[group.power or 0][1], check_dealer_editable=(group, 'power')) %}
     <div class="col-sm-6">
         <select name="power" id="power" class="form-control">
-            <option value="">Select a Power Level</option>
-            <option value="0">No power</option>
+            {% if not admin_area %}<option value="">Select a Power Level</option>{% endif %}
+            <option value="0"{% if not new_new_dealer and not group.power %}selected="selected"{% endif %}>No power</option>
             {{ options(c.PREREG_DEALER_POWER_OPTS[1:], None if new_new_dealer else group.power) }}
         </select>
     </div>
