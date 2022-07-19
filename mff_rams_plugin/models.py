@@ -35,7 +35,7 @@ class Group:
     review_notes = Column(UnicodeText)
 
     @cached_classproperty
-    def import_fields(self):
+    def import_fields(cls):
         return ['power', 'power_fee', 'power_usage', 'tax_number', 'review_notes']
 
     @presave_adjustment
@@ -98,7 +98,7 @@ class Attendee:
     fursuiting = Column(Choice(c.FURSUITING_OPTS), nullable=True)
 
     @cached_classproperty
-    def import_fields(self):
+    def import_fields(cls):
         return ['comped_reason', 'fursuiting']
 
     @presave_adjustment
