@@ -46,9 +46,16 @@ class Group:
         if self.power_fee == None:
             self.power_fee = 0
 
-    @cost_property
+    @property
     def default_power_cost(self):
         return c.POWER_PRICES.get(int(self.power), None)
+
+    @cost_property
+    def power_cost(self):
+        if self.auto_recalc:
+            return self.power_fee or self.default_power_cost
+        else:
+            return self.power_fee
 
     @cost_property
     def table_cost(self):
