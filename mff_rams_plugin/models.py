@@ -2,6 +2,7 @@ import math
 from datetime import timedelta
 
 from residue import CoerceUTF8 as UnicodeText, UTCDateTime
+from pockets import cached_classproperty
 from sqlalchemy import and_, or_
 from sqlalchemy.types import Integer
 from sqlalchemy.ext.hybrid import hybrid_property
@@ -32,6 +33,10 @@ class Group:
     table_fee = Column(Integer, default=0)
     tax_number = Column(UnicodeText)
     review_notes = Column(UnicodeText)
+
+    @cached_classproperty
+    def import_fields(cls):
+        return ['power', 'power_fee', 'power_usage', 'tax_number', 'review_notes']
 
     @presave_adjustment
     def guest_groups_approved(self):
@@ -91,6 +96,10 @@ class MarketplaceApplication:
 class Attendee:
     comped_reason = Column(UnicodeText, default='', admin_only=True)
     fursuiting = Column(Choice(c.FURSUITING_OPTS), nullable=True)
+
+    @cached_classproperty
+    def import_fields(cls):
+        return ['comped_reason', 'fursuiting']
 
     @presave_adjustment
     def save_group_cost(self):
