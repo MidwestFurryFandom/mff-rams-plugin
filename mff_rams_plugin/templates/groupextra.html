@@ -112,7 +112,7 @@
 
 {% if c.PAGE_PATH == '/preregistration/group_members' and group.status == c.APPROVED and group.power_fee %}
 <li id="power_cost">
-    {{ group.power_fee|format_currency }} for tier {{ group.power }} power ({{ c.DEALER_POWER_OPTS[group.power] if group.default_power_cost else "custom" }})
+    {{ group.power_fee|format_currency }} for tier {{ group.power }} power ({{ c.DEALER_POWER_OPTS[group.power][1] if group.default_power_cost else "custom" }})
 </li>
 
 <script type="text/javascript">
