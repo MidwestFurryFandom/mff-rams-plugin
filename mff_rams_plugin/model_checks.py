@@ -12,6 +12,12 @@ def need_fursuit_option(attendee):
 
 
 @validation.Attendee
+def shirt_for_sponsors(attendee):
+    if attendee.badge_type in [c.SPONSOR_BADGE, c.SHINY_BADGE] and attendee.shirt == c.NO_SHIRT:
+        return "Please select a shirt size."
+
+
+@validation.Attendee
 def need_comped_reason(attendee):
     if attendee.paid == c.NEED_NOT_PAY and not attendee.comped_reason and (
                 c.STAFF_RIBBON not in attendee.ribbon_ints and attendee.badge_type != c.STAFF_BADGE):
