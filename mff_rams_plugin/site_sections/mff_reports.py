@@ -171,7 +171,7 @@ class Root:
         }
 
     @csv_file
-    def full_dealer_report(self, out, session ):
+    def full_dealer_report(self, out, session):
         out.writerow([
             'Business Name',
             'Dealer Name',

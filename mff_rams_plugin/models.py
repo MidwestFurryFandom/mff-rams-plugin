@@ -55,18 +55,6 @@ class Group:
     def default_power_cost(self):
         return c.POWER_PRICES.get(int(self.power), None)
 
-    @cost_property
-    def power_cost(self):
-        if self.auto_recalc:
-            return self.power_fee or self.default_power_cost
-        else:
-            return self.power_fee
-
-    @cost_property
-    def table_cost(self):
-        return self.table_fee if self.table_fee \
-            else c.TABLE_PRICES.get(int(self.tables), None)
-
     @property
     def dealer_payment_due(self):
         if self.approved:
@@ -137,8 +125,7 @@ class Attendee:
             if not self.overridden_price and self.paid in [c.NOT_PAID, c.PAID_BY_GROUP]:
                 self.paid = c.NEED_NOT_PAY
 
-    @cost_property
-    def badge_cost(self):
+    def calculate_badge_cost(self, use_promo_code=False):
         registered = self.registered_local if self.registered else None
         if self.paid == c.NEED_NOT_PAY \
                 and self.badge_type not in [c.SPONSOR_BADGE, c.SHINY_BADGE]:
@@ -148,16 +135,15 @@ class Attendee:
                    - c.get_attendee_price(registered)
         elif self.overridden_price is not None:
             return self.overridden_price
-        elif self.badge_type == c.ONE_DAY_BADGE:
-            return c.get_oneday_price(registered)
-        elif self.is_presold_oneday:
-            return max(0, c.get_presold_oneday_price(self.badge_type) + self.age_discount)
-        if self.badge_type in c.BADGE_TYPE_PRICES:
-            return int(c.BADGE_TYPE_PRICES[self.badge_type])
-        elif self.age_discount != 0:
-            return max(0, c.get_attendee_price(registered) + self.age_discount)
+        elif self.is_dealer:
+            return c.DEALER_BADGE_PRICE
         else:
-            return c.get_attendee_price(registered)
+            cost = self.new_badge_cost
+
+        if c.BADGE_PROMO_CODES_ENABLED and self.promo_code and use_promo_code:
+            return self.promo_code.calculate_discounted_price(cost)
+        else:
+            return cost
 
     @property
     def age_discount(self):
