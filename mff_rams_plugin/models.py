@@ -10,7 +10,7 @@ from sqlalchemy.ext.hybrid import hybrid_property
 from uber.models import Session
 from uber.config import c
 from uber.utils import add_opt, localized_now, localize_datetime, remove_opt
-from uber.models.types import Choice, DefaultColumn as Column
+from uber.models.types import Choice, DefaultColumn as Column, MultiChoice
 from uber.decorators import cost_property, presave_adjustment
 
 
@@ -91,6 +91,8 @@ class MarketplaceApplication:
 class Attendee:
     comped_reason = Column(UnicodeText, default='', admin_only=True)
     fursuiting = Column(Choice(c.FURSUITING_OPTS), nullable=True)
+    accessibility_requests = Column(MultiChoice(c.ACCESSIBILITY_SERVICE_OPTS))
+    other_accessibility_requests = Column(UnicodeText)
 
     @cached_classproperty
     def import_fields(cls):

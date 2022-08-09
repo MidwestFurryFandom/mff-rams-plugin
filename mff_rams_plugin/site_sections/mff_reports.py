@@ -171,6 +171,27 @@ class Root:
         }
 
     @csv_file
+    def accessibility_report(self, out, session):
+        out.writerow([
+            'Badge Name',
+            'Badge Number',
+            'Email',
+            'Desired Accommodations',
+            'Other Desired Accommodations'
+        ])
+
+        accessibility_request_attendees = session.query(Attendee).filter(Attendee.accessibility_requests != '').all()
+
+        for attendee in accessibility_request_attendees:
+            out.writerow([
+                attendee.badge_printed_name,
+                attendee.badge_num,
+                attendee.email,
+                ", ".join(attendee.accessibility_requests_labels),
+                attendee.other_accessibility_requests
+            ])
+
+    @csv_file
     def full_dealer_report(self, out, session):
         out.writerow([
             'Business Name',
@@ -214,6 +235,7 @@ class Root:
                     group.power_usage,
                     group.location
                 ])
+
     @csv_file
     def dealers_publication_listing(self, out, session ):
         out.writerow([
