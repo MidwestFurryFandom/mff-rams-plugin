@@ -9,6 +9,7 @@
             $.field('comped_reason').parents('.form-group').insertAfter($.field('paid').parents('.form-group'));
             $.field('paid').change(showOrHideCompedReason);
             $.field('placeholder').click(showOrHideCompedReason);
+            $.field('badge_type').change(showOrHideCompedReason);
 
             showOrHideCompedReason();
             if ($.field('omit_badge')) {
@@ -84,6 +85,26 @@
         $(":radio[value={{ c.SUIT }}]").parents('label').removeClass('btn-default').addClass('btn-success');
     }
 
+    if ($.field('accessibility_requests')) {
+        $.field('accessibility_requests').parents('.form-group').insertAfter($.field('requested_accessibility_services').parents('.form-group'));
+
+        var showOrHideRequestedServices = function() {
+                setVisible($.field('accessibility_requests').parents('.form-group'),
+                           $.field('requested_accessibility_services').is(':checked'));
+            };
+
+        var showOrHideOtherRequestedServices = function() {
+            setVisible($.field('other_accessibility_requests').closest('.form-group'),
+                        $('input[type=checkbox][name="accessibility_requests"][value="{{ c.OTHER }}"]').is(':checked'));
+                        
+        }
+        $.field('requested_accessibility_services').click(showOrHideRequestedServices);
+        $('input[type=checkbox][name="accessibility_requests"][value="{{ c.OTHER }}"]').click(showOrHideOtherRequestedServices);
+        
+        showOrHideRequestedServices();
+        showOrHideOtherRequestedServices();
+    }
+
     {% if not admin_area and attendee and (attendee.badge_type == c.STAFF_BADGE or c.STAFF_RIBBON|string in attendee.ribbon_ints|string) %}
     // Hide staffing checkbox for staff to avoid confusion
     if ($.field('staffing')) {
@@ -107,3 +128,12 @@
 </script>
 
 {{ macros.form_group(attendee, 'fursuiting', type='radio_buttons', label="Do you plan on fursuiting at " + c.EVENT_NAME + "?", help="This is just to help us prepare; it's okay if your plans change!" if not admin_area else "", is_required=True) }}
+
+{% if c.ACCESSIBILITY_SERVICES_ENABLED and (c.HAS_OTHER_REPORTS_ACCESS or not admin_area) %}
+    {{ macros.form_checkgroup(attendee,
+                              'accessibility_requests',
+                              other_field='other_accessibility_requests',
+                              other_placeholder='What other accommodations do you need?',
+                              label='Accommodations Desired',
+                              )}}
+{% endif %}
