@@ -51,6 +51,11 @@ class Group:
         if self.power_fee == None:
             self.power_fee = 0
 
+    @presave_adjustment
+    def float_table_to_int(self):
+        # Fix some data weirdness with prior year groups
+        self.tables = int(self.tables)
+
     @property
     def default_power_cost(self):
         return c.POWER_PRICES.get(int(self.power), None)
