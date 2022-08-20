@@ -48,7 +48,7 @@
             $('#reg-types').hide();
         }
 
-        if ($("label[for='pii_consent']")) {
+        if ($("label[for='pii_consent']").length) {
             $("label[for='pii_consent']").html($("label[for='pii_consent']").html().replace('accessibility needs', 'accessibility needs, fursuiting plans'));
         }
 
