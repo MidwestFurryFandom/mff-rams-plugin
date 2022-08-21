@@ -48,6 +48,10 @@
             $('#reg-types').hide();
         }
 
+        if ($("label[for='pii_consent']").length) {
+            $("label[for='pii_consent']").html($("label[for='pii_consent']").html().replace('accessibility needs', 'accessibility needs, fursuiting plans'));
+        }
+
         // Also set visibility when the page loads
         setVisible('.shirt-row', $.val('badge_type') == {{ c.SPONSOR_BADGE }} || $.val('badge_type') ==  {{ c.SHINY_BADGE }});
         setVisible('.badge-row', true);
