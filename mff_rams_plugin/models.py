@@ -132,6 +132,11 @@ class Attendee:
             if not self.overridden_price and self.paid in [c.NOT_PAID, c.PAID_BY_GROUP]:
                 self.paid = c.NEED_NOT_PAY
 
+        if self.badge_num and self.badge_num in range(c.BADGE_RANGES[c.STAFF_BADGE][0],
+                                                      c.BADGE_RANGES[c.STAFF_BADGE][1]
+                                                ) and self.badge_status == c.IMPORTED_STATUS and self.badge_type != c.STAFF_BADGE:
+            self.ribbon = add_opt(self.ribbon_ints, c.STAFF_RIBBON)
+
     def calculate_badge_cost(self, use_promo_code=False):
         registered = self.registered_local if self.registered else None
         if self.paid == c.NEED_NOT_PAY \
