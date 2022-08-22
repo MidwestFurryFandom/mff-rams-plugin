@@ -5,12 +5,11 @@
 ({{ group.name }}) has successfully submitted a Dealer application for {{ c.EVENT_NAME }}
 this coming {{ event_dates() }}. Below is a copy of your application. You may
 <a href="{{ c.URL_BASE }}/preregistration/group_members?id={{ group.id }}">update it here</a> or
-<a href="{{ c.URL_BASE }}/preregistration/confirm?id={{ group.leader.id }}">view your badge here</a>{% if c.ATTENDEE_ACCOUNTS_ENABLED %}
-after logging into your account{% endif %}.
+<a href="{{ c.URL_BASE }}/preregistration/confirm?id={{ group.leader.id }}">view your badge here</a>{% if c.ATTENDEE_ACCOUNTS_ENABLED %} after logging into your account{% endif %}.
 <ul>
     <li><strong>Dealer Table Name</strong>: {{ group.name }}</li>
-    <li><strong>Tables</strong>: {{ group.tables_repr }} ({{ c.TABLE_PRICES[group.tables]|format_currency }}) </li>
-    <li><strong>Badges</strong>: {{ group.badges }} badge{{ group.badges|pluralize }} ({{ (group.new_badge_cost * group.badges)|format_currency }}) </li>
+    <li><strong>Tables</strong>: {{ group.tables_repr }} ({{ group.default_table_cost|format_currency }}) </li>
+    <li><strong>Badges</strong>: {{ group.badges }} badge{{ group.badges|pluralize }} ({{ group.default_badge_cost|format_currency }}) </li>
     {% if group.power %}
     <li><strong>Power</strong>: {{ c.PREREG_DEALER_POWER_OPTS[group.power][1] }}
     {% endif %}
