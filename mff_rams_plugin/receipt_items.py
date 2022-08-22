@@ -17,7 +17,7 @@ def table_cost(group):
 
 @cost_calculation.Group
 def power_cost(group):
-    if group.power_fee:
-        return ("Custom Fee for Tier {} Power".format(group.power), group.power_fee)
-    elif group.auto_recalc and group.default_power_cost:
-        return ("Tier {} Power Fee".format(group.power), group.default_power_cost)
+    if group.auto_recalc and group.default_power_cost:
+        return ("Tier {} Power Fee".format(group.power), int(group.default_power_cost) * 100)
+    elif group.power_fee:
+        return ("Custom Fee for Tier {} Power".format(group.power), group.power_fee * 100)
