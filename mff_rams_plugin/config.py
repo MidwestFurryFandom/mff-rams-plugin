@@ -1,6 +1,7 @@
 from sideboard.lib import parse_config, request_cached_property
 from collections import defaultdict
 from datetime import timedelta
+from pockets.autolog import log
 
 from uber.config import c, Config, dynamic
 from uber.menu import MenuItem
@@ -48,8 +49,13 @@ class ExtraConfig:
             {int(k): v for k, v in config['power_prices'].items()})
 
     @property
-    def DEALER_POWER_OPTS(self):
-        return [(0, 'No power'), (1, 'Default power')]
+    def PREREG_DEALER_POWER_OPTS(self):
+        power_opts = []
+        for count, desc in sorted(c.DEALER_POWERS.items()):
+            price_info = ": ${}".format(c.POWER_PRICES[count])\
+                if c.POWER_PRICES.get(count) else ""
+            power_opts.append((count, 'Tier {}{} {}'.format(count, price_info, desc)))
+        return power_opts
 
     @request_cached_property
     @dynamic
@@ -84,4 +90,3 @@ class ExtraConfig:
             elif self.ONE_DAY_BADGE_AVAILABLE:
                 opts.append((self.ONE_DAY_BADGE, 'Single Day Badge (${})'.format(self.ONEDAY_BADGE_PRICE)))
         return opts
-		

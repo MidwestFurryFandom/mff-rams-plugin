@@ -171,7 +171,28 @@ class Root:
         }
 
     @csv_file
-    def full_dealer_report(self, out, session ):
+    def accessibility_report(self, out, session):
+        out.writerow([
+            'Badge Name',
+            'Badge Number',
+            'Email',
+            'Desired Accommodations',
+            'Other Desired Accommodations'
+        ])
+
+        accessibility_request_attendees = session.query(Attendee).filter(Attendee.accessibility_requests != '').all()
+
+        for attendee in accessibility_request_attendees:
+            out.writerow([
+                attendee.badge_printed_name,
+                attendee.badge_num,
+                attendee.email,
+                ", ".join(attendee.accessibility_requests_labels),
+                attendee.other_accessibility_requests
+            ])
+
+    @csv_file
+    def full_dealer_report(self, out, session):
         out.writerow([
             'Business Name',
             'Dealer Name',
@@ -185,6 +206,7 @@ class Root:
             'Wares - Other',
             'Description',
             'Special Needs',
+            'Review Notes',
             'Admin Notes',
             'Power Requested',
             'Power Request Info',
@@ -207,11 +229,13 @@ class Root:
                     group.categories_text,
                     group.description,
                     group.special_needs,
+                    group.review_notes,
                     group.admin_notes,
                     group.power,
                     group.power_usage,
                     group.location
                 ])
+
     @csv_file
     def dealers_publication_listing(self, out, session ):
         out.writerow([
@@ -274,8 +298,9 @@ class Root:
             'Wares - Other',
             'Description',
             'Special Needs',
+            'Review Notes',
             'Admin Notes',
-            'Power Reqeusted',
+            'Power Requested',
             'Power Request Info'
         ])
         dealer_groups = session.query(Group).filter(Group.tables > 0).all()
@@ -292,6 +317,7 @@ class Root:
                     group.categories_text,
                     group.description,
                     group.special_needs,
+                    group.review_notes,
                     group.admin_notes,
                     group.power,
                     group.power_usage

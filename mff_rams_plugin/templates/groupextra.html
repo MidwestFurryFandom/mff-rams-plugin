@@ -31,8 +31,12 @@
             };
 
             $('#power-fields').insertBefore($.field('description').parents('.form-group'));
-            $('#power').on('click', powerOpt);
+            $('#power').on('change', powerOpt);
             powerOpt();
+        }
+
+        if ($.field('review_notes')) {
+            $.field('review_notes').parents('.form-group').insertBefore($.field('website').parents('.form-group'))
         }
 
         if ($("#moretables").length) {
@@ -50,60 +54,81 @@
             $('label:contains("Description")').text('Merchandise Description');
             $('p:contains("Please keep to one sentence.")').text('This will be used both for dealer selection (if necessary) and in all dealer listings.')
         }
-
-        // Change behavior of the form after approval
-        {% if group.status == c.APPROVED and not admin_area %}
-            $(function() {
-                $("form[action='group_members'] :input").prop('title','You cannot edit this information after you have been approved.');
-                $( "[name='name'], [name='website'], [name='description'], [name='power_usage'], [name='tax_number'], [name='special_needs']" )
-                    .attr("readonly", false).prop('title', '');
-                $("form[action='group_members'] :submit").attr("disabled", false).prop('title', '');
-            });
-        {% endif %}
     });
 </script>
 {% if group and group.is_dealer or new_dealer or attendee and attendee.badge_type == c.PSEUDO_DEALER_BADGE %}
+{% set new_new_dealer = (new_dealer or attendee and attendee.badge_type == c.PSEUDO_DEALER_BADGE) and not message and not edit_id %}
 <div id="power-fields">
 <div class="form-group">
-    <div class="col-sm-6 col-sm-offset-3">
-        {% if c.PAGE_PATH == '/group_admin/form' %}
+    <label for="power_level" class="col-sm-3 control-label">Power Level</label>
+    {% call macros.read_only_if(page_ro, c.PREREG_DEALER_POWER_OPTS[group.power or 0][1], check_dealer_editable=(group, 'power')) %}
+    <div class="col-sm-6">
         <select name="power" id="power" class="form-control">
-            {{ options(c.DEALER_POWER_OPTS, group.power) }}
+            {% if not admin_area %}<option value="">Select a Power Level</option>{% endif %}
+            <option value="0"{% if not new_new_dealer and not group.power %}selected="selected"{% endif %}>No power</option>
+            {{ options(c.PREREG_DEALER_POWER_OPTS[1:], None if new_new_dealer else group.power) }}
         </select>
-        {% else %}
-        <input type="checkbox" name="power" id="power" value="1" {% if group.power %}checked="checked"{% endif %} {% if group and not group.is_new %}disabled="disabled"{% endif %} />
-        <label for="power" class="optional-field">I need power at my table. ({{ c.POWER_PRICES[1]|format_currency }})</label>
-        {% endif %}
     </div>
+    {% endcall %}
 </div>
 <div class="form-group">
     <label for="power_usage" class="col-sm-3 control-label">Power Usage</label>
+    {% call macros.read_only_if(page_ro, group.power_usage, check_dealer_editable=(group, 'power_usage')) %}
     <div class="col-sm-6">
-        <textarea{% if page_ro %} readonly{% endif %} class="form-control" name="power_usage" id="power_usage" placeholder="Please provide a listing of what devices you will be using." rows="4">{{ group.power_usage }}</textarea>
+        <textarea class="form-control" name="power_usage" id="power_usage" placeholder="Please provide a listing of what devices you will be using." rows="4">{{ group.power_usage }}</textarea>
     </div>
+    {% endcall %}
 </div>
-{% if not c.PAGE_PATH == '/group_admin/form' and (group and group.power or attendee and attendee.badge_type == c.PSEUDO_DEALER_BADGE) %}
-<div class="form-group">
-    <p class="help-block col-sm-6 col-sm-offset-3"><i>If you expect to use more than 400 watts of power, be aware that you may be charged more for electrical access (See Dealer Instructions for more information).</i></p>
-</div>
-{% endif %}
 <div class="form-group">
     <label for="tax_number" class="col-sm-3 control-label optional-field">Illinois Business Tax Number</label>
+    {% call macros.read_only_if(page_ro, group.tax_number, check_dealer_editable=(group, 'tax_number')) %}
     <div class="col-sm-6">
-        <input type="text" name="tax_number" class="form-control" value="{{ group.tax_number }}" />
+        <input type="text" name="tax_number"  class="form-control" placeholder="1234-5678" value="{{ group.tax_number }}" pattern="[0-9]{4}-[0-9]{4}" title="1234-5678" />
     </div>
+    {% if not admin_area and (group or attendee and attendee.badge_type == c.PSEUDO_DEALER_BADGE) %}
+    <div class="clearfix"></div>
+    <p class="help-block col-sm-9 col-sm-offset-3">
+        If you have an Illinois Business license please provide the number here. Note that this number is in the format 1234-5678; it is not your Federal Tax ID or any other Tax ID number you may have.
+    </p>
+    {% endif %}
+    {% endcall %}
 </div>
 </div>
-{% if group.status == c.APPROVED %}
-    <button type="submit" class="btn btn-primary" value="Update Application">Update Application</button>
-{% endif %}
+<div class="form-group">
+    <label for="review_notes" class="col-sm-3 control-label optional-field">Review Notes</label>
+    {% call macros.read_only_if(page_ro, group.review_notes, check_dealer_editable=(group, 'review_notes')) %}
+    <div class="col-sm-6">
+        <textarea name="review_notes" class="form-control" rows="4">{{ group.review_notes }}</textarea>
+    </div>
+    {% if not admin_area and (group or attendee and attendee.badge_type == c.PSEUDO_DEALER_BADGE) %}
+    <div class="clearfix"></div>
+    <p class="help-block col-sm-9 col-sm-offset-3">
+        Please provide any additional information which you feel could assist in our selection process. This could include additional links other than your website or more detailed merchandise descriptions. If your website includes merchandise which may be in violation of our Intellectual Property rules, please confirm that you will not be bringing this merchandise for sale at MFF.
+    </p>
+    {% endif %}
+    {% endcall %}
+</div>
 {% endif %}
 
-{% if c.PAGE_PATH == '/group_admin/form' and group.is_dealer or new_dealer %}
+{% if c.PAGE_PATH == '/preregistration/group_members' and group.status == c.APPROVED and group.power_fee %}
+<li id="power_cost">
+    {{ group.power_fee|format_currency }} for tier {{ group.power }} power ({{ c.DEALER_POWER_OPTS[group.power][1] if group.default_power_cost else "custom" }})
+</li>
+
+<script type="text/javascript">
+    $(function () {
+        $('#power_cost').insertAfter($('div.alert.alert-success ul li').first());
+    });
+</script>
+{% endif %}
+
+{% if admin_area and group.is_dealer or new_dealer %}
 <script type="text/javascript">
     $(function () {
         // Position new field(s)
-        $.field('location').parents('.form-group').insertBefore($.field('wares').parents('.form-group'))
+        $.field('location').parents('.form-group').insertBefore($.field('wares').parents('.form-group'));
+        $.field('power_fee').parents('.form-group').insertAfter($.field('cost').parents('.form-group'));
+        $('#power-fields').insertAfter($.field('power_fee').parents('.form-group'));
     });
 </script>
 
@@ -111,6 +136,17 @@
     <label for="location" class="col-sm-3 control-label">Table Assignment</label>
     <div class="col-sm-6">
         <input type="text" name="location" value="{{ group.location }}" class="form-control" placeholder="Dealer's table location" />
+    </div>
+</div>
+
+<div class="form-group">
+    <label for="power_fee" class="col-sm-3 control-label">Power Fee</label>
+    <div class="col-sm-6">
+        <div class="input-group">
+        <span class="input-group-addon">$</span>
+        <input type="number" name="power_fee" value="{{ group.power_fee }}" placeholder="{{ group.default_power_cost|default('Please set a power fee.', true) }}" class="form-control" />
+        <span class="input-group-addon">.00</span>
+        </div>
     </div>
 </div>
 {% endif %}

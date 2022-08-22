@@ -2,6 +2,7 @@ import math
 from datetime import timedelta
 
 from residue import CoerceUTF8 as UnicodeText, UTCDateTime
+from pockets import cached_classproperty
 from sqlalchemy import and_, or_
 from sqlalchemy.types import Integer
 from sqlalchemy.ext.hybrid import hybrid_property
@@ -9,7 +10,7 @@ from sqlalchemy.ext.hybrid import hybrid_property
 from uber.models import Session
 from uber.config import c
 from uber.utils import add_opt, localized_now, localize_datetime, remove_opt
-from uber.models.types import Choice, DefaultColumn as Column
+from uber.models.types import Choice, DefaultColumn as Column, MultiChoice
 from uber.decorators import cost_property, presave_adjustment
 
 
@@ -25,27 +26,39 @@ class SessionMixin:
 
 @Session.model_mixin
 class Group:
-    power = Column(Integer, default=0)
+    power = Column(Choice(c.DEALER_POWER_OPTS), default=0)
     power_fee = Column(Integer, default=0)
     power_usage = Column(UnicodeText)
     location = Column(UnicodeText, default='', admin_only=True)
     table_fee = Column(Integer, default=0)
     tax_number = Column(UnicodeText)
+    review_notes = Column(UnicodeText)
+
+    @cached_classproperty
+    def import_fields(cls):
+        return ['power', 'power_fee', 'power_usage', 'tax_number', 'review_notes']
 
     @presave_adjustment
     def guest_groups_approved(self):
         if self.leader and self.leader.badge_type == c.GUEST_BADGE and self.status == c.UNAPPROVED:
             self.status = c.APPROVED
 
-    @cost_property
-    def power_cost(self):
-        return self.power_fee if self.power_fee \
-            else c.POWER_PRICES[int(self.power)]
+    @presave_adjustment
+    def set_power_fee(self):
+        if self.auto_recalc:
+            self.power_fee = self.default_power_cost or self.power_fee
 
-    @cost_property
-    def table_cost(self):
-        return self.table_fee if self.table_fee \
-            else c.TABLE_PRICES[int(self.tables)]
+        if self.power_fee == None:
+            self.power_fee = 0
+
+    @presave_adjustment
+    def float_table_to_int(self):
+        # Fix some data weirdness with prior year groups
+        self.tables = int(self.tables)
+
+    @property
+    def default_power_cost(self):
+        return c.POWER_PRICES.get(int(self.power), None)
 
     @property
     def dealer_payment_due(self):
@@ -83,6 +96,12 @@ class MarketplaceApplication:
 class Attendee:
     comped_reason = Column(UnicodeText, default='', admin_only=True)
     fursuiting = Column(Choice(c.FURSUITING_OPTS), nullable=True)
+    accessibility_requests = Column(MultiChoice(c.ACCESSIBILITY_SERVICE_OPTS))
+    other_accessibility_requests = Column(UnicodeText)
+
+    @cached_classproperty
+    def import_fields(cls):
+        return ['comped_reason', 'fursuiting']
 
     @presave_adjustment
     def save_group_cost(self):
@@ -113,8 +132,12 @@ class Attendee:
             if not self.overridden_price and self.paid in [c.NOT_PAID, c.PAID_BY_GROUP]:
                 self.paid = c.NEED_NOT_PAY
 
-    @cost_property
-    def badge_cost(self):
+        if self.badge_num and self.badge_num in range(c.BADGE_RANGES[c.STAFF_BADGE][0],
+                                                      c.BADGE_RANGES[c.STAFF_BADGE][1]
+                                                ) and self.badge_status == c.IMPORTED_STATUS and self.badge_type != c.STAFF_BADGE:
+            self.ribbon = add_opt(self.ribbon_ints, c.STAFF_RIBBON)
+
+    def calculate_badge_cost(self, use_promo_code=False):
         registered = self.registered_local if self.registered else None
         if self.paid == c.NEED_NOT_PAY \
                 and self.badge_type not in [c.SPONSOR_BADGE, c.SHINY_BADGE]:
@@ -124,16 +147,15 @@ class Attendee:
                    - c.get_attendee_price(registered)
         elif self.overridden_price is not None:
             return self.overridden_price
-        elif self.badge_type == c.ONE_DAY_BADGE:
-            return c.get_oneday_price(registered)
-        elif self.is_presold_oneday:
-            return max(0, c.get_presold_oneday_price(self.badge_type) + self.age_discount)
-        if self.badge_type in c.BADGE_TYPE_PRICES:
-            return int(c.BADGE_TYPE_PRICES[self.badge_type])
-        elif self.age_discount != 0:
-            return max(0, c.get_attendee_price(registered) + self.age_discount)
+        elif self.is_dealer:
+            return c.DEALER_BADGE_PRICE
         else:
-            return c.get_attendee_price(registered)
+            cost = self.new_badge_cost
+
+        if c.BADGE_PROMO_CODES_ENABLED and self.promo_code and use_promo_code:
+            return self.promo_code.calculate_discounted_price(cost)
+        else:
+            return cost
 
     @property
     def age_discount(self):
