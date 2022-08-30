@@ -59,6 +59,16 @@ class ExtraConfig:
 
     @request_cached_property
     @dynamic
+    def SPONSOR_BADGE_COUNT(self):
+        return self.get_badge_count_by_type(c.SPONSOR_BADGE)
+
+    @request_cached_property
+    @dynamic
+    def SHINY_BADGE_COUNT(self):
+        return self.get_badge_count_by_type(c.SHINY_BADGE)
+
+    @request_cached_property
+    @dynamic
     def AT_THE_DOOR_BADGE_OPTS(self):
         """
         This provides the dropdown on the /registration/register page with its
