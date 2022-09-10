@@ -219,7 +219,7 @@ class Root:
                 out.writerow([
                     group.name,
                     full_name,
-                    group.leader.email,
+                    group.leader.email if group.leader else '',
                     group.tables,
                     group.badges,
                     group.status_label,
@@ -282,8 +282,8 @@ class Root:
                     group.region,
                     group.zip_code,
                     group.country,
-                    group.leader.email,
-                    group.leader.cellphone,
+                    group.leader.email if group.leader else '',
+                    group.leader.cellphone if group.leader else '',
                     group.tax_number
                 ])    
     @csv_file
@@ -312,7 +312,7 @@ class Root:
                     full_name,
                     group.tables,
                     group.website,
-                    group.leader.email,
+                    group.leader.email if group.leader else '',
                     group.categories_labels,
                     group.categories_text,
                     group.description,
