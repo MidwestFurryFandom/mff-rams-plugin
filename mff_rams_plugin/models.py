@@ -1,7 +1,7 @@
 import math
 from datetime import timedelta
 
-from residue import CoerceUTF8 as UnicodeText, UTCDateTime
+from residue import CoerceUTF8 as UnicodeText
 from pockets import cached_classproperty
 from sqlalchemy import and_, or_
 from sqlalchemy.types import Integer
@@ -11,7 +11,7 @@ from uber.models import Session
 from uber.config import c
 from uber.utils import add_opt, localized_now, localize_datetime, remove_opt
 from uber.models.types import Choice, DefaultColumn as Column, MultiChoice
-from uber.decorators import cost_property, presave_adjustment
+from uber.decorators import presave_adjustment
 
 
 @Session.model_mixin
@@ -137,6 +137,16 @@ class Attendee:
                                                 ) and self.badge_status == c.IMPORTED_STATUS and self.badge_type != c.STAFF_BADGE:
             self.ribbon = add_opt(self.ribbon_ints, c.STAFF_RIBBON)
 
+    def undo_extras(self):
+        if self.active_receipt:
+            return "Could not undo extras, this attendee has an open receipt!"
+        self.amount_extra = 0
+        self.extra_donation = 0
+        if c.STAFF_RIBBON in self.ribbon_ints:
+            self.badge_type = c.STAFF_BADGE
+        else:
+            self.badge_type = c.ATTENDEE_BADGE
+
     def calculate_badge_cost(self, use_promo_code=False):
         registered = self.registered_local if self.registered else None
         if self.paid == c.NEED_NOT_PAY \
@@ -156,6 +166,18 @@ class Attendee:
             return self.promo_code.calculate_discounted_price(cost)
         else:
             return cost
+
+    @property
+    def ribbon_and_or_badge(self):
+        ribbon_labels = self.ribbon_labels
+        if self.badge_type == c.STAFF_BADGE and c.STAFF_RIBBON in self.ribbon_ints:
+            ribbon_labels.remove(c.RIBBONS[c.STAFF_RIBBON])
+        if self.ribbon and self.badge_type != c.ATTENDEE_BADGE:
+            return ' / '.join([self.badge_type_label] + ribbon_labels)
+        elif self.ribbon:
+            return ' / '.join(ribbon_labels)
+        else:
+            return self.badge_type_label
 
     @property
     def age_discount(self):
