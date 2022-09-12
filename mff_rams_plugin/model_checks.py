@@ -25,15 +25,6 @@ def need_comped_reason(attendee):
 
 
 @validation.Attendee
-def allowed_to_register(attendee):
-    if not attendee.age_group_conf['can_register']:
-        # It's COVID time!
-        return 'At this time, attendees under the age of 12 are unable to receive Covid-19 vaccinations \
-        and cannot attend FurFest 2021. We hope to see you back in 2022. Please email registration@furfest.org \
-        if you have any questions.'
-
-
-@validation.Attendee
 @validation.Group
 def no_emojis(model):
     for column in model.__table__.columns:
