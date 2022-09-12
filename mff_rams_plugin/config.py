@@ -67,6 +67,17 @@ class ExtraConfig:
     def SHINY_BADGE_COUNT(self):
         return self.get_badge_count_by_type(c.SHINY_BADGE)
 
+    @property
+    def PREREG_BADGE_TYPES(self):
+        types = [self.ATTENDEE_BADGE, self.PSEUDO_DEALER_BADGE]
+        for reg_open, badge_type in [(self.BEFORE_GROUP_PREREG_TAKEDOWN, self.PSEUDO_GROUP_BADGE)]:
+            if reg_open:
+                types.append(badge_type)
+        for badge_type in self.BADGE_TYPE_PRICES:
+            if badge_type not in types:
+                types.append(badge_type)
+        return types
+
     @request_cached_property
     @dynamic
     def AT_THE_DOOR_BADGE_OPTS(self):

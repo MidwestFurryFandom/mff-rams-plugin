@@ -142,10 +142,11 @@ class Attendee:
             return "Could not undo extras, this attendee has an open receipt!"
         self.amount_extra = 0
         self.extra_donation = 0
-        if c.STAFF_RIBBON in self.ribbon_ints:
-            self.badge_type = c.STAFF_BADGE
-        else:
-            self.badge_type = c.ATTENDEE_BADGE
+        if self.badge_type in c.BADGE_TYPE_PRICES:
+            if c.STAFF_RIBBON in self.ribbon_ints:
+                self.badge_type = c.STAFF_BADGE
+            else:
+                self.badge_type = c.ATTENDEE_BADGE
 
     def calculate_badge_cost(self, use_promo_code=False):
         registered = self.registered_local if self.registered else None
