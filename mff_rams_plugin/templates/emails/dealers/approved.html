@@ -20,7 +20,7 @@ This registration includes:
     <li> {{ group.badges }} badge{{ group.badges|pluralize }} ({{ group.default_badge_cost|format_currency }}) </li>
     <li> 
         {% if group.power > 0 %}
-        Tier {{ group.power }} power ({{ c.DEALER_POWER_OPTS[group.power][1] if group.default_power_cost else "custom" }})
+        Tier {{ group.power }} power ({{ c.DEALER_POWER_OPTS[group.power][1] if group.default_power_fee else "custom" }})
         for {{ group.power_fee|format_currency }} 
         {% else %}No power {% endif %}
     </li>
