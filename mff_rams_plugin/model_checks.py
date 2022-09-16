@@ -120,5 +120,5 @@ def edit_only_correct_statuses(group):
 
 @validation.Group
 def no_approval_without_power_fee(group):
-    if group.status == c.APPROVED and group.auto_recalc and not group.power_fee and group.default_power_cost == None:
+    if group.status == c.APPROVED and group.auto_recalc and not group.power_fee and group.default_power_fee == None:
         return "Please set a power fee. To provide free power, turn off automatic recalculation."

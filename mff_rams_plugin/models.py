@@ -46,7 +46,7 @@ class Group:
     @presave_adjustment
     def set_power_fee(self):
         if self.auto_recalc:
-            self.power_fee = self.default_power_cost or self.power_fee
+            self.power_fee = self.default_power_fee or self.power_fee
 
         if self.power_fee == None:
             self.power_fee = 0
@@ -57,7 +57,7 @@ class Group:
         self.tables = int(self.tables)
 
     @property
-    def default_power_cost(self):
+    def default_power_fee(self):
         return c.POWER_PRICES.get(int(self.power), None)
 
     @property
