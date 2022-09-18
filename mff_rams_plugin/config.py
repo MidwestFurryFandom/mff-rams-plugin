@@ -21,10 +21,6 @@ c.MENU.append_menu_item(
 @Config.mixin
 class ExtraConfig:
     @property
-    def DEALER_BADGE_PRICE(self):
-        return self.get_attendee_price()
-
-    @property
     def TABLE_OPTS(self):
         return [(1, 'Single Table'),
                 (2, 'Double Table'),
