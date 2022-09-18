@@ -148,26 +148,6 @@ class Attendee:
             else:
                 self.badge_type = c.ATTENDEE_BADGE
 
-    def calculate_badge_cost(self, use_promo_code=False):
-        registered = self.registered_local if self.registered else None
-        if self.paid == c.NEED_NOT_PAY \
-                and self.badge_type not in [c.SPONSOR_BADGE, c.SHINY_BADGE]:
-            return 0
-        elif self.paid == c.NEED_NOT_PAY:
-            return c.BADGE_TYPE_PRICES[self.badge_type] \
-                   - c.get_attendee_price(registered)
-        elif self.overridden_price is not None:
-            return self.overridden_price
-        elif self.is_dealer:
-            return c.DEALER_BADGE_PRICE
-        else:
-            cost = self.new_badge_cost
-
-        if c.BADGE_PROMO_CODES_ENABLED and self.promo_code and use_promo_code:
-            return self.promo_code.calculate_discounted_price(cost)
-        else:
-            return cost
-
     @property
     def ribbon_and_or_badge(self):
         ribbon_labels = self.ribbon_labels
