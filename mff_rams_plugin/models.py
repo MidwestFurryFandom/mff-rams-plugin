@@ -46,7 +46,7 @@ class Group:
     @presave_adjustment
     def set_power_fee(self):
         if self.auto_recalc:
-            self.power_fee = self.default_power_cost or self.power_fee
+            self.power_fee = self.default_power_fee or self.power_fee
 
         if self.power_fee == None:
             self.power_fee = 0
@@ -57,7 +57,7 @@ class Group:
         self.tables = int(self.tables)
 
     @property
-    def default_power_cost(self):
+    def default_power_fee(self):
         return c.POWER_PRICES.get(int(self.power), None)
 
     @property
@@ -142,30 +142,11 @@ class Attendee:
             return "Could not undo extras, this attendee has an open receipt!"
         self.amount_extra = 0
         self.extra_donation = 0
-        if c.STAFF_RIBBON in self.ribbon_ints:
-            self.badge_type = c.STAFF_BADGE
-        else:
-            self.badge_type = c.ATTENDEE_BADGE
-
-    def calculate_badge_cost(self, use_promo_code=False):
-        registered = self.registered_local if self.registered else None
-        if self.paid == c.NEED_NOT_PAY \
-                and self.badge_type not in [c.SPONSOR_BADGE, c.SHINY_BADGE]:
-            return 0
-        elif self.paid == c.NEED_NOT_PAY:
-            return c.BADGE_TYPE_PRICES[self.badge_type] \
-                   - c.get_attendee_price(registered)
-        elif self.overridden_price is not None:
-            return self.overridden_price
-        elif self.is_dealer:
-            return c.DEALER_BADGE_PRICE
-        else:
-            cost = self.new_badge_cost
-
-        if c.BADGE_PROMO_CODES_ENABLED and self.promo_code and use_promo_code:
-            return self.promo_code.calculate_discounted_price(cost)
-        else:
-            return cost
+        if self.badge_type in c.BADGE_TYPE_PRICES:
+            if c.STAFF_RIBBON in self.ribbon_ints:
+                self.badge_type = c.STAFF_BADGE
+            else:
+                self.badge_type = c.ATTENDEE_BADGE
 
     @property
     def ribbon_and_or_badge(self):

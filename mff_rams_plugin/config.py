@@ -21,10 +21,6 @@ c.MENU.append_menu_item(
 @Config.mixin
 class ExtraConfig:
     @property
-    def DEALER_BADGE_PRICE(self):
-        return self.get_attendee_price()
-
-    @property
     def TABLE_OPTS(self):
         return [(1, 'Single Table'),
                 (2, 'Double Table'),
@@ -66,6 +62,17 @@ class ExtraConfig:
     @dynamic
     def SHINY_BADGE_COUNT(self):
         return self.get_badge_count_by_type(c.SHINY_BADGE)
+
+    @property
+    def PREREG_BADGE_TYPES(self):
+        types = [self.ATTENDEE_BADGE, self.PSEUDO_DEALER_BADGE]
+        for reg_open, badge_type in [(self.BEFORE_GROUP_PREREG_TAKEDOWN, self.PSEUDO_GROUP_BADGE)]:
+            if reg_open:
+                types.append(badge_type)
+        for badge_type in self.BADGE_TYPE_PRICES:
+            if badge_type not in types:
+                types.append(badge_type)
+        return types
 
     @request_cached_property
     @dynamic

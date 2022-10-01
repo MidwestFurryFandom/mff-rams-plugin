@@ -25,15 +25,6 @@ def need_comped_reason(attendee):
 
 
 @validation.Attendee
-def allowed_to_register(attendee):
-    if not attendee.age_group_conf['can_register']:
-        # It's COVID time!
-        return 'At this time, attendees under the age of 12 are unable to receive Covid-19 vaccinations \
-        and cannot attend FurFest 2021. We hope to see you back in 2022. Please email registration@furfest.org \
-        if you have any questions.'
-
-
-@validation.Attendee
 @validation.Group
 def no_emojis(model):
     for column in model.__table__.columns:
@@ -129,5 +120,5 @@ def edit_only_correct_statuses(group):
 
 @validation.Group
 def no_approval_without_power_fee(group):
-    if group.status == c.APPROVED and group.auto_recalc and not group.power_fee and group.default_power_cost == None:
+    if group.status == c.APPROVED and group.auto_recalc and not group.power_fee and group.default_power_fee == None:
         return "Please set a power fee. To provide free power, turn off automatic recalculation."

@@ -2,4 +2,9 @@
 
 I regret to inform you that you have been placed on the waiting list for dealer space at this year's {{ c.EVENT_NAME}}. 
 Please be assured that your placement on the waiting list in no way reflects a rejection of your suitability to deal at {{ c.EVENT_NAME }}. The simple truth is that I received many more applications than I have available tables, and had to make some difficult decisions. If tables later become available, you will be notified.
+
+In the event that being waitlisted will cause you to want to withdraw from the {{ c.EVENT_NAME }} hotel room lottery, please fill out the form here: https://jira.furfest.org/servicedesk/customer/portal/4/create/43
+
+Please create an account if you do not already have one and include your confirmation number for fastest service.
+
 {{ c.MARKETPLACE_EMAIL_SIGNATURE }}
