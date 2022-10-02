@@ -65,6 +65,13 @@ def badge_printed_name(attendee):
 
 
 @validation.Attendee
+def allowed_to_register(attendee):
+    if not attendee.age_group_conf['can_register']:
+        return 'Attendees {} years of age do not need to register, ' \
+            'but MUST be accompanied by a parent or legal guardian with a valid registration at all times!'.format(attendee.age_group_conf['desc'].lower())
+
+
+@validation.Attendee
 def not_in_range(attendee):
     # Staff always keep their badge number regardless of their badge type.
     if c.STAFF_RIBBON not in attendee.ribbon_ints:
