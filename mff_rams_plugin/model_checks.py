@@ -17,6 +17,18 @@ def shirt_for_sponsors(attendee):
         return "Please select a shirt size."
 
 
+@prereg_validation.Attendee
+def no_more_sponsors(attendee):
+    if attendee.badge_type == c.SPONSOR_BADGE and not c.SPONSOR_BADGE_AVAILABLE:
+        return "Sponsor badges have sold out."
+
+
+@prereg_validation.Attendee
+def no_more_sponsors(attendee):
+    if attendee.badge_type == c.SHINY_BADGE and not c.SHINY_BADGE_AVAILABLE:
+        return "Shiny Sponsor badges have sold out."
+
+
 @validation.Attendee
 def need_comped_reason(attendee):
     if attendee.paid == c.NEED_NOT_PAY and not attendee.comped_reason and (
