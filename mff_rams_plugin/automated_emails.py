@@ -1,5 +1,5 @@
 from uber.config import c
-from uber.automated_emails import MarketplaceEmailFixture
+from uber.automated_emails import ArtShowAppEmailFixture, MarketplaceEmailFixture
 from uber.utils import before, days_before
 
 
@@ -23,3 +23,10 @@ MarketplaceEmailFixture(
     lambda g: g.status == c.WAITLISTED and g.registered < c.DEALER_REG_DEADLINE,
     when=before(c.DEALER_WAITLIST_CLOSED),
     ident='dealer_pending_now_waitlisted_mff')
+
+ArtShowAppEmailFixture(
+    '{EVENT_NAME} Charity Donations needed',
+    'art_show/charity.txt',
+    lambda a: a.status == c.APPROVED,
+    when=before(c.ART_SHOW_CHARITY_DEADLINE),
+    ident='art_show_charity')
