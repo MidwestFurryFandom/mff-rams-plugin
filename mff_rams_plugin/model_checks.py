@@ -17,6 +17,18 @@ def shirt_for_sponsors(attendee):
         return "Please select a shirt size."
 
 
+@prereg_validation.Attendee
+def no_more_sponsors(attendee):
+    if attendee.badge_type == c.SPONSOR_BADGE and not c.SPONSOR_BADGE_AVAILABLE and attendee.is_new or attendee.orig_value_of('badge_type') != attendee.badge_type:
+        return "Sponsor badges have sold out."
+
+
+@prereg_validation.Attendee
+def no_more_sponsors(attendee):
+    if attendee.badge_type == c.SHINY_BADGE and not c.SHINY_BADGE_AVAILABLE and attendee.is_new or attendee.orig_value_of('badge_type') != attendee.badge_type:
+        return "Shiny Sponsor badges have sold out."
+
+
 @validation.Attendee
 def need_comped_reason(attendee):
     if attendee.paid == c.NEED_NOT_PAY and not attendee.comped_reason and (
@@ -62,6 +74,13 @@ def no_emojis(model):
 def badge_printed_name(attendee):
     if not attendee.badge_printed_name:
         return 'Please enter a name for your custom-printed badge.'
+
+
+@validation.Attendee
+def allowed_to_register(attendee):
+    if not attendee.age_group_conf['can_register']:
+        return 'Attendees {} years of age do not need to register, ' \
+            'but MUST be accompanied by a parent or legal guardian with a valid registration at all times!'.format(attendee.age_group_conf['desc'].lower())
 
 
 @validation.Attendee
