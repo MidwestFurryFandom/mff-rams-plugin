@@ -1,5 +1,5 @@
 from uber.config import c
-from uber.automated_emails import ArtShowAppEmailFixture, MarketplaceEmailFixture
+from uber.automated_emails import ArtShowAppEmailFixture, MarketplaceEmailFixture, StopsEmailFixture
 from uber.utils import before, days_before
 
 
@@ -30,3 +30,9 @@ ArtShowAppEmailFixture(
     lambda a: a.status == c.APPROVED,
     when=before(c.ART_SHOW_CHARITY_DEADLINE),
     ident='art_show_charity')
+
+StopsEmailFixture(
+    '{EVENT_NAME} Volunteer Application Process',
+    'volunteer_interest.html',
+    lambda a: a.ribbon == c.VOLUNTEER_RIBBON,
+    ident='volunteer_interest')
