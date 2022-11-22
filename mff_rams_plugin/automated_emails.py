@@ -32,7 +32,7 @@ ArtShowAppEmailFixture(
     ident='art_show_charity')
 
 StopsEmailFixture(
-    '{EVENT_NAME} Volunteer Application Process',
+    'Volunteering At {EVENT_NAME}!',
     'volunteer_interest.html',
     lambda a: a.ribbon == c.VOLUNTEER_RIBBON,
     ident='volunteer_interest')
