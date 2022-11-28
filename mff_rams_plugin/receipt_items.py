@@ -2,7 +2,10 @@ from collections import defaultdict
 
 from uber.config import c
 from uber.decorators import cost_calculation, credit_calculation
-from uber.models import Attendee
+from uber.models import Group
+
+Group.cost_changes['power'] = ('Power Level', "calc_group_price_change")
+Group.cost_changes['power_fee'] = ('Custom Power Fee', "calc_group_price_change")
 
 @cost_calculation.Group
 def table_cost(group):
