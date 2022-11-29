@@ -24,7 +24,7 @@ def no_more_sponsors(attendee):
 
 
 @prereg_validation.Attendee
-def no_more_sponsors(attendee):
+def no_more_shiny_sponsors(attendee):
     if attendee.badge_type == c.SHINY_BADGE and not c.SHINY_BADGE_AVAILABLE and attendee.is_new or attendee.orig_value_of('badge_type') != attendee.badge_type:
         return "Shiny Sponsor badges have sold out."
 
