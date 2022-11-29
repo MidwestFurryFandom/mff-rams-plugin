@@ -2,6 +2,6 @@
 
 You still haven't accepted your {{ attendee.badge_type_label }} badge for this year's {{ c.EVENT_NAME }}.  We need to know whether you're coming, so please let us know by your registration at {{ c.URL_BASE }}/preregistration/confirm?id={{ attendee.id }}
 
-We're going to deactivate all un-accepted preregistrations at {{ c.PLACEHOLDER_DEADLINE|datetime_local }}, so please make sure to submit your registration before then.
+You won't be able to check-in at the event until your registration is complete!
 
 {{ c.REGDESK_EMAIL_SIGNATURE }}
