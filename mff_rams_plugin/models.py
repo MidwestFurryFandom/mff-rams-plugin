@@ -84,6 +84,44 @@ class Group:
     def dealer_max_badges(self):
         return c.MAX_DEALERS or min(math.ceil(self.tables) * 3, 12)
 
+    def calc_group_price_change(self, **kwargs):
+        preview_group = Group(**self.to_dict())
+        current_cost = int(self.cost * 100)
+        new_cost = None
+
+        if 'cost' in kwargs:
+            try:
+                preview_group.cost = int(kwargs['cost'])
+            except TypeError:
+                preview_group.cost = 0
+            new_cost = preview_group.cost * 100
+        if 'power_fee' in kwargs:
+            try:
+                preview_group.power_fee = int(kwargs['power_fee'])
+            except TypeError:
+                preview_group.power_fee = 0
+            return self.power_fee * 100, (preview_group.power_fee * 100) - (self.power_fee * 100)
+        if 'power' in kwargs:
+            preview_group.power = int(kwargs['power'])
+            if preview_group.default_power_fee is not None:
+                new_power_fee = int(preview_group.default_power_fee)
+                return self.power_fee * 100, (new_power_fee * 100) - (self.power_fee * 100)
+            elif preview_group.default_power_fee == 0:
+                return self.power_fee * 100, self.power_fee * 100 * -1
+            else:
+                # We changed the power option but that didn't actually change their power fee
+                return 0, 0
+        if 'tables' in kwargs:
+            preview_group.tables = int(kwargs['tables'])
+            return self.default_table_cost * 100, (preview_group.default_table_cost * 100) - (self.default_table_cost * 100)
+        if 'badges' in kwargs:
+            num_new_badges = int(kwargs['badges']) - self.badges_purchased
+            return self.current_badge_cost * 100, self.new_badge_cost * num_new_badges * 100
+
+        if not new_cost:
+            new_cost = int(preview_group.default_cost * 100)
+        return current_cost, new_cost - current_cost
+
 
 @Session.model_mixin
 class MarketplaceApplication:

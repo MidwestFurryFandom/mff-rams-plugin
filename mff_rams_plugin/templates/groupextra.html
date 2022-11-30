@@ -21,6 +21,9 @@
         // Position new field(s)
         if ($('#power-fields').length) {
             var powerOpt = function() {
+                {% if page_ro and group.power %}
+                $('#power_usage').parents('.form-group').show();
+                {% else %}
                 if ($('#power').is(':checked')) {
                     $('#power_usage').parents('.form-group').show();
                 } else if ($('#power :selected').length && $('#power').val() != 0) {
@@ -28,6 +31,7 @@
                 } else {
                     $('#power_usage').parents('.form-group').hide();
                 }
+                {% endif %}
             };
 
             $('#power-fields').insertBefore($.field('description').parents('.form-group'));
