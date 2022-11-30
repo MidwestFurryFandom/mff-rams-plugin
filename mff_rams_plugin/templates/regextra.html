@@ -28,6 +28,16 @@
 
 <script type="text/javascript">
     $(function() {
+        {% if admin_area %}
+            // Override setBadgeNum to show the shirt row if Sponsor or Shiny Sponsor is selected
+            if(setBadgeNum !== undefined) {
+                var origSetBadgeNum = setBadgeNum;
+                setBadgeNum = function() {
+                    origSetBadgeNum();
+                    setVisible($.field('shirt').parents('.form-group'), $.val('badge_type') == {{ c.SPONSOR_BADGE }} || $.val('badge_type') ==  {{ c.SHINY_BADGE }});
+                }
+            }
+        {% endif %}
         if (window.BADGE_TYPES) {
             // Append to the setBadge function to show the shirt row if Sponsor or Shiny Sponsor is selected
             var origSetBadge = setBadge;

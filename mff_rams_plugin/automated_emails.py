@@ -34,5 +34,5 @@ ArtShowAppEmailFixture(
 StopsEmailFixture(
     'Volunteering At {EVENT_NAME}!',
     'volunteer_interest.html',
-    lambda a: a.ribbon == c.VOLUNTEER_RIBBON,
+    lambda a: c.VOLUNTEER_RIBBON in a.ribbon_ints,
     ident='volunteer_interest')
