@@ -1,3 +1,4 @@
+from collections import defaultdict
 from pockets.autolog import log
 from sqlalchemy import func
 from sqlalchemy.sql.expression import literal
@@ -5,6 +6,7 @@ from sqlalchemy.sql.expression import literal
 from uber.config import c
 from uber.decorators import all_renderable, csv_file
 from uber.models import Attendee, Group
+from uber.utils import localized_now
 
 
 class RegistrationDataOneYear:
@@ -237,7 +239,7 @@ class Root:
                 ])
 
     @csv_file
-    def dealers_publication_listing(self, out, session ):
+    def dealers_publication_listing(self, out, session):
         out.writerow([
             'Business Name',
             'Description',
@@ -255,7 +257,26 @@ class Root:
                 ])
 
     @csv_file
-    def illinois_department_of_revenue_report(self, out, session ):
+    def dealer_memberships_report(self, out, session):
+        out.writerow([
+            'Full Name',
+            'Legal Name',
+            'Business Name',
+            'Group Status'
+        ])
+        dealers = session.query(Attendee).join(Attendee.group).filter(
+                                Group.tables > 0).filter(Group.status.in_([c.UNAPPROVED, c.APPROVED, c.WAITLISTED]))
+        for dealer in dealers:
+            if dealer.is_dealer and dealer.first_name:
+                out.writerow([
+                    dealer.full_name,
+                    dealer.legal_name,
+                    dealer.group.name,
+                    dealer.group.status_label,
+                ])
+
+    @csv_file
+    def illinois_department_of_revenue_report(self, out, session):
         out.writerow([
             'Business Name',
             'Point of Contact',
@@ -285,9 +306,33 @@ class Root:
                     group.leader.email if group.leader else '',
                     group.leader.cellphone if group.leader else '',
                     group.tax_number
-                ])    
+                ])
+
+    def dealer_cost_summary(self, session, message=''):
+        paid_groups = session.query(Group.power_fee, Group.name, Group.tables, Group.cost).filter(Group.amount_paid > 0)
+        custom_fee_groups = paid_groups.filter(Group.auto_recalc == False)
+        auto_recalc_groups = paid_groups.filter(Group.auto_recalc == True)
+        table_cost_list = defaultdict(int)
+        for num, desc in c.TABLE_OPTS:
+            table_cost_list[desc] = auto_recalc_groups.filter(Group.tables == num).count() * c.TABLE_PRICES.get(num)
+
+        return {
+            'now': localized_now(),
+            'message': message,
+            'num_custom_groups': custom_fee_groups.count(),
+            'num_auto_groups': auto_recalc_groups.count(),
+            'table_breakdown': table_cost_list.items(),
+            'table_sum': sum(table_cost_list.values()),
+            'badge_sum': session.query(Attendee).join(Attendee.group).filter(Attendee.paid == c.PAID_BY_GROUP,
+                                                                            Attendee.is_dealer == True,
+                                                                            Group.amount_paid > 0,
+                                                                            Group.auto_recalc == True).count() * c.DEALER_BADGE_PRICE,
+            'custom_fee_sum': sum([group.cost for group in custom_fee_groups]),
+            'power_fee_sum': sum([group.power_fee for group in auto_recalc_groups]),
+        }
+
     @csv_file
-    def dealers_application_review_report(self, out, session ):
+    def dealers_application_review_report(self, out, session):
         out.writerow([
             'Business Name',
             'Dealer Name',
