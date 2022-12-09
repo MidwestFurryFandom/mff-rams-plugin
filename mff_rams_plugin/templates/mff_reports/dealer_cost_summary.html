@@ -1,0 +1,41 @@
+{% extends "base.html" %}{% set admin_area=True %}
+{% block title %}Dealer Cost Summary{% endblock %}
+{% block content %}
+<h3 align="center">Dealer Cost Report -- {{ now|datetime("%m/%d/%Y, %-I:%M%p") }}</h3>
+<div class="panel panel-default">
+<table class="table table-bordered" style="margin: 20px; width: calc(100% - 40px);">
+  <tr>
+    <td colspan="2"><strong>Total Fees</strong></td><td width="75%">{{ (table_sum + badge_sum + custom_fee_sum + power_fee_sum)|format_currency }}</td>
+  </tr>
+  <tr>
+    <td></td><td>Badges</td><td>{{ badge_sum|format_currency }}</td>
+  </tr>
+  <tr>
+    <td></td><td>Tables</td><td>{{ table_sum|format_currency }}</td>
+  </tr>
+  <tr>
+    <td></td><td>Power</td><td>{{ power_fee_sum|format_currency }}</td>
+  </tr>
+  <tr>
+    <td></td><td>Custom Fees</td><td>{{ custom_fee_sum|format_currency }}</td>
+  </tr>
+  <tr></tr>
+  <tr>
+    <td colspan="2"><strong># of Paid Groups</strong></td><td>{{ num_custom_groups + num_auto_groups }}</td>
+  </tr>
+  <tr>
+    <td colspan="2"><strong># of Paid Groups with Custom Fees</strong></td><td>{{ num_custom_groups }}</td>
+  </tr>
+  <tr></tr>
+  <tr>
+    <td colspan="2"><strong>Table Fee Breakdown</strong></td><td></td>
+  </tr>
+  {% for desc, sum in table_breakdown %}
+  <tr>
+    <td></td><td>{{ desc }}</td><td>{{ sum|format_currency }}</td>
+  </tr>
+  {% endfor %}
+  <tr></tr>
+</table>
+</div>
+{% endblock %}
