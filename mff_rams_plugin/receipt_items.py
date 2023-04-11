@@ -2,7 +2,7 @@ from collections import defaultdict
 
 from uber.config import c
 from uber.decorators import cost_calculation, credit_calculation
-from uber.models import Group
+from uber.receipt_items import Group
 
 Group.cost_changes['power'] = ('Power Level', "calc_group_price_change")
 Group.cost_changes['power_fee'] = ('Custom Power Fee', "calc_group_price_change")
