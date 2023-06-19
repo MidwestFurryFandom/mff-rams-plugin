@@ -204,14 +204,12 @@ class Attendee:
                 and self.age_group_conf['val'] == c.UNDER_13 \
                 and c.AT_THE_CON:
             if self.badge_type == c.ATTENDEE_BADGE:
-                discount = 33
+                discount = 35
             elif self.badge_type in [c.FRIDAY, c.SUNDAY]:
-                discount = 13
+                discount = 15
             elif self.badge_type == c.SATURDAY:
                 discount = 20
-            if not self.age_group_conf['discount'] \
-                    or self.age_group_conf['discount'] < discount:
-                return -discount
+            return -discount
         return -self.age_group_conf['discount']
 
     @property
