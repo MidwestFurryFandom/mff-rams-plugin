@@ -74,6 +74,22 @@ class ExtraConfig:
                 types.append(badge_type)
         return types
 
+    @property
+    def FORMATTED_BADGE_TYPES(self):
+        badge_types = [{
+            'name': 'Attendee',
+            'desc': 'Allows access to the convention for its duration.',
+            'value': c.ATTENDEE_BADGE
+            }]
+        for badge_type in c.BADGE_TYPE_PRICES:
+            badge_types.append({
+                'name': c.BADGES[badge_type],
+                'desc': 'Donate extra to get an upgraded badge with perks.',
+                'value': badge_type,
+                'price': c.BADGE_TYPE_PRICES[badge_type]
+            })
+        return badge_types
+
     @request_cached_property
     @dynamic
     def AT_THE_DOOR_BADGE_OPTS(self):

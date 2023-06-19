@@ -1,0 +1,10 @@
+{% extends 'forms/personal_info.html' %}
+{% set badge_extras = badge_extras or forms['badge_extras'] %}
+
+{% block name %}
+{{ super() }}
+
+<div class="row g-3">
+    <div class="col">{{ form_macros.form_input(badge_extras.badge_printed_name) }}</div>
+</div>
+{% endblock %}

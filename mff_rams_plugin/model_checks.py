@@ -5,12 +5,6 @@ from uber.config import c
 from uber.model_checks import ignore_unassigned_and_placeholders
 
 
-@prereg_validation.Attendee
-def need_fursuit_option(attendee):
-    if not attendee.fursuiting:
-        return "Please tell us if you are planning to suit or not."
-
-
 @validation.Attendee
 def shirt_for_sponsors(attendee):
     if attendee.badge_type in [c.SPONSOR_BADGE, c.SHINY_BADGE] and attendee.shirt == c.NO_SHIRT:
