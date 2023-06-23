@@ -4,7 +4,7 @@ from datetime import timedelta
 from residue import CoerceUTF8 as UnicodeText
 from pockets import cached_classproperty
 from sqlalchemy import and_, or_
-from sqlalchemy.types import Integer
+from sqlalchemy.types import Boolean, Integer
 from sqlalchemy.ext.hybrid import hybrid_property
 
 from uber.models import Session
@@ -133,7 +133,7 @@ class MarketplaceApplication:
 @Session.model_mixin
 class Attendee:
     comped_reason = Column(UnicodeText, default='', admin_only=True)
-    fursuiting = Column(Choice(c.FURSUITING_OPTS), nullable=True)
+    fursuiting = Column(Boolean, default=False)
     accessibility_requests = Column(MultiChoice(c.ACCESSIBILITY_SERVICE_OPTS))
     other_accessibility_requests = Column(UnicodeText)
 

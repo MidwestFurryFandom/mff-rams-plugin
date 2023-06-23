@@ -39,13 +39,6 @@
             }
         {% endif %}
         if (window.BADGE_TYPES) {
-            // Append to the setBadge function to show the shirt row if Sponsor or Shiny Sponsor is selected
-            var origSetBadge = setBadge;
-            setBadge = function(types, index) {
-                origSetBadge(types, index);
-                setVisible('.shirt-row', $.val('badge_type') == {{ c.SPONSOR_BADGE }} || $.val('badge_type') ==  {{ c.SHINY_BADGE }});
-            };
-
             // Add a link explaining the different levels
             var levels = '<p class="help-block">'+
             '<span class="popup"><a href="https://www.furfest.org/registration" target="_blank">What are these?</a></span>'+
@@ -58,26 +51,14 @@
             $('#reg-types').hide();
         }
 
-        if ($("label[for='pii_consent']").length) {
-            $("label[for='pii_consent']").html($("label[for='pii_consent']").html().replace('accessibility needs', 'accessibility needs, fursuiting plans'));
-        }
-
         // Also set visibility when the page loads
         setVisible('.shirt-row', $.val('badge_type') == {{ c.SPONSOR_BADGE }} || $.val('badge_type') ==  {{ c.SHINY_BADGE }});
         setVisible('.badge-row', true);
-
-        // Hide all the things
-        $.field('found_how').parents('.form-group').hide();
-        $.field('comments').parents('.form-group').hide();
-        $.field('can_spam').parents('.form-group').hide();
          
         // Increase maximum length of badge_printed_name and make it bold
         $.field('badge_printed_name').prop('maxlength', 30);
         $("label[for='badge_printed_name']").removeClass('optional-field');
         $('p:contains("Badge names have a maximum of 20 characters.")').text("Badge names have a maximum of 30 characters.");
-
-    // We don't use amount_extra so we don't want this to do anything
-    donationChanged = function() {};
 
     // We don't want attendees to be able to invalidate themselves
     if ($("[form='invalidate']").length) {
@@ -91,32 +72,6 @@
         {% if not admin_area %}
         $('<p class="help-text"><em>If you have a discount code, enter it now. Agent codes may be added to your badge after logging in.</em></p>').insertAfter($.field('promo_code'));
         {% endif %}
-    }
-
-    if ($(':radio[name=fursuiting]')) {
-        $(':radio[name=fursuiting]').removeAttr('required').parents('.form-group').insertAfter($.field('cellphone').parents('.form-group'));
-        $(":radio[value={{ c.NO_SUIT }}]").parents('label').removeClass('btn-default').addClass('btn-danger');
-        $(":radio[value={{ c.SUIT }}]").parents('label').removeClass('btn-default').addClass('btn-success');
-    }
-
-    if ($.field('accessibility_requests')) {
-        $.field('accessibility_requests').parents('.form-group').insertAfter($.field('requested_accessibility_services').parents('.form-group'));
-
-        var showOrHideRequestedServices = function() {
-                setVisible($.field('accessibility_requests').parents('.form-group'),
-                           $.field('requested_accessibility_services').is(':checked'));
-            };
-
-        var showOrHideOtherRequestedServices = function() {
-            setVisible($.field('other_accessibility_requests').closest('.form-group'),
-                        $('input[type=checkbox][name="accessibility_requests"][value="{{ c.OTHER }}"]').is(':checked'));
-                        
-        }
-        $.field('requested_accessibility_services').click(showOrHideRequestedServices);
-        $('input[type=checkbox][name="accessibility_requests"][value="{{ c.OTHER }}"]').click(showOrHideOtherRequestedServices);
-        
-        showOrHideRequestedServices();
-        showOrHideOtherRequestedServices();
     }
 
     {% if not admin_area and attendee and (attendee.badge_type == c.STAFF_BADGE or c.STAFF_RIBBON|string in attendee.ribbon_ints|string) %}
@@ -141,13 +96,3 @@
     });
 </script>
 
-{{ macros.form_group(attendee, 'fursuiting', type='radio_buttons', label="Do you plan on fursuiting at " + c.EVENT_NAME + "?", help="This is just to help us prepare; it's okay if your plans change!" if not admin_area else "", is_required=True) }}
-
-{% if c.ACCESSIBILITY_SERVICES_ENABLED and (c.HAS_OTHER_REPORTS_ACCESS or not admin_area) %}
-    {{ macros.form_checkgroup(attendee,
-                              'accessibility_requests',
-                              other_field='other_accessibility_requests',
-                              other_placeholder='What other accommodations do you need?',
-                              label='Accommodations Desired',
-                              )}}
-{% endif %}
