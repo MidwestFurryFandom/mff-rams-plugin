@@ -12,7 +12,7 @@ You ({{ attendee.full_name }}) have preregistered for {{ c.EVENT_NAME }} at the 
 Your registration confirmation number is {{ attendee.id }} {% if c.ATTENDEE_ACCOUNTS_ENABLED and attendee.managers %}
 {% if attendee.email != attendee.managers[0].email %}
 and your registration has been processed under account {{ attendee.managers[0].id }} ({{ attendee.managers[0].email }}).
-You can update your contact information, change your badge name, or upgrade your registration level by having your account holder login to their account.
+You can update your contact information, change your badge name, or upgrade your registration level by having your account holder log into their account.
 {% else %}
 and your registration account is {{ attendee.managers[0].id }} ({{ attendee.managers[0].email }}).
 You can update your contact information, change your badge name, upgrade your registration level, or add additional registrations by <a href="{{ c.URL_BASE }}/preregistration/homepage" target="_blank">logging into your account</a>.
