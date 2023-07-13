@@ -1,32 +1,32 @@
 {% set row5 %}
-<div class="col-sm-6">
-    <strong>Phone:</strong> {{ attendee.cellphone }}
+<div class="col-12 col-sm-6">
+    <strong>Phone:</strong> {{ attendee.cellphone|default('N/A', true) }}
 </div>
-<div class="col-sm-6">
+<div class="col-12 col-sm-6">
     <strong>Fursuiting?</strong> {{ attendee.fursuiting|icon_yesno("ok-sign,remove-sign","success,danger") }}</span>
 </div>
 {% endset %}
 
 {% set row6 %}
-<div class="col-sm-6">
+<div class="col-12 col-sm-6">
     <strong>DOB:</strong> {{ attendee.birthdate|datetime('%m/%d/%Y') }}
 </div>
-<div class="col-sm-6">
+<div class="col-12 col-sm-6">
     <strong>Accommodations?</strong> {{ attendee.requested_accessibility_services|icon_yesno("ok-sign,remove-sign","success,danger") }}</span>
 </div>
 {% endset %}
 
 {% set row7 %}
-<div class="col-sm-6">
+<div class="col-12 col-sm-6">
     <strong>Address:</strong> {{ attendee.address1 }} {{ attendee.address2 }}
 </div>
-<div class="col-sm-6">&nbsp;</div>
+<div class="col-12 col-sm-6">&nbsp;</div>
 </row>
 <row>
-<div class="col-sm-6 text-end">
+<div class="col-12 col-sm-6 text-end">
     {{ attendee.city }}{{ attendee.city|yesno(',,') }} {{ attendee.region }} {{ attendee.zip_code }}
 </div>
-<div class="col-sm-6">&nbsp;</div>
+<div class="col-12 col-sm-6">&nbsp;</div>
 </row>
 {% endset %}
 
