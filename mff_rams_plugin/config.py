@@ -79,7 +79,8 @@ class ExtraConfig:
         badge_types = [{
             'name': 'Attendee',
             'desc': 'Allows access to the convention for its duration.',
-            'value': c.ATTENDEE_BADGE
+            'value': c.ATTENDEE_BADGE,
+            'price': c.get_attendee_price()
             }]
         for badge_type in c.BADGE_TYPE_PRICES:
             badge_types.append({
