@@ -95,19 +95,6 @@ def dealer_wares(group):
 
 
 @prereg_validation.Group
-def dealer_description(group):
-    if group.tables and not group.description:
-        return 'Please provide a description for us to evaluate ' \
-               'your submission and use in listings.'
-
-
-@prereg_validation.Group
-def selected_power(group):
-    if not group.power and group.power != 0:
-        return 'Please select what power level you want, or no power.'
-
-
-@prereg_validation.Group
 def power_usage(group):
     if group.power and not group.power_usage:
         return 'Please provide a list of what powered devices you expect to use.'

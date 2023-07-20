@@ -26,7 +26,7 @@ class SessionMixin:
 
 @Session.model_mixin
 class Group:
-    power = Column(Choice(c.DEALER_POWER_OPTS), default=0)
+    power = Column(Choice(c.DEALER_POWER_OPTS), default=-1)
     power_fee = Column(Integer, default=0)
     power_usage = Column(UnicodeText)
     location = Column(UnicodeText, default='', admin_only=True)

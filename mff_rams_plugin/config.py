@@ -45,13 +45,20 @@ class ExtraConfig:
             {int(k): v for k, v in config['power_prices'].items()})
 
     @property
-    def PREREG_DEALER_POWER_OPTS(self):
+    def DEALER_POWER_OPTS(self):
         power_opts = []
         for count, desc in sorted(c.DEALER_POWERS.items()):
-            price_info = ": ${}".format(c.POWER_PRICES[count])\
-                if c.POWER_PRICES.get(count) else ""
-            power_opts.append((count, 'Tier {}{} {}'.format(count, price_info, desc)))
+            if count == 0:
+                power_opts.append((count, desc))
+            else:
+                price_info = ": ${}".format(c.POWER_PRICES[count])\
+                    if c.POWER_PRICES.get(count) else ""
+                power_opts.append((count, 'Tier {}{} {}'.format(count, price_info, desc)))
         return power_opts
+    
+    @property
+    def PREREG_DEALER_POWER_OPTS(self):
+        return [(-1, "Select a Power Level")] + self.DEALER_POWER_OPTS
 
     @request_cached_property
     @dynamic
