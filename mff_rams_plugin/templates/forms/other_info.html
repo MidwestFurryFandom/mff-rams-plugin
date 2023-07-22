@@ -15,7 +15,7 @@
         {% if c.ACCESSIBILITY_SERVICES_ENABLED and (c.HAS_OTHER_REPORTS_ACCESS or not admin_area) %}
         {{ form_macros.form_input(other_info.accessibility_requests, extra_field=form_macros.form_input(other_info.other_accessibility_requests, no_margin=True)) }}
         {{ form_macros.toggle_fields_js(other_info.requested_accessibility_services, [other_info.accessibility_requests], toggle_required=True) }}
-        {{ form_macros.toggle_fields_js(other_info.accessibility_requests, [other_info.other_accessibility_requests], on_values=[c.OTHER], toggle_required=True, hide_row=False) }}
+        {{ form_macros.toggle_fields_js(other_info.accessibility_requests, [other_info.other_accessibility_requests], on_values=[c.OTHER], toggle_required=True, closest_hide_selector='.col') }}
         {% endif %}
     </div>
 </div>

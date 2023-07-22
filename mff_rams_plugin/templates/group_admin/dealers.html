@@ -1,0 +1,47 @@
+{% extends './group_admin/dealers.html' %}
+
+{% block table %}
+<table class="table table-striped datatable" data-info="false">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Approved</th>
+        <th>Website</th>
+        <th>Badges{{ macros.popup_link("../static_views/badgeCounts.html") }}</th>
+        <th>Tables</th>
+        <th>Power Request</th>
+        <th>Cost</th>
+        <th>Owed</th>
+        <th>Paid</th>
+        <th>Admin Notes</th>
+        {% if c.SIGNNOW_DEALER_TEMPLATE_ID %}<th>Signed?</th>{% endif %}
+      </tr>
+    </thead>
+    <tbody>
+  {% for group in groups if group.is_dealer and (show_all or (group.status not in [c.DECLINED, c.IMPORTED, c.CANCELLED])) %}
+      <tr{% if c.SIGNNOW_DEALER_TEMPLATE_ID and not group.signnow_document_signed or group.status in [c.DECLINED, c.CANCELLED] %} class="danger"{% endif %}>
+          <td style="text-align:left" data-order="{{ group.name }}" data-search="{{ group.name }}"> 
+            <a href="form?id={{ group.id }}">{{ group.name|default('?????', boolean=True) }}</a></td>
+          <td>
+              {{ group.status_label }}
+          </td>
+          <td><a href="{{ group.website }}" target="_blank">{{ group.website }}</a></td>
+          <td data-order="{{ group.badges_purchased }}" data-search="{{ group.badges_purchased }}"> {{ group.badges_purchased }} / {{ group.badges }} </td>
+          <td>{{ group.tables_repr }}</td>
+          <td>{{ group.power_label[:6] if group.power > 0 else "No power" }}
+            {% if group.power >= 1 %} for {{ group.power_usage }}{% endif %}
+           </td>
+          <td>{{ group.cost|format_currency }}</td>
+          <td>{{ group.amount_unpaid|format_currency }}
+            {% if group.amount_unpaid and group.dealer_payment_is_late %}
+            (PAYMENT OVERDUE: {{ group.dealer_payment_due|datetime_local }})
+            {% endif %}
+          </td>
+          <td>{{ (group.amount_paid / 100)|format_currency }}</td>
+          <td>{{ group.admin_notes }}</td>
+          {% if c.SIGNNOW_DEALER_TEMPLATE_ID %}<td>{{ group.signnow_document_signed }}</td>{% endif %}
+      </tr>
+  {% endfor %}
+    </tbody>
+  </table>
+{% endblock %}
