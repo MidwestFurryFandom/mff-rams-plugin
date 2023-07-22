@@ -23,9 +23,12 @@ class OtherInfo:
 @MagForm.form_mixin
 class Consents:
     def pii_consent_label(self):
-        label = "<strong>Yes</strong>, I understand and agree that {ORGANIZATION_NAME} will store the personal information I provided above for the limited purposes of contacting me about my registration"
-        label += ', accessibility needs, fursuiting plans, or volunteer opportunities selected at sign-up.'
+        label = "<strong>Yes</strong>, I understand and agree to the data retention policies in {ORGANIZATION_NAME}'s \
+            <a href='{}' target='_blank'>privacy policy.</a>".format(c.PRIVACY_POLICY_URL)
         return Markup(label)
+    
+    def pii_consent_desc(self):
+        return ""
     
 
 @MagForm.form_mixin
