@@ -11,7 +11,7 @@ from uber.custom_tags import format_currency
 from uber.models import Attendee, Session
 from uber.model_checks import invalid_zip_code, invalid_phone_number
 from uber.utils import get_age_from_birthday, get_age_conf_from_birthday
-from uber.decorators import form_validation, new_or_changed_validation, post_form_validation
+from uber.validations.attendee import form_validation, new_or_changed_validation, post_form_validation
 
 @new_or_changed_validation.badge_type
 def sold_out(form, field):
@@ -60,7 +60,7 @@ def need_comped_reason(attendee):
 
 @post_form_validation.badge_num
 def not_in_range(attendee):
-    if c.STAFF_RIBBON in attendee.ribbon_ints:
+    if c.STAFF_RIBBON in attendee.ribbon_ints or not attendee.badge_num:
         return
     
     badge_type = get_real_badge_type(attendee.badge_type)
