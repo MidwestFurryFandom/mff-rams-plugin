@@ -46,8 +46,8 @@ class BadgeExtras:
 @MagForm.form_mixin
 class Consents:
     def pii_consent_label(self):
-        label = "<strong>Yes</strong>, I understand and agree to the data retention policies in {ORGANIZATION_NAME}'s \
-            <a href='{}' target='_blank'>privacy policy.</a>".format(c.PRIVACY_POLICY_URL)
+        label = "<strong>Yes</strong>, I understand and agree to the data retention policies in {}'s \
+            <a href='{}' target='_blank'>privacy policy.</a>".format(c.ORGANIZATION_NAME, c.PRIVACY_POLICY_URL)
         return Markup(label)
     
     def pii_consent_desc(self):
