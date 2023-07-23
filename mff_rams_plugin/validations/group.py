@@ -11,7 +11,7 @@ from uber.custom_tags import format_currency
 from uber.models import Attendee, Session
 from uber.model_checks import invalid_zip_code, invalid_phone_number
 from uber.utils import get_age_from_birthday, get_age_conf_from_birthday
-from uber.decorators import form_validation, new_or_changed_validation, post_form_validation
+from uber.validations.group import form_validation, new_or_changed_validation, post_form_validation
 
 
 @form_validation.none
