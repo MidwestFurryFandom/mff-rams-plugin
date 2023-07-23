@@ -3,9 +3,8 @@
 {% block backlink %}{% endblock %}
 {% block content %}
 
-{% include 'prereg_masthead.html' %}
-<div class="panel panel-default">
-  <div class="panel-body">
+<div class="card">
+  <div class="card-body">
     <h2> Registration Held </h2>
 
     <p>
@@ -18,7 +17,9 @@
 
     <table style="width:auto" align="center">
       <tr>
-        {%- set next_page = 'hotel?id=' + id if c.PREREG_REQUEST_HOTEL_INFO_OPEN else 'index' -%}
+        {%- set next_page = "additional_info" ~ 
+                            ("?group_id=" ~ duplicate.group_id) if duplicate.badge_type == c.PSEUDO_DEALER_BADGE else 
+                            ("?attendee_id=" ~ duplicate.id) -%}
         <td><a href="{{ next_page }}">Continue with registration</a></td>
         <td> &nbsp;&nbsp;&nbsp;&nbsp; </td>
         <td><a href="delete?id={{ attendee.id }}">Cancel</a></td>

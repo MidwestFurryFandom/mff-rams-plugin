@@ -10,6 +10,6 @@
 {% block login_intro %}
     <div class="text-center">
         <h2>Log in</h2>
-        <a href="../accounts/login">MFF Staff? Click here to log in.</a>
+        <a href="../accounts/login{% if original_location %}?original_location={{ original_location }}{% endif %}">MFF Staff? Click here to log in.</a>
     </div>
 {% endblock %}

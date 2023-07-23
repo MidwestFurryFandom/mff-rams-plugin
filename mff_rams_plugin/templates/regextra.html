@@ -38,40 +38,10 @@
                 }
             }
         {% endif %}
-        if (window.BADGE_TYPES) {
-            // Add a link explaining the different levels
-            var levels = '<p class="help-block">'+
-            '<span class="popup"><a href="https://www.furfest.org/registration" target="_blank">What are these?</a></span>'+
-            '</p>';
-            $("label:contains('Badge Level')").append(levels);
-        }
-
-        // No Registration Type boxes
-        if ($('#reg-types').length) {
-            $('#reg-types').hide();
-        }
-
-        // Also set visibility when the page loads
-        setVisible('.shirt-row', $.val('badge_type') == {{ c.SPONSOR_BADGE }} || $.val('badge_type') ==  {{ c.SHINY_BADGE }});
-        setVisible('.badge-row', true);
-         
-        // Increase maximum length of badge_printed_name and make it bold
-        $.field('badge_printed_name').prop('maxlength', 30);
-        $("label[for='badge_printed_name']").removeClass('optional-field');
-        $('p:contains("Badge names have a maximum of 20 characters.")').text("Badge names have a maximum of 30 characters.");
 
     // We don't want attendees to be able to invalidate themselves
     if ($("[form='invalidate']").length) {
         $("[form='invalidate']").remove()
-    }
-
-    // No promo codes! Registration codes!
-    if ($.field('promo_code')) {
-        $("label[for='promo_code']").text("Registration Code");
-        $.field('promo_code').attr("placeholder", "A discount code or an agent code");
-        {% if not admin_area %}
-        $('<p class="help-text"><em>If you have a discount code, enter it now. Agent codes may be added to your badge after logging in.</em></p>').insertAfter($.field('promo_code'));
-        {% endif %}
     }
 
     {% if not admin_area and attendee and (attendee.badge_type == c.STAFF_BADGE or c.STAFF_RIBBON|string in attendee.ribbon_ints|string) %}
