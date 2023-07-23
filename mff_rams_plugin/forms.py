@@ -17,6 +17,16 @@ class OtherInfo:
     other_accessibility_requests = StringField('What other accommodations do you need?')
     fursuiting = BooleanField('I plan on fursuiting at the event.', widget=SwitchInput(), description="This is just to help us prepare; it's okay if your plans change!")
 
+    def get_non_admin_locked_fields(self, attendee):
+        if attendee.is_new:
+            return []
+        
+        locked_fields = []
+        if attendee.badge_type in [c.STAFF_BADGE, c.CONTRACTOR_BADGE]:
+            locked_fields.append('staffing')
+
+        return locked_fields
+
     def requested_accessibility_services_label(self):
         return "I have an accessibility request."
 
@@ -68,6 +78,15 @@ class TableInfo:
         validators.InputRequired("Please provide a description for us to evaluate your submission and use in listings.")
         ], description="This will be used both for dealer selection (if necessary) and in all dealer listings.")
     wares = HiddenField('Wares', validators=[validators.Optional()])
+
+    def get_non_admin_locked_fields(self, group):
+        if group.is_new:
+            return []
+
+        if group.status in c.DEALER_EDITABLE_STATUSES:
+            return ['power']
+        
+        return list(self._fields.keys())
 
     def special_needs_extra_validators(self):
         return [validators.Length(max=1000, message="Special requests cannot be longer than 1000 characters.")]
