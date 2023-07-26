@@ -57,7 +57,9 @@ class Consents:
 @MagForm.form_mixin
 class TableInfo:
     power = IntegerField('Power Level', validators=[
-        validators.InputRequired("Please select what power level you want, or no power.")
+        validators.InputRequired("Please select what power level you want, or no power."),
+        validators.NumberRange(min=0, message="Please select what power level you want, or no power."),
+        validators.NumberRange(max=max(c.DEALER_POWERS.keys()), message="Please select a valid power level.")
         ], widget=IntSelect())
     power_usage = TextAreaField('Power Usage', description="Please provide a listing of what devices you will be using.")
     tax_number = StringField('Illinois Business Tax Number', validators=[
