@@ -45,7 +45,7 @@
 
 <div class="row g-sm-3">
     <div class="col-12 col-sm-6">{{ form_macros.form_input(table_info.power, choices=c.DEALER_POWER_OPTS if admin_area else c.PREREG_DEALER_POWER_OPTS, disabled=not admin_area and not is_prereg_dealer) }}</div>
-    <div class="col-12 col-sm-6">{{ form_macros.form_input(table_info.power_usage) }}</div>
+    <div class="col-12 col-sm-6">{{ form_macros.form_input(table_info.power_usage, required=True) }}</div>
 </div>
 {{ form_macros.toggle_fields_js(table_info.power, [table_info.power_usage], off_values=[-1, 0], toggle_required=True, prop='readonly') }}
 {% endblock %}

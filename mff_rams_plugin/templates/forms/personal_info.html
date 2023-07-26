@@ -5,6 +5,6 @@
 {{ super() }}
 
 <div class="row g-sm-3">
-    <div class="col-12">{{ form_macros.form_input(badge_extras.badge_printed_name) }}</div>
+    <div class="col-12">{{ form_macros.form_input(badge_extras.badge_printed_name, required=True) }}</div>
 </div>
 {% endblock %}
