@@ -1,11 +1,10 @@
 {% extends "./preregistration/preregbase.html" %}
 {% set title_text = "Registration Step 4 of 4: Preregistration Successful" %}
 {% block content %}
-<div class="card card-body">
+<div class="card">
+  <div class="card-body">
   {{ macros.prereg_wizard(c.PAGE_PATH, is_prereg_dealer) }}
 
-<div class="row">
-  <div class="well col-md-offset-1 col-md-10">
     <h1>Registration Complete</h1>
     <p>
       Congratulations! Your registration was successful.
@@ -23,17 +22,14 @@
             {% if preregs|length > 1 %}All attendees will get their own confirmation email.{% endif %}
         </p>
     {% endif %}
-  </div>
-</div>
+  
 
-<div class="row">
-  <div class="col-md-offset-1 col-md-10">
-    <a href="../preregistration/form">
-      <button class="btn btn-primary">Add Another Registration</button>
-    </a>
+    <a href="../preregistration/form" class="btn btn-primary">Add Another Registration</a>
     {% if c.ATTENDEE_ACCOUNTS_ENABLED %}
     <a href="../preregistration/homepage" class="btn btn-info">Manage Your Registrations</a>
-    <a href="../preregistration/logout" class="btn btn-danger">Log Out</a>
     {% endif %}
+  
+  </div>
+</div>
 
 {% endblock %}
