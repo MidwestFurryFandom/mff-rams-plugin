@@ -3,6 +3,7 @@ from wtforms import (BooleanField, DecimalField, EmailField, Form, FormField,
                      HiddenField, SelectField, SelectMultipleField, IntegerField,
                      StringField, TelField, validators, TextAreaField)
 from wtforms.validators import ValidationError, StopValidation
+from pockets.autolog import log
 
 from uber.config import c
 from uber.forms import AddressForm, MultiCheckbox, MagForm, IntSelect, SwitchInput, DollarInput, HiddenIntField
@@ -32,8 +33,8 @@ class OtherInfo:
 
 @MagForm.form_mixin
 class BadgeExtras:
-    def badge_printed_name_extra_validators(self):
-        return [validators.InputRequired("Please enter a name for your custom-printed badge."),
+    def badge_printed_name_validators(self, field):
+        return (field.validators or []) + [validators.InputRequired("Please enter a name for your custom-printed badge."),
                 validators.Length(max=30, message="Your printed badge name is too long. \
                                   Please use less than 30 characters.")]
     
@@ -90,8 +91,9 @@ class TableInfo:
         
         return list(self._fields.keys())
 
-    def special_needs_extra_validators(self):
-        return [validators.Length(max=1000, message="Special requests cannot be longer than 1000 characters.")]
+    def special_needs_validators(self, field):
+        return (field.validators or []) + [
+            validators.Length(max=1000, message="Special requests cannot be longer than 1000 characters.")]
 
     def tables_desc(self):
         return ""
