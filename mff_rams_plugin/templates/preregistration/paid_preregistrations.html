@@ -1,10 +1,6 @@
 {% extends "./preregistration/preregbase.html" %}
-{% block title %}Preregistration Successful{% endblock %}
-{% block backlink %}{% endblock %}
+{% set title_text = "Registration Step 4 of 4: Preregistration Successful" %}
 {% block content %}
-<div class="masthead">
-</div>
-
 <div class="card card-body">
   {{ macros.prereg_wizard(c.PAGE_PATH, is_prereg_dealer) }}
 
