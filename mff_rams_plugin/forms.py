@@ -18,18 +18,9 @@ class OtherInfo:
     other_accessibility_requests = StringField('What other accommodations do you need?')
     fursuiting = BooleanField('I plan on fursuiting at the event.', widget=SwitchInput(), description="This is just to help us prepare; it's okay if your plans change!")
 
-    def get_non_admin_locked_fields(self, attendee):
-        if attendee.is_new:
-            return []
-        
-        locked_fields = []
-        if attendee.badge_type in [c.STAFF_BADGE, c.CONTRACTOR_BADGE]:
-            locked_fields.append('staffing')
-
-        return locked_fields
-
     def requested_accessibility_services_label(self):
         return "I have an accessibility request."
+
 
 @MagForm.form_mixin
 class BadgeExtras:
@@ -38,11 +29,28 @@ class BadgeExtras:
                 validators.Length(max=30, message="Your printed badge name is too long. \
                                   Please use less than 30 characters.")]
     
+    def get_non_admin_locked_fields(self, attendee):
+        locked_fields = self.super_get_non_admin_locked_fields(attendee)
+
+        if attendee.staffing_or_will_be:
+            locked_fields.append('badge_printed_name')
+        
+        return locked_fields
+    
+    def get_optional_fields(self, attendee):
+        optional_fields = self.super_get_optional_fields(attendee)
+
+        if attendee.staffing_or_will_be:
+            optional_fields.append('badge_printed_name')
+        
+        return optional_fields
+    
     def badge_printed_name_desc(self):
         return "Badge names have a maximum of 30 characters."
 
     def badge_type_desc(self):
         return Markup('<span class="popup"><a href="https://www.furfest.org/registration" target="_blank">What are these?</a></span>')
+
 
 @MagForm.form_mixin
 class Consents:
@@ -83,13 +91,12 @@ class TableInfo:
     wares = HiddenField('Wares', validators=[validators.Optional()])
 
     def get_non_admin_locked_fields(self, group):
-        if group.is_new:
-            return []
+        locked_fields = self.super_get_non_admin_locked_fields(group)
 
         if group.status in c.DEALER_EDITABLE_STATUSES:
-            return ['power']
+            locked_fields.append('power')
         
-        return list(self._fields.keys())
+        return locked_fields
 
     def special_needs_validators(self, field):
         return (field.validators or []) + [
