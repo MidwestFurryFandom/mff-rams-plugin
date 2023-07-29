@@ -37,8 +37,8 @@ class BadgeExtras:
         
         return locked_fields
     
-    def get_optional_fields(self, attendee):
-        optional_fields = self.super_get_optional_fields(attendee)
+    def get_optional_fields(self, attendee, is_admin=False):
+        optional_fields = self.super_get_optional_fields(attendee, is_admin)
 
         if attendee.staffing_or_will_be:
             optional_fields.append('badge_printed_name')
