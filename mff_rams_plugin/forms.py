@@ -93,6 +93,9 @@ class TableInfo:
     def get_non_admin_locked_fields(self, group):
         locked_fields = self.super_get_non_admin_locked_fields(group)
 
+        if group.is_new:
+            return locked_fields
+
         if group.status in c.DEALER_EDITABLE_STATUSES:
             locked_fields.append('power')
         
