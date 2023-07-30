@@ -59,6 +59,16 @@ class ExtraConfig:
     @property
     def PREREG_DEALER_POWER_OPTS(self):
         return [(-1, "Select a Power Level")] + self.DEALER_POWER_OPTS
+    
+    def get_badge_count_by_type(self, badge_type):
+        # Since sponsor and shiny sponsor badges are upgrades with limited availability,
+        # this expands how they're counted to match how preordered merch is counted
+        from uber.models import Session, Attendee
+        with Session() as session:
+            count = session.query(Attendee).filter_by(badge_type=badge_type).filter(
+                    ~Attendee.badge_status.in_([c.INVALID_GROUP_STATUS, c.INVALID_STATUS, 
+                                                c.IMPORTED_STATUS, c.REFUNDED_STATUS])).count()
+        return count
 
     @request_cached_property
     @dynamic
