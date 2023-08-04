@@ -29,22 +29,6 @@ class BadgeExtras:
                 validators.Length(max=30, message="Your printed badge name is too long. \
                                   Please use less than 30 characters.")]
     
-    def get_non_admin_locked_fields(self, attendee):
-        locked_fields = self.super_get_non_admin_locked_fields(attendee)
-
-        if attendee.staffing_or_will_be:
-            locked_fields.append('badge_printed_name')
-        
-        return locked_fields
-    
-    def get_optional_fields(self, attendee, is_admin=False):
-        optional_fields = self.super_get_optional_fields(attendee, is_admin)
-
-        if attendee.staffing_or_will_be:
-            optional_fields.append('badge_printed_name')
-        
-        return optional_fields
-    
     def badge_printed_name_desc(self):
         return "Badge names have a maximum of 30 characters."
 
