@@ -8,3 +8,24 @@
     <div class="col-12">{{ form_macros.form_input(badge_extras.badge_printed_name, required=True) }}</div>
 </div>
 {% endblock %}
+
+{% block age %}
+<div class="row g-sm-3">
+  <div class="col-12 col-sm-6">
+  {{ form_macros.form_input(personal_info.birthdate) }}
+  </div>
+
+  <div class="col-12 col-sm-6">
+    {% if not admin_area %}
+    <div class="alert alert-warning" role="alert">
+      <em>
+        Please review our <a href="https://www.furfest.org/support/parents-guide" target="_blank">Parent's Guide</a> for more information about FurFest's policies 
+        regarding the attendance of those under 18 years of age.
+      </em>
+    </div>
+    {% elif admin_area and attendee.birthdate %}
+      ({{ attendee.age_group_conf.desc }})
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
