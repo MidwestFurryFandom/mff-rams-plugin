@@ -9,7 +9,6 @@ from uber.config import c
 from uber.forms import AddressForm, MultiCheckbox, MagForm, IntSelect, SwitchInput, DollarInput, HiddenIntField
 from uber.custom_tags import popup_link, format_currency, pluralize, table_prices
 
-from uber.config import c
 
 @MagForm.form_mixin
 class OtherInfo:
@@ -33,7 +32,7 @@ class BadgeExtras:
         return "Badge names have a maximum of 30 characters."
 
     def badge_type_desc(self):
-        return Markup('<span class="popup"><a href="https://www.furfest.org/registration" target="_blank">What are these?</a></span>')
+        return Markup('<span class="popup"><a href="https://www.furfest.org/registration" target="_blank"><i class="fa fa-question-circle" aria-hidden="true"></i> Badge details, pickup information, and refund policy</a></span>')
 
 
 @MagForm.form_mixin
