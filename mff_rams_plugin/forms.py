@@ -24,7 +24,7 @@ class OtherInfo:
 @MagForm.form_mixin
 class BadgeExtras:
     def badge_printed_name_validators(self, field):
-        return (field.validators or []) + [validators.InputRequired("Please enter a name for your custom-printed badge."),
+        return (field.validators or []) + [validators.DataRequired("Please enter a name for your custom-printed badge."),
                 validators.Length(max=30, message="Your printed badge name is too long. \
                                   Please use less than 30 characters.")]
     
@@ -49,7 +49,7 @@ class Consents:
 @MagForm.form_mixin
 class TableInfo:
     power = IntegerField('Power Level', validators=[
-        validators.InputRequired("Please select what power level you want, or no power."),
+        validators.DataRequired("Please select what power level you want, or no power."),
         validators.NumberRange(min=0, message="Please select what power level you want, or no power."),
         validators.NumberRange(max=max(c.DEALER_POWERS.keys()), message="Please select a valid power level.")
         ], widget=IntSelect())
@@ -69,7 +69,7 @@ class TableInfo:
                 Intellectual Property rules, please confirm that you will not be bringing this merchandise 
                 for sale at MFF.""")
     description = StringField('Merchandise Description', validators=[
-        validators.InputRequired("Please provide a description for us to evaluate your submission and use in listings.")
+        validators.DataRequired("Please provide a description for us to evaluate your submission and use in listings.")
         ], description="This will be used both for dealer selection (if necessary) and in all dealer listings.")
     wares = HiddenField('Wares', validators=[validators.Optional()])
 
