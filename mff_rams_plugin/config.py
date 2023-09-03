@@ -123,16 +123,15 @@ class ExtraConfig:
             opts.append((c.SPONSOR_BADGE,
                          '{} (${})'.format(self.BADGES[c.SPONSOR_BADGE], self.BADGE_TYPE_PRICES[c.SPONSOR_BADGE])))
         if self.ONE_DAYS_ENABLED:
-            if self.PRESELL_ONE_DAYS:
-                day = max(localized_now(), self.EPOCH)
-                while day.date() <= self.ESCHATON.date():
-                    day_name = day.strftime('%A')
-                    if day_name in ["Friday", "Saturday", "Sunday"]:
-                        price = self.BADGE_PRICES['single_day'].get(day_name) or self.DEFAULT_SINGLE_DAY
-                        badge = getattr(self, day_name.upper())
-                        if getattr(self, day_name.upper() + '_AVAILABLE', None):
-                            opts.append((badge, day_name + ' Badge (${})'.format(price)))
-                    day += timedelta(days=1)
+            # We don't ACTUALLY presell one day badges, we just need them split up into days
+            # Also, the event is open Thursday but we do not sell Thursday badges
+            if self.PRESELL_ONE_DAYS and localized_now().date() >= self.EPOCH.date():
+                day_name = localized_now().strftime('%A')
+                if day_name in ["Friday", "Saturday", "Sunday"]:
+                    price = self.BADGE_PRICES['single_day'].get(day_name) or self.DEFAULT_SINGLE_DAY
+                    badge = getattr(self, day_name.upper())
+                    if getattr(self, day_name.upper() + '_AVAILABLE', None):
+                        opts.append((badge, day_name + ' Badge (${})'.format(price)))
             elif self.ONE_DAY_BADGE_AVAILABLE:
                 opts.append((self.ONE_DAY_BADGE, 'Single Day Badge (${})'.format(self.ONEDAY_BADGE_PRICE)))
         return opts
