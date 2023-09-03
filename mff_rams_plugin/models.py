@@ -200,16 +200,13 @@ class Attendee:
 
     @property
     def age_discount(self):
-        if 'val' in self.age_group_conf \
-                and self.age_group_conf['val'] == c.UNDER_13 \
-                and c.AT_THE_CON:
-            if self.badge_type == c.ATTENDEE_BADGE:
-                discount = 35
-            elif self.badge_type in [c.FRIDAY, c.SUNDAY]:
-                discount = 15
-            elif self.badge_type == c.SATURDAY:
-                discount = 20
-            return -discount
+        import math
+        if self.badge_type in [c.SPONSOR_BADGE, c.SHINY_BADGE]:
+            return 0
+        elif self.age_now_or_at_con and self.age_now_or_at_con < 13:
+            half_off = math.ceil(c.BADGE_PRICE / 2)
+            if not self.age_group_conf['discount'] or self.age_group_conf['discount'] < half_off:
+                return -half_off
         return -self.age_group_conf['discount']
 
     @property
