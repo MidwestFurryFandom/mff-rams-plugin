@@ -225,7 +225,7 @@ c.STATIC_HASH_LIST = {
     "styles/styles.css": "sha384-q761r8ICTniYVjj/GZ0VyIVOT9yCO43MR5cspXcTGJpNLtd95PWkHxdoTlF4Lc7b",
     "styles/login.css": "sha384-tKT6+xUzjqdQAhN/87ZGyqhXpazxNuXTF24z2CxXdCPs7XJDCUgj5WIynPxWGOsf",
     "theme/prereg.css": "sha384-FE5a74PVo1LT/knP+n4QqT50AvrY4FIx/5YFuYtRtJ0/2516WbJXnTNS0lYGgj3R",
-    "theme/prereg_extra.css": "sha384-OLBgp1GsljhM2TJ+sbHjaiH9txEUvgdDTAzHv2P24donTt6/529l+9Ua0vFImLlb",
+    "theme/prereg_extra.css": "sha384-1Y2O5xB/ObfxLxE/FH0iH6/XdsbKdTIHvDGSDP7coXZEH+RhmaDXBPCAYva0yube",
     "deps/selectToAutocomplete/jquery-1.11.1.min.js": "sha384-UM1JrZIpBwVf5jj9dTKVvGiiZPZTLVoq4sfdvIe9SBumsvCuv6AHDNtEiIb5h1kU",
     "deps/selectToAutocomplete/jquery-ui.min.js": "sha384-TkwOpfRia7iUdElqSOlUgVT6+cZb8lR/wsXT91RPkrUYQAoCyG3SlfVX8c0Ey5IR",
     "deps/selectToAutocomplete/jquery.select-to-autocomplete.js": "sha384-qUnRY5v9UDiLpcdltjLZlygKiMN2Atj4Ayqp+/YJKRIs/GW1mdEvDuFLohZ9VtIe",
@@ -244,7 +244,7 @@ c.STATIC_HASH_LIST = {
     "analytics/analytics.css": "sha384-dkX0vm6BS1m/WlIYlYo343t7pIPnAwgTdyGJDrZpLiXkG5/7uy7XuMbu93ZqnjW6",
     "deps/jquery/jquery-3.7.0.slim.min.js": "sha384-w5y/xIeYixWvfM+A1cEbmHPURnvyqmVg5eVENruEdDjcyRLUSNej7512JQGspFUr",
     "deps/bootstrap5/bootstrap.min.css": "sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC",
-    "deps/bootstrap5/bootbox.all.min.js": "sha384-ZSs6LKr2GoUPDyHrN+rCQgyHL1yUyok5xMniSrgeRG7rUvA6vTmxronM1eZOfjgz",
+    "deps/bootstrap5/bootbox.all.min.js": "sha384-Iuvblri4OHq06GlDWnUaUNcMgpaj3AiGTiPSVw7PXtEDPu4lj52RmmmEZsW5jL74",
     "deps/bootstrap5/bootstrap.bundle.min.js": "sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM",
     "deps/bootstrap5/font-awesome.min.css": "sha384-CuwP2ckM9Wo6xqj5tG9ZruVMIloIkLp2rqByE1eAQT0dhFF1hYmCB6zTC2SH2nUo",
     "deps/bootstrap5/datatables.min.js": "sha384-CN58bpmXin5Fow0v/oIa4a2ozwWukNdZCFp0tIHjXctyCkoVu8g7JGqTSmV0M6Fx",
@@ -253,5 +253,8 @@ c.STATIC_HASH_LIST = {
     "deps/bootstrap3/bootbox.min.js": "sha384-Nk2l95f1t/58dCc4FTWQZoXfrOoI2DkcpUvgbLk26lL64Yx3DeBbeftGruSisV3a",
     "deps/bootstrap3/bootstrap.min.js": "sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa",
     "deps/bootstrap3/datatables.min.js": "sha384-S5Wb+oeeAwtsSDersXSNo5jSRQ2HxeK9rJL6MnrQAtws1VrhDv3inAuUmNudKHMs",
-    "deps/bootstrap3/datatables.min.css": "sha384-tMUqy/JmkCoLTMQ7lUzW4q/YQQuWHWJlogdb38MxR2tvKHTo3vzfHUo/Cr6R1xIt"
+    "deps/bootstrap3/datatables.min.css": "sha384-tMUqy/JmkCoLTMQ7lUzW4q/YQQuWHWJlogdb38MxR2tvKHTo3vzfHUo/Cr6R1xIt",
+    "deps/jquery/jquery-migrate-3.4.1.js": "sha384-cG5RCHYtwmrSoNV1o0el92fuszs0g3Q7LmgwVE5f6u2Yn/LWDcUeEsDdmAhV0D3e",
+    "js/warn-before-logout-dealer.js": "sha384-OXrEL7xAoSb+ANl19Ersw+KAlXTYfY0RsPnCNnSV0728UrqNtP0qmydzITZC6czF",
+    "js/warn-before-logout.js": "sha384-5PRxRUAXPZOR80tka4DE5DZp9V3v/+lpP1TuesQwDA8bvZQ6J5xBL30OPZGFgFYu",
 }
