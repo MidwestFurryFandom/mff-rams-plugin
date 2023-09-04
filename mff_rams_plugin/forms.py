@@ -13,12 +13,25 @@ from uber.custom_tags import popup_link, format_currency, pluralize, table_price
 @MagForm.form_mixin
 class OtherInfo:
     promo_code = StringField('Registration Code', description="A discount code or an art show agent code.")
-    accessibility_requests = SelectMultipleField('Accommodations Desired', choices=c.ACCESSIBILITY_SERVICE_OPTS, coerce=int, validators=[validators.Optional()], widget=MultiCheckbox())
+    accessibility_requests = SelectMultipleField('Accommodations Desired', validators=[
+        validators.DataRequired("Please select one or more accessbility accommodations.")
+    ], choices=c.ACCESSIBILITY_SERVICE_OPTS, coerce=int, widget=MultiCheckbox())
     other_accessibility_requests = StringField('What other accommodations do you need?')
     fursuiting = BooleanField('I plan on fursuiting at the event.', widget=SwitchInput(), description="This is just to help us prepare; it's okay if your plans change!")
 
+    def get_optional_fields(self, attendee, is_admin=False):
+        optional_list = self.super_get_optional_fields(attendee)
+        if not self.requested_accessibility_services.data:
+            optional_list.append('accessibility_requests')
+
+        return optional_list
+
     def requested_accessibility_services_label(self):
         return "I have an accessibility request."
+    
+    def validate_accessibility_requests(form, field):
+        if field.data and c.OTHER in field.data and not form.other_accessibility_requests.data:
+            raise ValidationError("Please describe what other accommodations you need.")
 
 
 @MagForm.form_mixin
