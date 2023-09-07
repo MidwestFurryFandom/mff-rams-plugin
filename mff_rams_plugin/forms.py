@@ -25,6 +25,9 @@ class OtherInfo:
             optional_list.append('accessibility_requests')
 
         return optional_list
+    
+    def staffing_desc(self):
+        return 
 
     def requested_accessibility_services_label(self):
         return "I have an accessibility request."
