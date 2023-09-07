@@ -11,7 +11,7 @@ this coming {{ event_dates() }}. Below is a copy of your application. You may
     <li><strong>Tables</strong>: {{ group.tables_repr }} ({{ group.default_table_cost|format_currency }}) </li>
     <li><strong>Badges</strong>: {{ group.badges }} badge{{ group.badges|pluralize }} ({{ group.default_badge_cost|format_currency }}) </li>
     {% if group.power %}
-    <li><strong>Power</strong>: {{ c.PREREG_DEALER_POWER_OPTS[group.power][1] }}
+    <li><strong>Tier {{ group.power }} Power</strong>: {{ group.power_label[8:] }} for {{ group.power_usage }}
     {% endif %}
     <li><strong>Total Price</strong>: {{ group.cost|format_currency }}{% if not group.default_power_fee %} plus custom power fee{% endif %}</li>
     <li><strong>Description</strong>: {{ group.description }}</li>
