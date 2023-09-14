@@ -43,7 +43,7 @@ class Root:
     def enter(self, session, id, room_owner=''):
         attendee = session.attendee(id)
         request_headers = _prepare_hotel_lottery_headers(attendee.id, attendee.email)
-        response = requests.post(c.HOTEL_LOTTERY_API_URL, headers=request_headers)
+        response = requests.post(c.HOTEL_LOTTERY_API_URL, headers=request_headers, timeout=10)
         if response.json().get('success', False) == True:
             raise HTTPRedirect("{}?r={}&t={}{}".format(c.HOTEL_LOTTERY_FORM_LINK,
                                                        request_headers['REG_ID'],
@@ -57,7 +57,7 @@ class Root:
     def send_link(self, session, id):
         attendee = session.attendee(id)
         request_headers = _prepare_hotel_lottery_headers(attendee.id, attendee.email, token_type="MAGIC_LINK")
-        response = requests.post(c.HOTEL_LOTTERY_API_URL, headers=request_headers)
+        response = requests.post(c.HOTEL_LOTTERY_API_URL, headers=request_headers, timeout=10)
         if response.json().get('success', False) == True:
             lottery_link = "{}?r={}&t={}".format(c.HOTEL_LOTTERY_FORM_LINK,
                                                        request_headers['REG_ID'],
