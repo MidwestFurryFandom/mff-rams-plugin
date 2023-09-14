@@ -8,9 +8,10 @@ from sqlalchemy import func
 from sqlalchemy.sql.expression import literal
 
 from uber.config import c
-from uber.decorators import all_renderable, ajax, csv_file, requires_account
+from uber.decorators import all_renderable, ajax, csv_file, requires_account, render
 from uber.errors import HTTPRedirect
 from uber.models import Attendee, Group
+from uber.tasks.email import send_email
 from uber.utils import localized_now
 
 def _prepare_hotel_lottery_headers(attendee_id, attendee_email, token_type="X-SITE"):
@@ -34,7 +35,7 @@ class Root:
     @requires_account(Attendee)
     def check_duplicate_emails(self, session, id, **params):
         attendee = session.attendee(id)
-        attendee_count = session.valid_attendees().filter(~Attendee.badge_status.in_([c.REFUNDED_STATUS, c.NOT_ATTENDING, c.DEFERRED_STATUS])
+        attendee_count = session.query(Attendee).filter(Attendee.is_valid == True).filter(~Attendee.badge_status.in_([c.REFUNDED_STATUS, c.NOT_ATTENDING, c.DEFERRED_STATUS])
                                                            ).filter(Attendee.normalized_email == attendee.normalized_email).count()
         return {'count': max(0, attendee_count - 1)}
 
@@ -55,5 +56,20 @@ class Root:
     @requires_account(Attendee)
     def send_link(self, session, id):
         attendee = session.attendee(id)
-        request_headers = _prepare_hotel_lottery_headers(attendee.id, attendee.email, token="MAGIC_LINK")
+        request_headers = _prepare_hotel_lottery_headers(attendee.id, attendee.email, token_type="MAGIC_LINK")
         response = requests.post(c.HOTEL_LOTTERY_API_URL, headers=request_headers)
+        if response.json().get('success', False) == True:
+            lottery_link = "{}?r={}&t={}".format(c.HOTEL_LOTTERY_FORM_LINK,
+                                                       request_headers['REG_ID'],
+                                                       request_headers['TOKEN'])
+            send_email.delay(
+                    attendee.email,
+                    "hotel@furfest.org",
+                    f'Magic link for the {c.EVENT_NAME_AND_YEAR} hotel lottery',
+                    render('emails/hotel_lottery_link.html', {'attendee': attendee, 'magic_link': lottery_link}, encoding=None),
+                    'html',
+                    model=attendee.to_dict('id'))
+            raise HTTPRedirect("../preregistration/homepage?message=", f"Email sent! Please ask {attendee.full_name} to check their email.")
+        else:
+            log.error(f"We tried to register a token for sending a link to the room lottery, but got an error: \
+                      {response.json().get('message', response.text)}")
