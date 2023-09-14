@@ -60,6 +60,10 @@ class ExtraConfig:
     def PREREG_DEALER_POWER_OPTS(self):
         return [(-1, "Select a Power Level")] + self.DEALER_POWER_OPTS
     
+    @property
+    def HOTEL_LOTTERY_OPEN(self):
+        return c.AFTER_HOTEL_LOTTERY_START and c.BEFORE_HOTEL_LOTTERY_DEADLINE
+    
     def get_badge_count_by_type(self, badge_type):
         # Since sponsor and shiny sponsor badges are upgrades with limited availability,
         # this expands how they're counted to match how preordered merch is counted
