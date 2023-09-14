@@ -52,6 +52,7 @@ class Root:
         else:
             log.error(f"We tried to register a token for the room lottery, but got an error: \
                       {response.json().get('message', response.text)}")
+            raise HTTPRedirect("../preregistration/homepage?message={}", f"Sorry, something went wrong. Please try again in a few minutes.")
 
     @requires_account(Attendee)
     def send_link(self, session, id):
@@ -69,7 +70,8 @@ class Root:
                     render('emails/hotel_lottery/magic_link.html', {'attendee': attendee, 'magic_link': lottery_link}, encoding=None),
                     'html',
                     model=attendee.to_dict('id'))
-            raise HTTPRedirect("../preregistration/homepage?message=", f"Email sent! Please ask {attendee.full_name} to check their email.")
+            raise HTTPRedirect("../preregistration/homepage?message={}", f"Email sent! Please ask {attendee.full_name} to check their email.")
         else:
             log.error(f"We tried to register a token for sending a link to the room lottery, but got an error: \
                       {response.json().get('message', response.text)}")
+            raise HTTPRedirect("../preregistration/homepage?message={}", f"Sorry, the link could not be sent at this time. Please try again in a few minutes.")
