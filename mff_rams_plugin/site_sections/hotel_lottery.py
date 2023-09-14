@@ -35,8 +35,8 @@ class Root:
     @requires_account(Attendee)
     def check_duplicate_emails(self, session, id, **params):
         attendee = session.attendee(id)
-        attendee_count = session.query(Attendee).filter(Attendee.is_valid == True).filter(~Attendee.badge_status.in_([c.REFUNDED_STATUS, c.NOT_ATTENDING, c.DEFERRED_STATUS])
-                                                           ).filter(Attendee.normalized_email == attendee.normalized_email).count()
+        attendee_count = session.query(Attendee).filter(Attendee.hotel_lottery_eligible == True
+                                                        ).filter(Attendee.normalized_email == attendee.normalized_email).count()
         return {'count': max(0, attendee_count - 1)}
 
     @requires_account(Attendee)
@@ -63,10 +63,10 @@ class Root:
                                                        request_headers['REG_ID'],
                                                        request_headers['TOKEN'])
             send_email.delay(
+                    c.HOTELS_EMAIL,
                     attendee.email,
-                    "hotel@furfest.org",
-                    f'Magic link for the {c.EVENT_NAME_AND_YEAR} hotel lottery',
-                    render('emails/hotel_lottery_link.html', {'attendee': attendee, 'magic_link': lottery_link}, encoding=None),
+                    f'Entry link for the {c.EVENT_NAME_AND_YEAR} hotel lottery',
+                    render('emails/hotel_lottery/magic_link.html', {'attendee': attendee, 'magic_link': lottery_link}, encoding=None),
                     'html',
                     model=attendee.to_dict('id'))
             raise HTTPRedirect("../preregistration/homepage?message=", f"Email sent! Please ask {attendee.full_name} to check their email.")

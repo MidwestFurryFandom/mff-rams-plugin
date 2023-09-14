@@ -1,6 +1,16 @@
-{% if c.HOTEL_LOTTERY_OPEN and attendee.is_valid and attendee.badge_status not in [c.REFUNDED_STATUS, c.NOT_ATTENDING, c.DEFERRED_STATUS] %}
-{% if attendee.normalized_email != account.email|trim|lower|replace('.', '') %}
-<button type="button" class="btn btn-sm btn-secondary" data-bs-toggle="modal" data-bs-target="#lotteryModal-{{ attendee.id }}" onClick="checkDuplicateEmails('{{ attendee.id }}')">
+{% if c.HOTEL_LOTTERY_OPEN and attendee.hotel_lottery_eligible %}
+{% set hotel_lottery_link = "../hotel_lottery/enter?id=" ~ attendee.id %}
+
+{% if attendee.normalized_email == account.email|trim|lower|replace('.', '') %}
+<a href="{{ hotel_lottery_link }}" class="btn btn-sm btn-secondary" onClick="checkDuplicateEmails('{{ attendee.id }}', '{{ attendee.full_name }}')">
+    <i class="fa fa-hotel"></i>&nbsp; Enter Hotel Lottery
+</a>
+{% elif attendee.age_now_or_at_con and attendee.age_now_or_at_con >= 18 %}
+<a href="../hotel_lottery/send_link?id={{ attendee.id }}" class="btn btn-sm btn-secondary">
+    <i class="fa fa-hotel"></i>&nbsp; Send Lottery Entry Link
+</a>
+{% else %}
+<button type="button" class="btn btn-sm btn-secondary" data-bs-toggle="modal" data-bs-target="#lotteryModal-{{ attendee.id }}" onClick="checkDuplicateEmails('{{ attendee.id }}', '{{ attendee.full_name }}')">
     <i class="fa fa-hotel"></i>&nbsp; Enter Hotel Lottery
 </button>
 
@@ -15,7 +25,7 @@
             <span class="duplicate-warning"></span>
             Please choose one of the following options:
             <div class="card-group">
-                <div class="card">
+                <div class="card" style="max-width: 25rem;">
                     <div class="card-body">
                         <p class="card-text">Enter the hotel lottery as {{ attendee.full_name }}.</p>
                     </div>
@@ -25,8 +35,8 @@
                         </a>
                     </div>
                 </div>
-                {% if account_attendee %}
-                <div class="card">
+                {% if account_attendee and False %}
+                <div class="card" style="max-width: 25rem;">
                     <div class="card-body">
                         <p class="card-text">Enter {{ attendee.full_name }} as a roommate for {{ account_attendee.full_name }}.</p>
                     </div>
@@ -37,7 +47,7 @@
                     </div>
                 </div>
                 {% endif %}
-                <div class="card">
+                <div class="card" style="max-width: 25rem;">
                     <div class="card-body">
                         <p class="card-text">Send a link for entering the hotel lottery to {{ attendee.full_name }}. The link expires in 30 minutes.</p>
                     </div>
@@ -52,10 +62,5 @@
       </div>
     </div>
   </div>
-  {% else %}
-  {% set hotel_lottery_link = "../hotel_lottery/enter?id=" ~ attendee.id %}
-  <a href="{{ hotel_lottery_link }}" class="btn btn-sm btn-secondary" onClick="checkDuplicateEmails('{{ attendee.id }}')">
-    <i class="fa fa-hotel"></i>&nbsp; Enter Hotel Lottery
-</a>
   {% endif %}
 {% endif %}
