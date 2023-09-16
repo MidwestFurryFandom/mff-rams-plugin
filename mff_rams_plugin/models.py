@@ -3,13 +3,14 @@ from datetime import timedelta
 
 from residue import CoerceUTF8 as UnicodeText
 from pockets import cached_classproperty
-from sqlalchemy import and_, or_
+from sqlalchemy import and_, or_, not_
 from sqlalchemy.types import Boolean, Integer
 from sqlalchemy.ext.hybrid import hybrid_property
 
 from uber.models import Session
 from uber.config import c
-from uber.utils import add_opt, localized_now, localize_datetime, remove_opt
+from uber.utils import add_opt, localized_now, localize_datetime, remove_opt, normalize_email_legacy
+from uber.models import Attendee as BaseAttendee
 from uber.models.types import Choice, DefaultColumn as Column, MultiChoice
 from uber.decorators import presave_adjustment
 
@@ -200,16 +201,13 @@ class Attendee:
 
     @property
     def age_discount(self):
-        if 'val' in self.age_group_conf \
-                and self.age_group_conf['val'] == c.UNDER_13 \
-                and c.AT_THE_CON:
-            if self.badge_type == c.ATTENDEE_BADGE:
-                discount = 35
-            elif self.badge_type in [c.FRIDAY, c.SUNDAY]:
-                discount = 15
-            elif self.badge_type == c.SATURDAY:
-                discount = 20
-            return -discount
+        import math
+        if self.badge_type in [c.SPONSOR_BADGE, c.SHINY_BADGE]:
+            return 0
+        elif self.age_now_or_at_con and self.age_now_or_at_con < 13:
+            half_off = math.ceil(c.BADGE_PRICE / 2)
+            if not self.age_group_conf['discount'] or self.age_group_conf['discount'] < half_off:
+                return -half_off
         return -self.age_group_conf['discount']
 
     @property
@@ -277,3 +275,27 @@ class Attendee:
             merch.append(self.extra_merch)
 
         return merch
+    
+    is_valid = BaseAttendee.is_valid
+    badge_status = BaseAttendee.badge_status
+
+    @hybrid_property
+    def hotel_lottery_eligible(self):
+        return self.is_valid and self.badge_status not in [c.REFUNDED_STATUS, c.NOT_ATTENDING, c.DEFERRED_STATUS]
+    
+    @hotel_lottery_eligible.expression
+    def hotel_lottery_eligible(cls):
+        return and_(cls.is_valid,
+            not_(cls.badge_status.in_([c.REFUNDED_STATUS, c.NOT_ATTENDING, c.DEFERRED_STATUS])
+            ))
+    
+
+@Session.model_mixin
+class AttendeeAccount:
+    @property
+    def hotel_eligible_attendees(self):
+        return [attendee for attendee in self.attendees if attendee.hotel_lottery_eligible]
+    
+    @property
+    def hotel_eligible_dealers(self):
+        return [attendee for attendee in self.hotel_eligible_attendees if attendee.is_dealer]

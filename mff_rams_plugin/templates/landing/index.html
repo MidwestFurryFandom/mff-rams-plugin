@@ -1,15 +1,20 @@
 {% extends 'landing/index.html' %}
-{% block landing_info_box %}
-    <div class="alert alert-warning">
-        Please refer to our <a href="https://www.furfest.org/covid-19" target="_blank">Covid-19 Policy</a> 
-        for information regarding current attendee requirements for {{ c.EVENT_NAME_AND_YEAR }}. Non-compliance of the Covid-19 
-        policy will result in badge rescindment.
-    </div>
-{% endblock %}
-
 {% block login_intro %}
     <div class="text-center">
         <h2>Log in</h2>
         <a href="../accounts/login{% if original_location %}?original_location={{ original_location }}{% endif %}">MFF Staff? Click here to log in.</a>
     </div>
+{% endblock %}
+
+{% block content %}
+{{ super() }}
+
+<br/>
+
+<div class="row justify-content-center">
+    <div class="alert alert-secondary col-9" id="mff_read_more">
+        Midwest FurFest is an annual convention produced by <a href="https://www.midwestfurryfandom.org/" target="_blank">Midwest Furry Fandom, Inc</a> to celebrate the furry fandom.
+        <br/><br/>Please log in or create an account to purchase a badge for <a href="https://www.furfest.org/" target="_blank">Midwest FurFest {{ c.EVENT_YEAR }}</a>, which will be held <strong>{{ event_dates() }}</strong> at the Donald E. Stephens Convention Center in Rosemont, IL.
+    </div>
+</div>
 {% endblock %}
