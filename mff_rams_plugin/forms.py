@@ -40,12 +40,14 @@ class OtherInfo:
 @MagForm.form_mixin
 class BadgeExtras:
     def badge_printed_name_validators(self, field):
-        return (field.validators or []) + [validators.DataRequired("Please enter a name for your custom-printed badge."),
-                validators.Length(max=30, message="Your printed badge name is too long. \
-                                  Please use less than 30 characters.")]
+        # TODO: Add an upgrade to load_forms later that does this find and replace for you
+        return [validator for validator in (field.validators or []) if not isinstance(validator, validators.Length)] + [
+            validators.DataRequired("Please enter a name for your custom-printed badge."),
+            validators.Length(max=20, message="Your printed badge name is too long. \
+                              Please use less than 20 characters.")]
     
     def badge_printed_name_desc(self):
-        return "Badge names have a maximum of 30 characters."
+        return "Badge names have a maximum of 20 characters and must not include emoji."
 
     def badge_type_desc(self):
         return Markup('<span class="popup"><a href="https://www.furfest.org/registration" target="_blank"><i class="fa fa-question-circle" aria-hidden="true"></i> Badge details, pickup information, and refund policy</a></span>')
