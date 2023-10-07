@@ -6,7 +6,7 @@ You can pay the {{ group.cost|format_currency }} you owe using the credit card b
 <a href="{{ c.URL_BASE }}/preregistration/group_members?id={{ group.id }}">on this page</a>.
 Payment is expected by: {{ group.dealer_payment_due|datetime_local }} or your application may be removed and your tables filled by another applicant.
 
-{% if group.unassigned_badges %}
+{% if group.unassigned %}
     <br/> <br/>
     Some of your badges are not yet assigned to a specific person. Membership information for these badges must be provided before {{ c.PREREG_TAKEDOWN|datetime_local }}.
     You may do this by <a href="{{ c.URL_BASE }}/preregistration/group_members?id={{ group.id }}">clicking here</a>.
