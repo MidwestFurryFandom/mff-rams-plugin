@@ -17,9 +17,8 @@
 
     <table style="width:auto" align="center">
       <tr>
-        {%- set next_page = "additional_info" ~ 
-                            ("?group_id=" ~ duplicate.group_id) if duplicate.badge_type == c.PSEUDO_DEALER_BADGE else 
-                            ("?attendee_id=" ~ duplicate.id) -%}
+        {%- set url_string = ("?group_id=" ~ attendee.group_id) if attendee.badge_type == c.PSEUDO_DEALER_BADGE else ("?attendee_id=" ~ (attendee.group.id if attendee.group else attendee.id)) %}
+        {%- set next_page = "additional_info" ~ url_string -%}
         <td><a href="{{ next_page }}">Continue with registration</a></td>
         <td> &nbsp;&nbsp;&nbsp;&nbsp; </td>
         <td><a href="delete?id={{ attendee.id }}">Cancel</a></td>
