@@ -9,3 +9,34 @@
     });
 </script>
 {% endif %}
+
+{% if c.PAGE_PATH == '/preregistration/group_members' %}
+<script type="text/javascript">
+    cancelConfirm = function(event){
+        var formToSubmit = this;
+        event.preventDefault();
+        bootbox.confirm({
+            title: "Cancel Dealer Application?",
+            message: "<p>This will permanently cancel your application. All registered badges in the group will be converted to individual badges.</p>" + 
+                     '<p><strong>If you are planning to share a table with another dealer, you must get written permission from {{ "dealers@furfest.org"|email_to_link }} BEFORE cancelling your application.</strong></p>' +
+                     "<p>All table-sharing requests must be sent at least two weeks before the event.</p>" +
+                     "<p>Are you sure you want to cancel your dealer application?</p>",
+            buttons: {
+                confirm: {
+                    label: 'Yes, Cancel My Application',
+                    className: 'btn-danger'
+                },
+                cancel: {
+                    label: 'Nevermind',
+                    className: 'btn-outline-secondary'
+                }
+            },
+            callback: function (result) {
+                if(result) {
+                    formToSubmit.submit();
+                }
+            }
+        });
+    }
+</script>
+{% endif %}
