@@ -22,8 +22,13 @@ MarketplaceEmailFixture(
     'Your {EVENT_NAME} ({EVENT_DATE}) dealer application has been waitlisted',
     'dealers/pending_waitlisted.txt',
     lambda g: g.status == c.WAITLISTED and g.registered < c.DEALER_REG_DEADLINE,
-    when=before(c.DEALER_WAITLIST_CLOSED),
     ident='dealer_pending_now_waitlisted_mff')
+
+MarketplaceEmailFixture(
+    'Your {EVENT_NAME} ({EVENT_DATE}) dealer application has been declined',
+    'dealers/declined.txt',
+    lambda g: g.status == c.DECLINED,
+    ident='dealer_pending_declined_mff')
 
 ArtShowAppEmailFixture(
     '{EVENT_NAME} Charity Donations needed',
