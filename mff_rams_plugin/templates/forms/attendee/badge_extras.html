@@ -1,0 +1,12 @@
+{% extends "uber/templates/forms/attendee/badge_extras.html" %}
+
+{% block add_ons %}{% endblock %}
+
+{% block perk_info %}
+{% if attendee.gets_any_kind_of_shirt or ((not receipt or upgrade_modal) and (c.SPONSOR_BADGE_AVAILABLE or c.SHINY_BADGE_AVAILABLE)) %}
+<div class="row g-sm-3">
+    <div class="col-12">{{ form_macros.form_input(badge_extras.shirt, required=True) }}</div>
+</div>
+{{ form_macros.toggle_fields_js(badge_extras.badge_type, [badge_extras.shirt], on_values=[c.SPONSOR_BADGE, c.SHINY_BADGE], toggle_required=True, source_field_id=id_upgrade_prepend ~ "badge_type") }}
+{% endif %}
+{% endblock %}
