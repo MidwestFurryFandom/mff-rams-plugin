@@ -1,4 +1,4 @@
-{% extends "forms/other_info.html" %}
+{% extends "uber/templates/forms/attendee/prereg_other_info.html" %}
 
 {% block staffing %}
 {% set include_cellphone = 'cellphone' in other_info and not other_info.cellphone.data %}
@@ -24,30 +24,9 @@
 <input type="hidden" name="cellphone" value="{{ other_info.cellphone.data }}" />
 {% endif %}
 
-{% if c.JOB_INTEREST_OPTS or c.PUBLIC_DEPARTMENT_OPTS_WITH_DESC|length > 1 %}
+{% if c.PUBLIC_DEPARTMENT_OPTS_WITH_DESC|length > 1 %}
 <div class="row g-sm-3">
     <div class="col-12">{{ form_macros.form_input(other_info.requested_dept_ids) }}</div>
 </div>
 {% endif %}
-{% endblock %}
-
-{% block interests %}
-{{ super() }}
-<div class="row g-sm-3">
-    <div class="col-12">{{ form_macros.form_input(other_info.fursuiting) }}</div>
-</div>
-{% endblock %}
-
-{% block accessibility %}
-{{ super() }}
-
-<div class="row g-sm-3">
-    <div class="col-12">
-        {% if c.ACCESSIBILITY_SERVICES_ENABLED and (c.HAS_OTHER_REPORTS_ACCESS or not admin_area) %}
-        {{ form_macros.form_input(other_info.accessibility_requests, extra_field=form_macros.form_input(other_info.other_accessibility_requests, no_margin=True)) }}
-        {{ form_macros.toggle_fields_js(other_info.requested_accessibility_services, [other_info.accessibility_requests], toggle_required=True) }}
-        {{ form_macros.toggle_fields_js(other_info.accessibility_requests, [other_info.other_accessibility_requests], on_values=[c.OTHER], toggle_required=True, closest_hide_selector='.col') }}
-        {% endif %}
-    </div>
-</div>
 {% endblock %}
