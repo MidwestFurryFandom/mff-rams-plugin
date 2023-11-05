@@ -145,7 +145,7 @@ class Attendee:
     @presave_adjustment
     def save_group_cost(self):
         if self.group and self.group.auto_recalc:
-            self.group.cost = self.group.default_cost
+            self.group.cost = self.group.calc_default_cost()
 
     @presave_adjustment
     def never_spam(self):
