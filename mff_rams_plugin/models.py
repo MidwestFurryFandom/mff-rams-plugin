@@ -4,7 +4,7 @@ from datetime import timedelta
 from residue import CoerceUTF8 as UnicodeText
 from pockets import cached_classproperty
 from sqlalchemy import and_, or_, not_
-from sqlalchemy.types import Boolean, Integer
+from sqlalchemy.types import Boolean, Integer, Numeric
 from sqlalchemy.ext.hybrid import hybrid_property
 
 from uber.models import Session
@@ -27,6 +27,10 @@ class SessionMixin:
 
 @Session.model_mixin
 class Group:
+    tables = Column(Numeric, default=0)
+    cost = Column(Integer, default=0, admin_only=True)
+    status = Column(Choice(c.DEALER_STATUS_OPTS), default=c.UNAPPROVED, admin_only=True)
+    
     power = Column(Choice(c.DEALER_POWER_OPTS), default=-1)
     power_fee = Column(Integer, default=0)
     power_usage = Column(UnicodeText)
@@ -34,6 +38,14 @@ class Group:
     table_fee = Column(Integer, default=0)
     tax_number = Column(UnicodeText)
     review_notes = Column(UnicodeText)
+
+    @hybrid_property
+    def is_dealer(self):
+        return bool(self.tables or self.cost or self.status not in [c.IMPORTED, c.UNAPPROVED])
+
+    @is_dealer.expression
+    def is_dealer(cls):
+        return or_(cls.tables > 0, cls.cost > 0, not_(cls.status.in_([c.IMPORTED, c.UNAPPROVED])))
 
     @cached_classproperty
     def import_fields(cls):
