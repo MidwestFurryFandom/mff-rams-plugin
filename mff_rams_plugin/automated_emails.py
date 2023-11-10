@@ -1,7 +1,18 @@
 from uber.automated_emails import ArtShowAppEmailFixture, AutomatedEmailFixture, MarketplaceEmailFixture, StopsEmailFixture
 from uber.config import c
-from uber.models import AttendeeAccount
+from uber.models import Attendee, AttendeeAccount
 from uber.utils import before, days_before
+
+
+AutomatedEmailFixture(
+    Attendee,
+    'A Message from Furfest Accessibility Services',
+    'accessibility_info.html',
+    lambda a: a.requested_accessibility_services,
+    when=days_before(7, c.EPOCH),
+    sender='accessibility@furfest.org',
+    ident='accessibility_info',
+)
 
 
 MarketplaceEmailFixture(
