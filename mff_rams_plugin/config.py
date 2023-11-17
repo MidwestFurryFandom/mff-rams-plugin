@@ -106,6 +106,45 @@ class ExtraConfig:
             opts.append(self.SHINY_BADGE)
 
         return opts
+    
+    @request_cached_property
+    @dynamic
+    def FORMATTED_BADGE_TYPES(self):
+        badge_types = []
+        if c.AT_THE_CON and self.ONE_DAYS_ENABLED:
+            if self.PRESELL_ONE_DAYS and localized_now().date() >= self.EPOCH.date() or True:
+                day_name = localized_now().strftime('%A')
+                if day_name in ["Thursday", "Friday", "Saturday", "Sunday"]: # Change to Fri/Sat/Sun
+                    price = self.BADGE_PRICES['single_day'].get(day_name) or self.DEFAULT_SINGLE_DAY
+                    badge = getattr(self, day_name.upper())
+                    if getattr(self, day_name.upper() + '_AVAILABLE', None):
+                        badge_types.append({
+                            'name': day_name,
+                            'desc': "Can be upgraded to an Attendee badge later.",
+                            'value': badge,
+                            'price': price,
+                        })
+            elif self.ONE_DAY_BADGE_AVAILABLE:
+                badge_types.append({
+                    'name': 'Single Day',
+                    'desc': "Can be upgraded to an Attendee badge later.",
+                    'value': c.ONE_DAY_BADGE,
+                    'price': self.DEFAULT_SINGLE_DAY
+                })
+        badge_types.append({
+            'name': 'Attendee',
+            'desc': 'Allows access to the convention for its duration.',
+            'value': c.ATTENDEE_BADGE,
+            'price': c.get_attendee_price()
+            })
+        for badge_type in c.BADGE_TYPE_PRICES:
+            badge_types.append({
+                'name': c.BADGES[badge_type],
+                'desc': 'Donate extra to get an upgraded badge with perks.',
+                'value': badge_type,
+                'price': c.BADGE_TYPE_PRICES[badge_type]
+            })
+        return badge_types
 
     @request_cached_property
     @dynamic
@@ -139,6 +178,9 @@ class ExtraConfig:
             elif self.ONE_DAY_BADGE_AVAILABLE:
                 opts.append((self.ONE_DAY_BADGE, 'Single Day Badge (${})'.format(self.ONEDAY_BADGE_PRICE)))
         return opts
+
+# TODO: Why do we need to redefine this?
+c.TERMINAL_ID_TABLE = {k.lower().replace('-', ''): v for k, v in config['secret']['terminal_ids'].items()}
 
 c.STATIC_HASH_LIST = {
     "fullcalendar-5.3.2/examples/js/theme-chooser.js": "sha384-w5FSPeW6DBrsVHTk/juh/qrSOKuxuqkRcgf+J8hPe+2yZj87TCF1q5sp/l2zV9pm",
