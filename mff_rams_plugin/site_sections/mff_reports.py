@@ -290,7 +290,7 @@ class Root:
             'Phone Number',
             'Tax Number'
         ])
-        dealer_groups = session.query(Group).filter(Group.tables > 0).all()
+        dealer_groups = session.query(Group).filter_by(Group.is_dealer == True).all()
         for group in dealer_groups:
             if group.is_dealer and group.status_label == 'Approved':
                 full_name = group.leader.full_name if group.leader else ''
