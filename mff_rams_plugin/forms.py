@@ -63,6 +63,15 @@ class BadgeExtras:
 
 
 @MagForm.form_mixin
+class AdminBadgeExtras:
+    new_or_changed_validation = CustomValidation()
+
+    @new_or_changed_validation.badge_type
+    def badge_upgrade_sold_out(form, field):
+        pass # Let admins 'oversell' badges
+
+
+@MagForm.form_mixin
 class BadgeFlags:
     comped_reason = StringField("Reason for Comped Badge")
 
