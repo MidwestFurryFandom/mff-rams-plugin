@@ -114,7 +114,7 @@ class ExtraConfig:
         if c.AT_THE_CON and self.ONE_DAYS_ENABLED:
             if self.PRESELL_ONE_DAYS and localized_now().date() >= self.EPOCH.date() or True:
                 day_name = localized_now().strftime('%A')
-                if day_name in ["Thursday", "Friday", "Saturday", "Sunday"]: # Change to Fri/Sat/Sun
+                if day_name in ["Friday", "Saturday", "Sunday"]:
                     price = self.BADGE_PRICES['single_day'].get(day_name) or self.DEFAULT_SINGLE_DAY
                     badge = getattr(self, day_name.upper())
                     if getattr(self, day_name.upper() + '_AVAILABLE', None):
@@ -138,12 +138,13 @@ class ExtraConfig:
             'price': c.get_attendee_price()
             })
         for badge_type in c.BADGE_TYPE_PRICES:
-            badge_types.append({
-                'name': c.BADGES[badge_type],
-                'desc': 'Donate extra to get an upgraded badge with perks.',
-                'value': badge_type,
-                'price': c.BADGE_TYPE_PRICES[badge_type]
-            })
+            if c.PRE_CON or badge_type not in c.SOLD_OUT_BADGE_TYPES:
+                badge_types.append({
+                    'name': c.BADGES[badge_type],
+                    'desc': 'Donate extra to get an upgraded badge with perks.',
+                    'value': badge_type,
+                    'price': c.BADGE_TYPE_PRICES[badge_type]
+                })
         return badge_types
 
     @request_cached_property

@@ -176,6 +176,11 @@ class Attendee:
                                                 ) and self.badge_status == c.IMPORTED_STATUS and self.badge_type != c.STAFF_BADGE:
             self.ribbon = add_opt(self.ribbon_ints, c.STAFF_RIBBON)
 
+    @presave_adjustment
+    def kid_in_tow_badge(self):
+        if self.age_now_or_at_con and self.age_now_or_at_con < 7 and self.badge_type == c.ATTENDEE_BADGE:
+            self.badge_type = c.KID_IN_TOW_BADGE
+
     def undo_extras(self):
         if self.active_receipt:
             return "Could not undo extras, this attendee has an open receipt!"
