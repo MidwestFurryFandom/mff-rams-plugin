@@ -158,6 +158,32 @@ class Attendee:
             self.comped_reason = "Automated: Not Attending badge status."
 
     @presave_adjustment
+    def pit_need_not_pay(self):
+        if self.badge_type == c.PARENT_IN_TOW_BADGE:
+            self.paid = c.NEED_NOT_PAY
+            self.comped_reason = "Automated: Parent in Tow badge."
+
+    def calculate_badge_cost(self, use_promo_code=False):
+        # Adds overrides for a couple special cases where a badge should be free
+        if self.paid == c.NEED_NOT_PAY or self.badge_status == c.NOT_ATTENDING or self.badge_type == c.PARENT_IN_TOW_BADGE:
+            return 0
+        elif self.overridden_price is not None:
+            return self.overridden_price
+        elif self.is_dealer:
+            return c.DEALER_BADGE_PRICE
+        elif self.promo_code_groups:
+            return c.get_group_price()
+        elif self.in_promo_code_group:
+            return self.promo_code.cost
+        else:
+            cost = self.new_badge_cost
+
+        if c.BADGE_PROMO_CODES_ENABLED and self.promo_code and use_promo_code:
+            return self.promo_code.calculate_discounted_price(cost)
+        else:
+            return cost
+
+    @presave_adjustment
     def staffing_badge_and_ribbon_adjustments(self):
         if self.badge_type == c.STAFF_BADGE or c.STAFF_RIBBON in self.ribbon_ints:
             self.ribbon = remove_opt(self.ribbon_ints, c.VOLUNTEER_RIBBON)
@@ -210,7 +236,7 @@ class Attendee:
         if self.badge_type in [c.SPONSOR_BADGE, c.SHINY_BADGE]:
             return 0
         elif self.age_now_or_at_con and self.age_now_or_at_con < 13:
-            half_off = math.ceil(c.BADGE_PRICE / 2)
+            half_off = math.ceil(self.new_badge_cost / 2)
             if not self.age_group_conf['discount'] or self.age_group_conf['discount'] < half_off:
                 return -half_off
         return -self.age_group_conf['discount']
