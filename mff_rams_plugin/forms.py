@@ -11,6 +11,16 @@ from uber.custom_tags import popup_link, format_currency, pluralize, table_price
 
 
 @MagForm.form_mixin
+class PersonalInfo:
+    def get_optional_fields(self, attendee, is_admin=False):
+        optional_list = self.super_get_optional_fields(attendee)
+
+        if c.STAFF_RIBBON in attendee.ribbon_ints and 'onsite_contact' not in optional_list:
+            optional_list.append('onsite_contact')
+
+        return optional_list
+
+@MagForm.form_mixin
 class OtherInfo:
     promo_code = StringField('Registration Code', description="A discount code or an art show agent code.")
     accessibility_requests = SelectMultipleField('Accommodations Desired', validators=[
