@@ -270,6 +270,7 @@ c.STATIC_HASH_LIST = {
     "js/badge_num_barcode.js": "sha384-/SnNKSIYNqoKfPQPzjlVzOGhKprpwnfULI10YIO53t3TL2ESShXD8zqgos8XsCkz",
     "js/servertimecheck.js": "sha384-Y5HavH5aTQVEYJlpWLWAwJ+k2ojugn6r533PoMGcznySyW9Uzq5PAZxyjsAKrqrT",
     "js/load-attendee-modal.js": "sha384-8lGUJFplMQ3ervQ4EZBhl6Zxf+PGlCCwQFXj3mqcysEEFzgvVdTNiTza+/KgKOFh",
+    "js/check-duplicate-email.js": "sha384-/APjfl/cVRBfLU8+wA5ZSegLaUtMkZcNur2c+SBowl4buJZp6hv3ngGt6iT9Vqna",
     "styles/bootstrap.min.css": "sha384-kBDxMwTPdHoj6gazpsPy4h8BnD8sU4Jeo7NbWJ0H03VMluDI3/F9mwnXMZUUkhwB",
     "styles/styles.css": "sha384-q761r8ICTniYVjj/GZ0VyIVOT9yCO43MR5cspXcTGJpNLtd95PWkHxdoTlF4Lc7b",
     "styles/login.css": "sha384-tKT6+xUzjqdQAhN/87ZGyqhXpazxNuXTF24z2CxXdCPs7XJDCUgj5WIynPxWGOsf",
