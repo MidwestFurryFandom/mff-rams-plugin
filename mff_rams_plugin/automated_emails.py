@@ -54,6 +54,12 @@ StopsEmailFixture(
     lambda a: c.VOLUNTEER_RIBBON in a.ribbon_ints,
     ident='volunteer_interest')
 
+StopsEmailFixture(
+    '{EVENT_NAME} Volunteering Update!',
+    'volunteer_update.html',
+    lambda a: c.VOLUNTEER_RIBBON in a.ribbon_ints,
+    ident='volunteer_update')
+
 AutomatedEmailFixture(
     AttendeeAccount,
     '{EVENT_NAME} Hotel Lottery Instructions',
