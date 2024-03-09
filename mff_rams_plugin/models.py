@@ -4,7 +4,7 @@ from datetime import timedelta
 from residue import CoerceUTF8 as UnicodeText
 from pockets import cached_classproperty
 from sqlalchemy import and_, or_, not_
-from sqlalchemy.types import Boolean, Integer
+from sqlalchemy.types import Boolean, Integer, Numeric
 from sqlalchemy.ext.hybrid import hybrid_property
 
 from uber.models import Session
@@ -116,7 +116,7 @@ class Group:
             preview_group.tables = int(kwargs['tables'])
             return self.default_table_cost * 100, (preview_group.default_table_cost * 100) - (self.default_table_cost * 100)
         if 'badges' in kwargs:
-            num_new_badges = int(kwargs['badges']) - self.badges_purchased
+            num_new_badges = int(kwargs['badges']) - self.badges
             return self.current_badge_cost * 100, self.new_badge_cost * num_new_badges * 100
 
         if not new_cost:
@@ -145,7 +145,7 @@ class Attendee:
     @presave_adjustment
     def save_group_cost(self):
         if self.group and self.group.auto_recalc:
-            self.group.cost = self.group.default_cost
+            self.group.cost = self.group.calc_default_cost()
 
     @presave_adjustment
     def never_spam(self):
@@ -156,6 +156,32 @@ class Attendee:
         if self.badge_status == c.NOT_ATTENDING:
             self.paid = c.NEED_NOT_PAY
             self.comped_reason = "Automated: Not Attending badge status."
+
+    @presave_adjustment
+    def pit_need_not_pay(self):
+        if self.badge_type == c.PARENT_IN_TOW_BADGE:
+            self.paid = c.NEED_NOT_PAY
+            self.comped_reason = "Automated: Parent in Tow badge."
+
+    def calculate_badge_cost(self, use_promo_code=False):
+        # Adds overrides for a couple special cases where a badge should be free
+        if self.paid == c.NEED_NOT_PAY or self.badge_status == c.NOT_ATTENDING or self.badge_type == c.PARENT_IN_TOW_BADGE:
+            return 0
+        elif self.overridden_price is not None:
+            return self.overridden_price
+        elif self.is_dealer:
+            return c.DEALER_BADGE_PRICE
+        elif self.promo_code_groups:
+            return c.get_group_price()
+        elif self.in_promo_code_group:
+            return self.promo_code.cost
+        else:
+            cost = self.new_badge_cost
+
+        if c.BADGE_PROMO_CODES_ENABLED and self.promo_code and use_promo_code:
+            return self.promo_code.calculate_discounted_price(cost)
+        else:
+            return cost
 
     @presave_adjustment
     def staffing_badge_and_ribbon_adjustments(self):
@@ -175,6 +201,11 @@ class Attendee:
                                                       c.BADGE_RANGES[c.STAFF_BADGE][1]
                                                 ) and self.badge_status == c.IMPORTED_STATUS and self.badge_type != c.STAFF_BADGE:
             self.ribbon = add_opt(self.ribbon_ints, c.STAFF_RIBBON)
+
+    @presave_adjustment
+    def kid_in_tow_badge(self):
+        if self.age_now_or_at_con and self.age_now_or_at_con < 7 and self.badge_type == c.ATTENDEE_BADGE:
+            self.badge_type = c.KID_IN_TOW_BADGE
 
     def undo_extras(self):
         if self.active_receipt:
@@ -205,7 +236,7 @@ class Attendee:
         if self.badge_type in [c.SPONSOR_BADGE, c.SHINY_BADGE]:
             return 0
         elif self.age_now_or_at_con and self.age_now_or_at_con < 13:
-            half_off = math.ceil(c.BADGE_PRICE / 2)
+            half_off = math.ceil(self.new_badge_cost / 2)
             if not self.age_group_conf['discount'] or self.age_group_conf['discount'] < half_off:
                 return -half_off
         return -self.age_group_conf['discount']

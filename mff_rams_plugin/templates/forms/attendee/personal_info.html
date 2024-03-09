@@ -1,18 +1,9 @@
-{% extends 'forms/personal_info.html' %}
-{% set badge_extras = badge_extras or forms['badge_extras'] %}
-
-{% block name %}
-{{ super() }}
-
-<div class="row g-sm-3">
-    <div class="col-12">{{ form_macros.form_input(badge_extras.badge_printed_name, required=True) }}</div>
-</div>
-{% endblock %}
+{% extends 'uber/templates/forms/attendee/personal_info.html' %}
 
 {% block age %}
 <div class="row g-sm-3">
   <div class="col-12 col-sm-6">
-  {{ form_macros.form_input(personal_info.birthdate) }}
+    {{ form_macros.form_input(personal_info.birthdate, admin_text=attendee.age_group_conf.desc) }}
   </div>
 
   <div class="col-12 col-sm-6">
@@ -23,8 +14,6 @@
         regarding the attendance of those under 18 years of age.
       </em>
     </div>
-    {% elif admin_area and attendee.birthdate %}
-      ({{ attendee.age_group_conf.desc }})
     {% endif %}
   </div>
 </div>

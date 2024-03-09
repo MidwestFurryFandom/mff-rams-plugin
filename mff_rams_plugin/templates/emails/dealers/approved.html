@@ -6,7 +6,7 @@ You can pay the {{ group.cost|format_currency }} you owe using the credit card b
 <a href="{{ c.URL_BASE }}/preregistration/group_members?id={{ group.id }}">on this page</a>.
 Payment is expected by: {{ group.dealer_payment_due|datetime_local }} or your application may be removed and your tables filled by another applicant.
 
-{% if group.unassigned_badges %}
+{% if group.unassigned %}
     <br/> <br/>
     Some of your badges are not yet assigned to a specific person. Membership information for these badges must be provided before {{ c.PREREG_TAKEDOWN|datetime_local }}.
     You may do this by <a href="{{ c.URL_BASE }}/preregistration/group_members?id={{ group.id }}">clicking here</a>.
@@ -16,8 +16,8 @@ Payment is expected by: {{ group.dealer_payment_due|datetime_local }} or your ap
 <p>
 This registration includes:
 <ul>
-    <li> {{ group.tables_repr }} ({{ group.default_table_cost|format_currency }}) </li>
-    <li> {{ group.badges }} badge{{ group.badges|pluralize }} ({{ group.default_badge_cost|format_currency }}) </li>
+    <li> {{ group.tables_repr }}{% if group.auto_recalc %} ({{ group.default_table_cost|format_currency }}){% endif %}</li>
+    <li> {{ group.badges }} badge{{ group.badges|pluralize }}{% if group.auto_recalc %} ({{ group.default_badge_cost|format_currency }}) {% endif %}</li>
     <li> 
         {% if group.power > 0 %}
         Tier {{ group.power }} power ({{ c.DEALER_POWER_OPTS[group.power][1] if group.default_power_fee else "custom" }})

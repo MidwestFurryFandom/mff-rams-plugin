@@ -6,9 +6,19 @@ from wtforms.validators import ValidationError, StopValidation
 from pockets.autolog import log
 
 from uber.config import c
-from uber.forms import AddressForm, MultiCheckbox, MagForm, IntSelect, SwitchInput, DollarInput, HiddenIntField
+from uber.forms import AddressForm, CustomValidation, MultiCheckbox, MagForm, IntSelect, SwitchInput, NumberInputGroup, HiddenIntField
 from uber.custom_tags import popup_link, format_currency, pluralize, table_prices
 
+
+@MagForm.form_mixin
+class PersonalInfo:
+    def get_optional_fields(self, attendee, is_admin=False):
+        optional_list = self.super_get_optional_fields(attendee)
+
+        if c.STAFF_RIBBON in attendee.ribbon_ints and 'onsite_contact' not in optional_list:
+            optional_list.append('onsite_contact')
+
+        return optional_list
 
 @MagForm.form_mixin
 class OtherInfo:
@@ -39,6 +49,15 @@ class OtherInfo:
 
 @MagForm.form_mixin
 class BadgeExtras:
+    new_or_changed_validation = CustomValidation()
+
+    @new_or_changed_validation.badge_type
+    def badge_upgrade_sold_out(form, field):
+        if field.data == c.SPONSOR_BADGE and not c.SPONSOR_BADGE_AVAILABLE:
+            raise ValidationError("Sponsor badges have sold out.")
+        elif field.data == c.SHINY_BADGE and not c.SHINY_BADGE_AVAILABLE:
+            raise ValidationError("Shiny Sponsor badges have sold out.")
+
     def badge_printed_name_validators(self, field):
         # TODO: Add an upgrade to load_forms later that does this find and replace for you
         return [validator for validator in (field.validators or []) if not isinstance(validator, validators.Length)] + [
@@ -51,6 +70,20 @@ class BadgeExtras:
 
     def badge_type_desc(self):
         return Markup('<span class="popup"><a href="https://www.furfest.org/registration" target="_blank"><i class="fa fa-question-circle" aria-hidden="true"></i> Badge details, pickup information, and refund policy</a></span>')
+
+
+@MagForm.form_mixin
+class AdminBadgeExtras:
+    new_or_changed_validation = CustomValidation()
+
+    @new_or_changed_validation.badge_type
+    def badge_upgrade_sold_out(form, field):
+        pass # Let admins 'oversell' badges
+
+
+@MagForm.form_mixin
+class BadgeFlags:
+    comped_reason = StringField("Reason for Comped Badge")
 
 
 @MagForm.form_mixin
@@ -116,4 +149,4 @@ class TableInfo:
 @MagForm.form_mixin
 class AdminTableInfo:
     location = StringField('Table Assignment', render_kw={'placeholder': "Dealer's table location"})
-    power_fee = IntegerField('Power Fee', widget=DollarInput())
+    power_fee = IntegerField('Power Fee', widget=NumberInputGroup())
