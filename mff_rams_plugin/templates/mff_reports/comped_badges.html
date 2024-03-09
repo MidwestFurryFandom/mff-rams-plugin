@@ -8,16 +8,16 @@
   <li class="active">Comped Badges Report</li>
 </ol>
 
-<div class="panel panel-default">
+<div class="card">
     <b>Total:</b> {{ all_comped }} comped badges <br/>
     <strong>Claimed:</strong> {{ claimed_comped }} <br/>
     <strong>Unclaimed:</strong> {{ unclaimed_comped }}
 </div>
 
-<div class="panel panel-default">
+<div class="card">
 </div>
 
-<div class="panel panel-default">
+<div class="card">
 <ul class="nav nav-tabs" role="tablist">
   <li {% if show == "all" %}class="active"{% endif %}><a href="comped_badges?show=all">All</a></li>
   <li {% if show == "claimed" %}class="active"{% endif %}><a href="comped_badges?show=claimed">Claimed</a></li>

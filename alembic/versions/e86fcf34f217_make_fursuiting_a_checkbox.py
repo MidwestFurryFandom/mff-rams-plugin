@@ -1,21 +1,21 @@
-"""Initial migration
+"""Make fursuiting a checkbox
 
-Revision ID: 6fd3a80ca4e0
-Revises: 735063d71b57
-Create Date: 2018-05-08 23:18:35.150928
+Revision ID: e86fcf34f217
+Revises: 9abc513c99cb
+Create Date: 2023-06-14 14:20:23.148850
 
 """
 
 
 # revision identifiers, used by Alembic.
-revision = '6fd3a80ca4e0'
-down_revision = '1ed43776064f'
-branch_labels = ('mff_rams_plugin',)
+revision = 'e86fcf34f217'
+down_revision = '9abc513c99cb'
+branch_labels = None
 depends_on = None
 
 from alembic import op
 import sqlalchemy as sa
-import residue
+
 
 
 try:
@@ -52,18 +52,10 @@ sqlite_reflect_kwargs = {
 
 
 def upgrade():
-    op.add_column('attendee', sa.Column('comped_reason', residue.CoerceUTF8(), server_default='', nullable=False))
-    op.add_column('group', sa.Column('location', residue.CoerceUTF8(), server_default='', nullable=False))
-    op.add_column('group', sa.Column('power', sa.Integer(), server_default='0', nullable=False))
-    op.add_column('group', sa.Column('power_fee', sa.Integer(), server_default='0', nullable=False))
-    op.add_column('group', sa.Column('power_usage', residue.CoerceUTF8(), nullable=False))
-    op.add_column('group', sa.Column('table_fee', sa.Integer(), server_default='0', nullable=False))
+    op.drop_column('attendee', 'fursuiting')
+    op.add_column('attendee', sa.Column('fursuiting', sa.Boolean(), server_default='False', nullable=False))
 
 
 def downgrade():
-    op.drop_column('group', 'table_fee')
-    op.drop_column('group', 'power_usage')
-    op.drop_column('group', 'power_fee')
-    op.drop_column('group', 'power')
-    op.drop_column('group', 'location')
-    op.drop_column('attendee', 'comped_reason')
+    op.drop_column('attendee', 'fursuiting')
+    op.add_column('attendee', sa.Column('fursuiting', sa.INTEGER(), autoincrement=False, nullable=True))

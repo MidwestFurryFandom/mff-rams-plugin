@@ -2,7 +2,7 @@
 {% block title %}Dealer Cost Summary{% endblock %}
 {% block content %}
 <h3 align="center">Dealer Cost Report -- {{ now|datetime("%m/%d/%Y, %-I:%M%p") }}</h3>
-<div class="panel panel-default">
+<div class="card">
 <table class="table table-bordered" style="margin: 20px; width: calc(100% - 40px);">
   <tr>
     <td colspan="2"><strong>Total Fees</strong></td><td width="75%">{{ (table_sum + badge_sum + custom_fee_sum + power_fee_sum)|format_currency }}</td>
