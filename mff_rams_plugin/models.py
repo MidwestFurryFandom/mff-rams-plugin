@@ -306,18 +306,15 @@ class Attendee:
             merch.append(self.extra_merch)
 
         return merch
-    
-    is_valid = BaseAttendee.is_valid
-    badge_status = BaseAttendee.badge_status
 
     @hybrid_property
     def hotel_lottery_eligible(self):
         return self.is_valid and self.badge_status not in [c.REFUNDED_STATUS, c.NOT_ATTENDING, c.DEFERRED_STATUS]
-    
+
     @hotel_lottery_eligible.expression
     def hotel_lottery_eligible(cls):
-        return and_(cls.is_valid,
-            not_(cls.badge_status.in_([c.REFUNDED_STATUS, c.NOT_ATTENDING, c.DEFERRED_STATUS])
+        return and_(BaseAttendee.is_valid,
+            not_(BaseAttendee.badge_status.in_([c.REFUNDED_STATUS, c.NOT_ATTENDING, c.DEFERRED_STATUS])
             ))
     
 
