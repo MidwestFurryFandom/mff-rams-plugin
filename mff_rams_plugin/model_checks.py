@@ -7,14 +7,12 @@ from wtforms.validators import ValidationError, StopValidation
 
 from uber.badge_funcs import get_real_badge_type
 from uber.config import c
-from uber.custom_tags import format_currency
-from uber.models import Attendee, Session
-from uber.model_checks import invalid_zip_code, invalid_phone_number
-from uber.utils import get_age_from_birthday, get_age_conf_from_birthday
-from uber.validations.group import form_validation, new_or_changed_validation, post_form_validation
+from uber.decorators import prereg_validation, validation
 
 
-@form_validation.none
+@validation.Attendee
+@validation.Group
+@validation.ArtShowApplication
 def no_emojis(model):
     for column in model.__table__.columns:
         emojis = re.compile(
@@ -43,10 +41,31 @@ def no_emojis(model):
             r'|[\U0001F980-\U0001F984]|\U0001F9C0'
             r'|[\U0001F1E6-\U0001F1FC][\U0001F1E6-\U0001F1FF])')
         if re.search(emojis, str(getattr(model, column.name))):
-            raise ValidationError('Fields cannot contain emoji.')
-        
-###### Admin-Only Validations ######
-@post_form_validation.power_fee
+            return ('', 'Fields cannot contain emoji.')
+
+
+@validation.Group
 def no_approval_without_power_fee(group):
     if group.status == c.APPROVED and group.auto_recalc and not group.power_fee and group.default_power_fee == None:
         return "Please set a power fee. To provide free power, turn off automatic recalculation."
+
+
+@validation.Attendee
+def need_comped_reason(attendee):
+    if attendee.paid == c.NEED_NOT_PAY and not attendee.comped_reason and (
+                c.STAFF_RIBBON not in attendee.ribbon_ints and attendee.badge_type != c.STAFF_BADGE):
+        return ('comped_reason', 'You must enter a reason for comping this attendee\'s badge.')
+
+
+@validation.Attendee
+def not_in_range(attendee):
+    if c.STAFF_RIBBON in attendee.ribbon_ints or not attendee.badge_num:
+        return
+    
+    badge_type = get_real_badge_type(attendee.badge_type)
+    lower_bound, upper_bound = c.BADGE_RANGES[badge_type]
+    if not (lower_bound <= attendee.badge_num <= upper_bound):
+        return ('badge_num', 'Badge number {} is out of range for badge type {} ({} - {})'.format(attendee.badge_num, 
+                                                                                    c.BADGES[attendee.badge_type],
+                                                                                    lower_bound, 
+                                                                                    upper_bound))

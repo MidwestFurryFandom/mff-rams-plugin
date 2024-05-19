@@ -1,0 +1,7 @@
+{% extends 'uber/templates/preregistration/homepage.html' %}
+
+{% block head_javascript %}
+{{ super() }}
+<meta id="js-script-vars" data-hotel-lottery-faq-url="{{ c.HOTEL_LOTTERY_FAQ_URL }}">
+{{ "js/check-duplicate-email.js"|serve_static_content }}
+{% endblock %}

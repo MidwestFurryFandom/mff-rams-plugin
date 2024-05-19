@@ -106,6 +106,46 @@ class ExtraConfig:
             opts.append(self.SHINY_BADGE)
 
         return opts
+    
+    @request_cached_property
+    @dynamic
+    def FORMATTED_BADGE_TYPES(self):
+        badge_types = []
+        if c.AT_THE_CON and self.ONE_DAYS_ENABLED:
+            if self.PRESELL_ONE_DAYS and localized_now().date() >= self.EPOCH.date() or True:
+                day_name = localized_now().strftime('%A')
+                if day_name in ["Friday", "Saturday", "Sunday"]:
+                    price = self.BADGE_PRICES['single_day'].get(day_name) or self.DEFAULT_SINGLE_DAY
+                    badge = getattr(self, day_name.upper())
+                    if getattr(self, day_name.upper() + '_AVAILABLE', None):
+                        badge_types.append({
+                            'name': day_name,
+                            'desc': "Can be upgraded to an Attendee badge later.",
+                            'value': badge,
+                            'price': price,
+                        })
+            elif self.ONE_DAY_BADGE_AVAILABLE:
+                badge_types.append({
+                    'name': 'Single Day',
+                    'desc': "Can be upgraded to an Attendee badge later.",
+                    'value': c.ONE_DAY_BADGE,
+                    'price': self.DEFAULT_SINGLE_DAY
+                })
+        badge_types.append({
+            'name': 'Attendee',
+            'desc': 'Allows access to the convention for its duration.',
+            'value': c.ATTENDEE_BADGE,
+            'price': c.get_attendee_price()
+            })
+        for badge_type in c.BADGE_TYPE_PRICES:
+            if c.PRE_CON or badge_type not in c.SOLD_OUT_BADGE_TYPES:
+                badge_types.append({
+                    'name': c.BADGES[badge_type],
+                    'desc': 'Donate extra to get an upgraded badge with perks.',
+                    'value': badge_type,
+                    'price': c.BADGE_TYPE_PRICES[badge_type]
+                })
+        return badge_types
 
     @request_cached_property
     @dynamic
@@ -139,6 +179,9 @@ class ExtraConfig:
             elif self.ONE_DAY_BADGE_AVAILABLE:
                 opts.append((self.ONE_DAY_BADGE, 'Single Day Badge (${})'.format(self.ONEDAY_BADGE_PRICE)))
         return opts
+
+# TODO: Why do we need to redefine this?
+c.TERMINAL_ID_TABLE = {k.lower().replace('-', ''): v for k, v in config['secret']['terminal_ids'].items()}
 
 c.STATIC_HASH_LIST = {
     "fullcalendar-5.3.2/examples/js/theme-chooser.js": "sha384-w5FSPeW6DBrsVHTk/juh/qrSOKuxuqkRcgf+J8hPe+2yZj87TCF1q5sp/l2zV9pm",
@@ -227,6 +270,7 @@ c.STATIC_HASH_LIST = {
     "js/badge_num_barcode.js": "sha384-/SnNKSIYNqoKfPQPzjlVzOGhKprpwnfULI10YIO53t3TL2ESShXD8zqgos8XsCkz",
     "js/servertimecheck.js": "sha384-Y5HavH5aTQVEYJlpWLWAwJ+k2ojugn6r533PoMGcznySyW9Uzq5PAZxyjsAKrqrT",
     "js/load-attendee-modal.js": "sha384-8lGUJFplMQ3ervQ4EZBhl6Zxf+PGlCCwQFXj3mqcysEEFzgvVdTNiTza+/KgKOFh",
+    "js/check-duplicate-email.js": "sha384-/APjfl/cVRBfLU8+wA5ZSegLaUtMkZcNur2c+SBowl4buJZp6hv3ngGt6iT9Vqna",
     "styles/bootstrap.min.css": "sha384-kBDxMwTPdHoj6gazpsPy4h8BnD8sU4Jeo7NbWJ0H03VMluDI3/F9mwnXMZUUkhwB",
     "styles/styles.css": "sha384-q761r8ICTniYVjj/GZ0VyIVOT9yCO43MR5cspXcTGJpNLtd95PWkHxdoTlF4Lc7b",
     "styles/login.css": "sha384-tKT6+xUzjqdQAhN/87ZGyqhXpazxNuXTF24z2CxXdCPs7XJDCUgj5WIynPxWGOsf",

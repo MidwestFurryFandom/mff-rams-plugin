@@ -1,7 +1,18 @@
 from uber.automated_emails import ArtShowAppEmailFixture, AutomatedEmailFixture, MarketplaceEmailFixture, StopsEmailFixture
 from uber.config import c
-from uber.models import AttendeeAccount
+from uber.models import Attendee, AttendeeAccount
 from uber.utils import before, days_before
+
+
+AutomatedEmailFixture(
+    Attendee,
+    'A Message from Furfest Accessibility Services',
+    'accessibility_info.html',
+    lambda a: a.requested_accessibility_services,
+    when=days_before(7, c.EPOCH),
+    sender='accessibility@furfest.org',
+    ident='accessibility_info',
+)
 
 
 MarketplaceEmailFixture(
@@ -22,8 +33,13 @@ MarketplaceEmailFixture(
     'Your {EVENT_NAME} ({EVENT_DATE}) dealer application has been waitlisted',
     'dealers/pending_waitlisted.txt',
     lambda g: g.status == c.WAITLISTED and g.registered < c.DEALER_REG_DEADLINE,
-    when=before(c.DEALER_WAITLIST_CLOSED),
     ident='dealer_pending_now_waitlisted_mff')
+
+MarketplaceEmailFixture(
+    'Your {EVENT_NAME} ({EVENT_DATE}) dealer application has been declined',
+    'dealers/declined.txt',
+    lambda g: g.status == c.DECLINED,
+    ident='dealer_pending_declined_mff')
 
 ArtShowAppEmailFixture(
     '{EVENT_NAME} Charity Donations needed',
@@ -37,6 +53,12 @@ StopsEmailFixture(
     'volunteer_interest.html',
     lambda a: c.VOLUNTEER_RIBBON in a.ribbon_ints,
     ident='volunteer_interest')
+
+StopsEmailFixture(
+    '{EVENT_NAME} Volunteering Update!',
+    'volunteer_update.html',
+    lambda a: c.VOLUNTEER_RIBBON in a.ribbon_ints,
+    ident='volunteer_update')
 
 AutomatedEmailFixture(
     AttendeeAccount,

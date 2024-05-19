@@ -1,0 +1,22 @@
+{% extends "uber/templates/forms/attendee/staffing_info.html" %}
+
+{% block staffing %}
+{% set staffing_message = "" %}
+{% if not admin_area %}
+    {% if attendee.badge_type in [c.CONTRACTOR_BADGE, c.STAFF_BADGE] or c.STAFF_RIBBON in attendee.ribbon_ints %}
+    {% set staffing_message = "This checkbox is required for contractors and staff. Please contact Furfest HR if you wish to change your status." %}
+    {% elif attendee.shifts %}
+    {% set staffing_message = "Please " ~ 'go to the Gophers desk to change your volunteer status.' if c.AT_THE_CON else 'unassign yourself from shifts before changing your volunteer status.' %}
+    {% endif %}
+{% endif %}
+<div class="row g-sm-3">
+    <div class="col-12">{{ form_macros.toggle_checkbox(staffing_info.staffing, 
+        [staffing_info.requested_depts_ids], toggle_required=True, help_text=staffing_message) }}</div>
+</div>
+
+{% if c.PUBLIC_DEPARTMENT_OPTS_WITH_DESC|length > 1 %}
+<div class="row g-sm-3">
+    <div class="col-12">{{ form_macros.form_input(staffing_info.requested_depts_ids) }}</div>
+</div>
+{% endif %}
+{% endblock %}
