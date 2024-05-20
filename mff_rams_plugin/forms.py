@@ -12,6 +12,8 @@ from uber.custom_tags import popup_link, format_currency, pluralize, table_price
 
 @MagForm.form_mixin
 class PersonalInfo:
+    kwarg_overrides = {'badge_printed_name': {'maxlength': 30}}
+
     def get_optional_fields(self, attendee, is_admin=False):
         optional_list = self.super_get_optional_fields(attendee)
 
@@ -19,6 +21,16 @@ class PersonalInfo:
             optional_list.append('onsite_contact')
 
         return optional_list
+
+    def badge_printed_name_validators(self, field):
+        # TODO: Add an upgrade to load_forms later that does this find and replace for you
+        return [validator for validator in (field.validators or []) if not isinstance(validator, validators.Length)] + [
+            validators.DataRequired("Please enter a name for your custom-printed badge."),
+            validators.Length(max=30, message="Your printed badge name is too long. \
+                              Please use less than 30 characters.")]
+    
+    def badge_printed_name_desc(self):
+        return "Badge names have a maximum of 30 characters and must not include emoji."
 
 @MagForm.form_mixin
 class OtherInfo:
@@ -57,16 +69,6 @@ class BadgeExtras:
             raise ValidationError("Sponsor badges have sold out.")
         elif field.data == c.SHINY_BADGE and not c.SHINY_BADGE_AVAILABLE:
             raise ValidationError("Shiny Sponsor badges have sold out.")
-
-    def badge_printed_name_validators(self, field):
-        # TODO: Add an upgrade to load_forms later that does this find and replace for you
-        return [validator for validator in (field.validators or []) if not isinstance(validator, validators.Length)] + [
-            validators.DataRequired("Please enter a name for your custom-printed badge."),
-            validators.Length(max=20, message="Your printed badge name is too long. \
-                              Please use less than 20 characters.")]
-    
-    def badge_printed_name_desc(self):
-        return "Badge names have a maximum of 20 characters and must not include emoji."
 
     def badge_type_desc(self):
         return Markup('<span class="popup"><a href="https://www.furfest.org/registration" target="_blank"><i class="fa fa-question-circle" aria-hidden="true"></i> Badge details, pickup information, and refund policy</a></span>')
