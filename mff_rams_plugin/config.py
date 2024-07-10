@@ -17,6 +17,9 @@ c.MENU.append_menu_item(
     ])
 )
 
+c.MENU['People'].append_menu_item(MenuItem(name='Promo Codes',
+                                               href='../promo_codes/index'), position=3)
+
 
 @Config.mixin
 class ExtraConfig:
