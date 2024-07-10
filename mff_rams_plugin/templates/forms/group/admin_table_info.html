@@ -8,13 +8,3 @@
     <div class="col-12 col-sm-6">{{ form_macros.form_input(table_info.location) }}</div>
 </div>
 {% endblock %}
-
-{% block badges_tables %}
-{{ super() }}
-
-<div class="row g-sm-3">
-    <div class="col-12 col-sm-6">{{ form_macros.form_input(table_info.power, choices=c.DEALER_POWER_OPTS) }}</div>
-    <div class="col-12 col-sm-6">{{ form_macros.form_input(table_info.power_usage, required=True) }}</div>
-</div>
-{{ form_macros.toggle_fields_js(table_info.power, [table_info.power_usage], off_values=[-1, 0], toggle_required=True, prop='readonly') }}
-{% endblock %}

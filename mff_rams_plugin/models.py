@@ -57,9 +57,26 @@ class Group:
         # Fix some data weirdness with prior year groups
         self.tables = int(self.tables)
 
+    @presave_adjustment
+    def no_dealer_no_power(self):
+        if not self.is_dealer:
+            self.power = 0
+
     @property
     def default_power_fee(self):
         return c.POWER_PRICES.get(int(self.power), None)
+    
+    def convert_to_shared(self, session):
+        self.tables = 0
+        self.power = 0
+        self.power_fee = 0
+
+        if len(self.floating) < abs(1 - self.badges):
+            new_badges_count = self.badges - len(self.floating)
+        else:
+            new_badges_count = 1
+
+        session.assign_badges(self, new_badges_count)
 
     @property
     def dealer_payment_due(self):

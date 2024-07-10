@@ -214,7 +214,7 @@ class Root:
             'Power Request Info',
             'Location'
         ])
-        dealer_groups = session.query(Group).filter(Group.tables > 0).all()
+        dealer_groups = session.query(Group).filter(Group.is_dealer == True).all()
         for group in dealer_groups:
             if group.is_dealer:
                 full_name = group.leader.full_name if group.leader else ''
@@ -246,15 +246,15 @@ class Root:
             'URL',
             'Location'
         ])
-        dealer_groups = session.query(Group).filter(Group.tables > 0).all()
+        dealer_groups = session.query(Group).filter(Group.is_dealer == True,
+                                                    Group.status.in_([c.APPROVED, c.SHARED])).all()
         for group in dealer_groups:
-            if group.is_dealer and group.status_label == 'Approved':
-                out.writerow([
-                    group.name,
-                    group.description,
-                    group.website,
-                    group.location
-                ])
+            out.writerow([
+                group.name,
+                group.description,
+                group.website,
+                group.location
+            ])
 
     @csv_file
     def dealer_memberships_report(self, out, session):
@@ -265,7 +265,7 @@ class Root:
             'Group Status'
         ])
         dealers = session.query(Attendee).join(Attendee.group).filter(
-                                Group.tables > 0).filter(Group.status.in_([c.UNAPPROVED, c.APPROVED, c.WAITLISTED]))
+            Group.is_dealer == True, Group.status.in_([c.UNAPPROVED, c.APPROVED, c.SHARED, c.WAITLISTED]))
         for dealer in dealers:
             if dealer.is_dealer and dealer.first_name:
                 out.writerow([
@@ -290,26 +290,26 @@ class Root:
             'Phone Number',
             'Tax Number'
         ])
-        dealer_groups = session.query(Group).filter(Group.is_dealer == True).all()
+        dealer_groups = session.query(Group).filter(Group.is_dealer == True,
+                                                    Group.status.in_([c.APPROVED, c.SHARED])).all()
         for group in dealer_groups:
-            if group.is_dealer and group.status_label == 'Approved':
-                full_name = group.leader.full_name if group.leader else ''
-                out.writerow([
-                    group.name,
-                    full_name,
-                    group.address1,
-                    group.address2,
-                    group.city,
-                    group.region,
-                    group.zip_code,
-                    group.country,
-                    group.leader.email if group.leader else '',
-                    group.leader.cellphone if group.leader else '',
-                    group.tax_number
-                ])
+            out.writerow([
+                group.name,
+                group.leader.full_name if group.leader else '',
+                group.address1,
+                group.address2,
+                group.city,
+                group.region,
+                group.zip_code,
+                group.country,
+                group.leader.email if group.leader else '',
+                group.leader.cellphone if group.leader else '',
+                group.tax_number
+            ])
 
     def dealer_cost_summary(self, session, message=''):
-        paid_groups = session.query(Group.power_fee, Group.name, Group.tables, Group.cost).filter(Group.amount_paid > 0)
+        paid_groups = session.query(Group.power_fee, Group.name, Group.tables, Group.cost).filter(Group.is_dealer == True,
+                                                                                                  Group.amount_paid > 0)
         custom_fee_groups = paid_groups.filter(Group.auto_recalc == False)
         auto_recalc_groups = paid_groups.filter(Group.auto_recalc == True)
         table_cost_list = defaultdict(int)
@@ -348,7 +348,7 @@ class Root:
             'Power Requested',
             'Power Request Info'
         ])
-        dealer_groups = session.query(Group).filter(Group.tables > 0).all()
+        dealer_groups = session.query(Group).filter(Group.is_dealer == True).all()
         for group in dealer_groups:
             if group.is_dealer and group.status_label == 'Pending Approval':
                 full_name = group.leader.full_name if group.leader else ''
