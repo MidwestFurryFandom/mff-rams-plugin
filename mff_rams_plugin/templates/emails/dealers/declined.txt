@@ -1,5 +1,5 @@
 {{ group.leader.first_name }},
 
-Unfortunately, with the huge number of excellent, talented, exciting dealers that have applied this year, we have had to make some hard decisions and cannot fit everyone we would have liked in the Dealer Den, even with the expansion. We have far more applications than any kind of reasonable waitlist, so we are cancelling those dealers past 100 on the waitlist, which includes yours. This is in no way a reflection on your suitability or talent, but we want you to know so you can plan accordingly.
+Unfortunately, with the huge number of excellent, talented, exciting dealers that have applied this year, we have had to make some hard decisions and cannot fit everyone we would have liked in the Dealer Den, even with the expansion. We have far more applications than any kind of reasonable waitlist, so we are canceling those dealers past 100 on the waitlist, which includes yours. This is in no way a reflection on your suitability or talent, but we want you to know so you can plan accordingly.
 
 {{ c.MARKETPLACE_EMAIL_SIGNATURE }}
