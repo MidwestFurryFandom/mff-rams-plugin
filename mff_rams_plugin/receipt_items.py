@@ -26,4 +26,4 @@ def power_cost(group):
     if group.default_power_fee:
         return ("Tier {} Power Fee".format(group.power), int(group.default_power_fee) * 100, 'power')
     elif group.power_fee:
-        return ("Custom Fee for Tier {} Power".format(group.power), group.power_fee * 100, 'power_fee')
+        return ("Custom Fee for Tier {} Power".format(group.power), int(group.power_fee) * 100, 'power_fee')
