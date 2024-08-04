@@ -3,6 +3,7 @@ from datetime import timedelta
 
 from residue import CoerceUTF8 as UnicodeText
 from pockets import cached_classproperty
+from pockets.autolog import log
 from sqlalchemy import and_, or_, not_
 from sqlalchemy.types import Boolean, Integer, Numeric
 from sqlalchemy.ext.hybrid import hybrid_property
@@ -51,6 +52,8 @@ class Group:
 
         if self.power_fee == None:
             self.power_fee = 0
+        else:
+            self.power_fee = int(self.power_fee)
 
     @presave_adjustment
     def float_table_to_int(self):
@@ -162,7 +165,10 @@ class Attendee:
     @presave_adjustment
     def save_group_cost(self):
         if self.group and self.group.auto_recalc and not self.is_new:
-            self.group.cost = self.group.calc_default_cost()
+            try:
+                self.group.cost = self.group.calc_default_cost()
+            except Exception:
+                log.exception("Problem when saving group cost from save_group_cost!")
 
     @presave_adjustment
     def never_spam(self):
