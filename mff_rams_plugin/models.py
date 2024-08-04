@@ -161,7 +161,7 @@ class Attendee:
 
     @presave_adjustment
     def save_group_cost(self):
-        if self.group and self.group.auto_recalc:
+        if self.group and self.group.auto_recalc and not self.is_new:
             self.group.cost = self.group.calc_default_cost()
 
     @presave_adjustment
