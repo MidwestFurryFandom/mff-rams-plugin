@@ -1,6 +1,6 @@
 from uber.automated_emails import ArtShowAppEmailFixture, AutomatedEmailFixture, MarketplaceEmailFixture, StopsEmailFixture
 from uber.config import c
-from uber.models import Attendee, AttendeeAccount
+from uber.models import Attendee, AttendeeAccount, AutomatedEmail
 from uber.utils import before, days_before
 
 

@@ -113,6 +113,7 @@ class MarketplaceApplication:
 
 @Session.model_mixin
 class Attendee:
+    consent_form_email = Column(UnicodeText)
     comped_reason = Column(UnicodeText, default='', admin_only=True)
     fursuiting = Column(Boolean, default=False)
     accessibility_requests = Column(MultiChoice(c.ACCESSIBILITY_SERVICE_OPTS))
@@ -186,6 +187,10 @@ class Attendee:
     def kid_in_tow_badge(self):
         if self.age_now_or_at_con and self.age_now_or_at_con < 7 and self.badge_type == c.ATTENDEE_BADGE:
             self.badge_type = c.KID_IN_TOW_BADGE
+
+    def cc_emails_for_ident(self, ident=''):
+        if ident == 'under_18_parental_consent_reminder':
+            return self.consent_form_email
 
     def undo_extras(self):
         if self.active_receipt:

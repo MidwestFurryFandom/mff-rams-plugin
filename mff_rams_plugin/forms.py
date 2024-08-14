@@ -12,13 +12,24 @@ from uber.custom_tags import popup_link, format_currency, pluralize, table_price
 
 @MagForm.form_mixin
 class PersonalInfo:
+    field_validation, new_or_changed_validation = CustomValidation(), CustomValidation()
     kwarg_overrides = {'badge_printed_name': {'maxlength': 30}}
+    consent_form_email = EmailField('Email for Consent Forms', validators=[
+        validators.DataRequired("Please enter an email address for us to send consent forms to."),
+        validators.Length(max=255, message="Email addresses cannot be longer than 255 characters."),
+        validators.Email(granular_message=True),
+        ],
+        description="We will send consent forms to this email address.",
+        render_kw={'placeholder': 'test@example.com'})
 
     def get_optional_fields(self, attendee, is_admin=False):
         optional_list = self.super_get_optional_fields(attendee)
 
         if c.STAFF_RIBBON in attendee.ribbon_ints and 'onsite_contact' not in optional_list:
             optional_list.append('onsite_contact')
+        
+        if not attendee.birthdate or not attendee.age_group_conf['consent_form']:
+            optional_list.append('consent_form_email')
 
         return optional_list
 
@@ -31,6 +42,10 @@ class PersonalInfo:
     
     def badge_printed_name_desc(self):
         return "Badge names have a maximum of 30 characters and must not include emoji."
+    
+    @field_validation.cellphone
+    def not_same_cellphone_ec(form, field):
+        return
 
 @MagForm.form_mixin
 class OtherInfo:
