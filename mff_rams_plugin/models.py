@@ -194,7 +194,7 @@ class Attendee:
             self.badge_type = c.KID_IN_TOW_BADGE
 
     def cc_emails_for_ident(self, ident=''):
-        if ident == 'under_18_parental_consent_reminder':
+        if ident == 'under_18_parental_consent_reminder' and self.email != self.consent_form_email:
             return self.consent_form_email
 
     def undo_extras(self):
