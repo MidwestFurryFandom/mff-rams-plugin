@@ -183,8 +183,10 @@ class ExtraConfig:
                 opts.append((self.ONE_DAY_BADGE, 'Single Day Badge (${})'.format(self.ONEDAY_BADGE_PRICE)))
         return opts
 
+
 # TODO: Why do we need to redefine this?
 c.TERMINAL_ID_TABLE = {k.lower().replace('-', ''): v for k, v in config['secret']['terminal_ids'].items()}
+
 
 c.STATIC_HASH_LIST = {
     "fullcalendar-5.3.2/examples/js/theme-chooser.js": "sha384-w5FSPeW6DBrsVHTk/juh/qrSOKuxuqkRcgf+J8hPe+2yZj87TCF1q5sp/l2zV9pm",

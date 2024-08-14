@@ -48,7 +48,7 @@ class Group:
     @presave_adjustment
     def set_power_fee(self):
         if self.auto_recalc:
-            self.power_fee = self.default_power_fee or self.power_fee
+            self.power_fee = self.power_fee if self.default_power_fee is None else self.default_power_fee
 
         if self.power_fee == None:
             self.power_fee = 0
@@ -105,44 +105,6 @@ class Group:
     def dealer_max_badges(self):
         return c.MAX_DEALERS or min(math.ceil(self.tables) * 3, 12)
 
-    def calc_group_price_change(self, **kwargs):
-        preview_group = Group(**self.to_dict())
-        current_cost = int(self.cost * 100)
-        new_cost = None
-
-        if 'cost' in kwargs:
-            try:
-                preview_group.cost = int(kwargs['cost'])
-            except TypeError:
-                preview_group.cost = 0
-            new_cost = preview_group.cost * 100
-        if 'power_fee' in kwargs:
-            try:
-                preview_group.power_fee = int(kwargs['power_fee'])
-            except TypeError:
-                preview_group.power_fee = 0
-            return self.power_fee * 100, (preview_group.power_fee * 100) - (self.power_fee * 100)
-        if 'power' in kwargs:
-            preview_group.power = int(kwargs['power'])
-            if preview_group.default_power_fee is not None:
-                new_power_fee = int(preview_group.default_power_fee)
-                return self.power_fee * 100, (new_power_fee * 100) - (self.power_fee * 100)
-            elif preview_group.default_power_fee == 0:
-                return self.power_fee * 100, self.power_fee * 100 * -1
-            else:
-                # We changed the power option but that didn't actually change their power fee
-                return 0, 0
-        if 'tables' in kwargs:
-            preview_group.tables = int(kwargs['tables'])
-            return self.default_table_cost * 100, (preview_group.default_table_cost * 100) - (self.default_table_cost * 100)
-        if 'badges' in kwargs:
-            num_new_badges = int(kwargs['badges']) - self.badges
-            return self.current_badge_cost * 100, self.new_badge_cost * num_new_badges * 100
-
-        if not new_cost:
-            new_cost = int(preview_group.default_cost * 100)
-        return current_cost, new_cost - current_cost
-
 
 @Session.model_mixin
 class MarketplaceApplication:
@@ -153,6 +115,7 @@ class MarketplaceApplication:
 
 @Session.model_mixin
 class Attendee:
+    consent_form_email = Column(UnicodeText)
     comped_reason = Column(UnicodeText, default='', admin_only=True)
     fursuiting = Column(Boolean, default=False)
     accessibility_requests = Column(MultiChoice(c.ACCESSIBILITY_SERVICE_OPTS))
@@ -230,6 +193,10 @@ class Attendee:
         if self.age_now_or_at_con and self.age_now_or_at_con < 7 and self.badge_type == c.ATTENDEE_BADGE:
             self.badge_type = c.KID_IN_TOW_BADGE
 
+    def cc_emails_for_ident(self, ident=''):
+        if ident == 'under_18_parental_consent_reminder':
+            return self.consent_form_email
+
     def undo_extras(self):
         if self.active_receipt:
             return "Could not undo extras, this attendee has an open receipt!"
@@ -252,17 +219,6 @@ class Attendee:
             return ' / '.join(ribbon_labels)
         else:
             return self.badge_type_label
-
-    @property
-    def age_discount(self):
-        import math
-        if self.badge_type in [c.SPONSOR_BADGE, c.SHINY_BADGE]:
-            return 0
-        elif self.age_now_or_at_con and self.age_now_or_at_con < 13:
-            half_off = math.ceil(self.new_badge_cost / 2)
-            if not self.age_group_conf['discount'] or self.age_group_conf['discount'] < half_off:
-                return -half_off
-        return -self.age_group_conf['discount']
 
     @property
     def paid_for_a_shirt(self):
