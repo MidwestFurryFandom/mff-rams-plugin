@@ -52,6 +52,8 @@ class Group:
 
         if self.power_fee == None:
             self.power_fee = 0
+        else:
+            self.power_fee = int(self.power_fee)
 
     @presave_adjustment
     def float_table_to_int(self):
@@ -125,8 +127,11 @@ class Attendee:
 
     @presave_adjustment
     def save_group_cost(self):
-        if self.group and self.group.auto_recalc:
-            self.group.cost = self.group.calc_default_cost()
+        if self.group and self.group.auto_recalc and not self.is_new:
+            try:
+                self.group.cost = self.group.calc_default_cost()
+            except Exception:
+                log.exception("Problem when saving group cost from save_group_cost!")
 
     @presave_adjustment
     def never_spam(self):
