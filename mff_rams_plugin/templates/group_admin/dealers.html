@@ -5,6 +5,7 @@
     <thead>
       <tr>
         <th>Name</th>
+        <th>Email</th>
         <th>Approved</th>
         <th>Website</th>
         <th>Badges{{ macros.popup_link("../static_views/badgeCounts.html") }}</th>
@@ -22,6 +23,15 @@
       <tr{% if c.SIGNNOW_DEALER_TEMPLATE_ID and not group.signnow_document_signed or group.status in [c.DECLINED, c.CANCELLED] %} class="danger"{% endif %}>
           <td style="text-align:left" data-order="{{ group.name }}" data-search="{{ group.name }}"> 
             <a href="form?id={{ group.id }}">{{ group.name|default('?????', boolean=True) }}</a></td>
+          {% if group.email %}
+          <td data-order="{{ group.email }} data-search="{{ group.email }}>
+            {{ group.email|email_to_link }}
+          </td>
+          {% elif group.leader %}
+          <td data-order="{{ group.leader.email }} data-search="{{ group.leader.email }}>
+            {{ group.leader.email|email_to_link }}
+          </td>
+          {% else %}<td>N/A</td>{% endif %}
           <td>
               {{ group.status_label }}
           </td>
