@@ -285,6 +285,10 @@ class Attendee:
             merch.append(self.extra_merch)
 
         return merch
+    
+    @property
+    def has_personalized_badge(self):
+        return True
 
     @hybrid_property
     def hotel_lottery_eligible(self):
