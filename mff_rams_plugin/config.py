@@ -67,6 +67,9 @@ class ExtraConfig:
     def HOTEL_LOTTERY_OPEN(self):
         return c.AFTER_HOTEL_LOTTERY_START and c.BEFORE_HOTEL_LOTTERY_DEADLINE
     
+    def get_table_price(self, table_count):
+        return self.TABLE_PRICES[table_count]
+    
     def get_badge_count_by_type(self, badge_type):
         # Since sponsor and shiny sponsor badges are upgrades with limited availability,
         # this expands how they're counted to match how preordered merch is counted
