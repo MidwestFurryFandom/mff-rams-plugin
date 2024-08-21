@@ -149,18 +149,16 @@ class Attendee:
             self.paid = c.NEED_NOT_PAY
             self.comped_reason = "Automated: Parent in Tow badge."
 
-    def calculate_badge_cost(self, use_promo_code=False):
+    def calculate_badge_cost(self, use_promo_code=False, include_price_override=True):
         # Adds overrides for a couple special cases where a badge should be free
         if self.paid == c.NEED_NOT_PAY or self.badge_status == c.NOT_ATTENDING or self.badge_type == c.PARENT_IN_TOW_BADGE:
             return 0
-        elif self.overridden_price is not None:
+        elif self.overridden_price is not None and include_price_override:
             return self.overridden_price
         elif self.is_dealer:
             return c.DEALER_BADGE_PRICE
-        elif self.promo_code_groups:
+        elif self.promo_code_groups or (self.group and self.group.cost and self.paid == c.PAID_BY_GROUP):
             return c.get_group_price()
-        elif self.in_promo_code_group:
-            return self.promo_code.cost
         else:
             cost = self.new_badge_cost
 
