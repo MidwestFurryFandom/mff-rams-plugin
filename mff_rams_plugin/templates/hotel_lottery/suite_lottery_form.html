@@ -1,0 +1,36 @@
+{% extends "uber/templates/hotel_lottery/suite_lottery_form.html" %}
+
+{% block hotel_ranking %}{% endblock %}
+
+{% block room_type_ranking %}
+<h3>{{ room_text.title() }} Type Preference</h3>
+<p>
+    {% if read_only %}Below are your selected {{ room_text }} types in order of preference.
+    {% else %}
+    Rank your choice of {{ room_text }} type by clicking and dragging rooms from "Available" to "Selected" in order of preference.
+    At least one selection is required.
+    {% endif %}
+</p>
+{{ form_macros.form_input(room_or_suite_lottery.shared_fields['room_or_suite_type_preference'],
+    help_text="" if c.AFTER_HOTEL_LOTTERY_FORM_START else "The staff (less expensive) Regency suite rate is not available after the staff room lottery closes.",
+    readonly=read_only) }}
+<hr/>
+{% endblock %}
+
+{% block terms %}
+{% if not read_only %}
+<hr>
+<h3>Suite Policy Agreement</h3>
+<p>
+    By checking the box below, you certify that you have read, understand and agree to comply with the
+    <a href="https://www.furfest.org/attend/hotels/suites#policies" target="_blank">{{ c.EVENT_NAME }} Suite Policies and Rules</a>,
+    including social/party policies, payment and cancellation requirements.
+    You further understand that failure to comply may result in the hotel disallowing any social gatherings and/or becoming ineligible for suites in future years.
+</p>
+<div class="row g-sm-3">
+    <div class="col-12">
+        <strong>{{ form_macros.form_input(room_or_suite_lottery.suite_terms_accepted) }}</strong>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

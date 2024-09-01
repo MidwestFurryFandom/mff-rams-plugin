@@ -62,11 +62,15 @@ class ExtraConfig:
     @property
     def PREREG_DEALER_POWER_OPTS(self):
         return [(-1, "Select a Power Level")] + self.DEALER_POWER_OPTS
-    
+
     @property
     def HOTEL_LOTTERY_OPEN(self):
-        return c.AFTER_HOTEL_LOTTERY_START and c.BEFORE_HOTEL_LOTTERY_DEADLINE
+        return c.AFTER_HOTEL_LOTTERY_FORM_START and c.BEFORE_HOTEL_LOTTERY_FORM_DEADLINE
     
+    @property
+    def STAFF_HOTEL_LOTTERY_OPEN(self):
+        return c.AFTER_HOTEL_LOTTERY_STAFF_START and c.BEFORE_HOTEL_LOTTERY_STAFF_DEADLINE
+
     def get_table_price(self, table_count):
         return self.TABLE_PRICES[table_count]
     

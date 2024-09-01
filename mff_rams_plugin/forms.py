@@ -112,7 +112,13 @@ class Consents:
     
     def pii_consent_desc(self):
         return ""
-    
+
+
+@MagForm.form_mixin
+class RoomLottery:
+    def room_type_preference_desc(self):
+        return 'A limited number of small junior suites ("King/Queen Parlor Suites") are available at select hotels. They are awarded along with standard rooms, and are separate from the suite options at the Hyatt Regency O\'Hare.'
+
 
 @MagForm.form_mixin
 class TableInfo:
