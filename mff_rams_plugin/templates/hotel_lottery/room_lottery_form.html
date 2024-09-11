@@ -1,75 +1,70 @@
 {% extends "uber/templates/hotel_lottery/room_lottery_form.html" %}
 
-{% block hotel_ranking %}
-<h3>Hotel Preference</h3>
+{% block hotel_ranking_desc %}
+    <p>
+        {% if read_only %}Below are your selected hotels in order of preference.{% else %}
+        Rank your choice of hotel below by clicking and dragging hotels from "Available" to "Selected" in order of preference.
+        At least one selection is required. Not all hotels need be selected. Accordingly, <em>please do not select hotels you do not wish to stay at</em>.
+        {% endif %}
+        For additional room and amenity information, please see <a href="{{ c.HOTEL_LOTTERY_URL }}" target="_blank">our website</a>.
+    </p>
 
-<p>
-    {% if read_only %}Below are your selected hotels in order of preference.{% else %}
-    Rank your choice of hotel below by clicking and dragging hotels from "Available" to "Selected" in order of preference.
-    At least one selection is required. Not all hotels need be selected. Accordingly, <em>please do not select hotels you do not wish to stay at</em>.
+    {% if application.attendee.is_dealer %}
+    <script type="text/javascript">
+        var openCloseDealerInfo = function () {
+            $('#dealer-info').toggle();
+            if($('#dealer-info').is(":visible")) {
+                $('#dealer-icon').removeClass('fa-angle-down').addClass('fa-angle-up');
+            } else {
+                $('#dealer-icon').removeClass('fa-angle-up').addClass('fa-angle-down');
+            }
+        }
+    </script>
+
+    <h4>Dealer Room Block Information <button type="button" class="btn btn-sm btn-outline-primary" onClick="openCloseDealerInfo()"><i id="dealer-icon" class="fa fa-angle-down" aria-hidden="true"></i></button></h4>
+    <div class="collapse" id="dealer-info">
+        <p>
+            A block of rooms is set aside exclusively for Dealers at the Crowne Plaza, just across from the convention center.
+            <strong>We strongly recommend anyone dealing at MFF include the Crowne Plaza in their hotel choices.</strong>
+            Doing so is not required, and we will still award a room in a higher-ranked choice if one is available just as we do for any other attendee, but this will dramatically increase your chances of obtaining a room.
+        </p>
+
+        <p>If your dealer application is pending at the time you enter, that is okay. We will check all dealer applications before announcing room results.</p>
+
+        <p>
+            Room groups <strong>must</strong> have a dealer as the group leader to be eligible for the dealer block.
+        </p>
+
+        <p>We encourage people from the same dealer group to room together to help accommodate as many people as possible.</p>
+    </div>
     {% endif %}
-    For additional room and amenity information, please see <a href="{{ c.HOTEL_LOTTERY_URL }}" target="_blank">our website</a>.
-</p>
 
-{% if application.attendee.is_dealer %}
-<script type="text/javascript">
-    var openCloseDealerInfo = function () {
-        $('#dealer-info').toggle();
-        if($('#dealer-info').is(":visible")) {
-            $('#dealer-icon').removeClass('fa-angle-down').addClass('fa-angle-up');
-        } else {
-            $('#dealer-icon').removeClass('fa-angle-up').addClass('fa-angle-down');
+    {% if application.attendee.badge_type == c.STAFF_BADGE or c.STAFF_RIBBON in application.attendee.ribbon_ints %}
+    <script type="text/javascript">
+        var openCloseStaffInfo = function () {
+            $('#staff-info').toggle();
+            if($('#staff-info').is(":visible")) {
+                $('#staff-icon').removeClass('fa-angle-down').addClass('fa-angle-up');
+            } else {
+                $('#staff-icon').removeClass('fa-angle-up').addClass('fa-angle-down');
+            }
         }
-    }
-</script>
+    </script>
 
-<h4>Dealer Room Block Information <button type="button" class="btn btn-sm btn-outline-primary" onClick="openCloseDealerInfo()"><i id="dealer-icon" class="fa fa-angle-down" aria-hidden="true"></i></button></h4>
-<div class="collapse" id="dealer-info">
-    <p>
-        A block of rooms is set aside exclusively for Dealers at the Crowne Plaza, just across from the convention center.
-        <strong>We strongly recommend anyone dealing at MFF include the Crowne Plaza in their hotel choices.</strong>
-        Doing so is not required, and we will still award a room in a higher-ranked choice if one is available just as we do for any other attendee, but this will dramatically increase your chances of obtaining a room.
-    </p>
-
-    <p>If your dealer application is pending at the time you enter, that is okay. We will check all dealer applications before announcing room results.</p>
-
-    <p>
-        Room groups <strong>must</strong> have a dealer as the group leader to be eligible for the dealer block.
-    </p>
-
-    <p>We encourage people from the same dealer group to room together to help accommodate as many people as possible.</p>
-</div>
-{% endif %}
-
-{% if application.attendee.badge_type == c.STAFF_BADGE or c.STAFF_RIBBON in application.attendee.ribbon_ints %}
-<script type="text/javascript">
-    var openCloseStaffInfo = function () {
-        $('#staff-info').toggle();
-        if($('#staff-info').is(":visible")) {
-            $('#staff-icon').removeClass('fa-angle-down').addClass('fa-angle-up');
-        } else {
-            $('#staff-icon').removeClass('fa-angle-up').addClass('fa-angle-down');
-        }
-    }
-</script>
-
-<h4>Staff Room Rate Information <button type="button" class="btn btn-sm btn-outline-primary" onClick="openCloseStaffInfo()"><i id="staff-icon" class="fa fa-angle-down" aria-hidden="true"></i></button></h4>
-<div class="collapse" id="staff-info">
-    <img src="../static/images/staff-lottery.png" class="img-fluid">
-    <p>
-        Our hotel contracts set aside a certain number of rooms for staff, sometimes at a reduced rate.
-        During the staff lottery{% if c.BEFORE_HOTEL_LOTTERY_FORM_START %} (that's this one!){% endif %}, we only fill staff blocks at staff rates (when applicable).
-        If all rooms are exhausted in a hotel's staff block, <strong>no more rooms will be booked in that hotel</strong>.
-    </p>
-    <p>
-        During the attendee lottery{% if c.BEFORE_HOTEL_LOTTERY_FORM_START %} starting {{ c.HOTEL_LOTTERY_FORM_START|datetime_local }}{% endif %}, staff will be placed in a staff block <em>if</em> rooms are still available after the staff lottery. Otherwise, rooms are awarded out of the attendee block with the attendee rate.
-    </p>
-    <p>
-        Should your entry be selected during the attendee lottery, it is both possible <em>and probable</em> the room will be awarded out of the attendee block at the attendee rate.
-    </p>
-</div>
-{% endif %}
-
-{{ form_macros.form_input(room_or_suite_lottery.hotel_preference, readonly=read_only) }}
-<hr/>
+    <h4>Staff Room Rate Information <button type="button" class="btn btn-sm btn-outline-primary" onClick="openCloseStaffInfo()"><i id="staff-icon" class="fa fa-angle-down" aria-hidden="true"></i></button></h4>
+    <div class="collapse" id="staff-info">
+        <img src="../static/images/staff-lottery.png" class="img-fluid">
+        <p>
+            Our hotel contracts set aside a certain number of rooms for staff, sometimes at a reduced rate.
+            During the staff lottery{% if c.BEFORE_HOTEL_LOTTERY_FORM_START %} (that's this one!){% endif %}, we only fill staff blocks at staff rates (when applicable).
+            If all rooms are exhausted in a hotel's staff block, <strong>no more rooms will be booked in that hotel</strong>.
+        </p>
+        <p>
+            During the attendee lottery{% if c.BEFORE_HOTEL_LOTTERY_FORM_START %} starting {{ c.HOTEL_LOTTERY_FORM_START|datetime_local }}{% endif %}, staff will be placed in a staff block <em>if</em> rooms are still available after the staff lottery. Otherwise, rooms are awarded out of the attendee block with the attendee rate.
+        </p>
+        <p>
+            Should your entry be selected during the attendee lottery, it is both possible <em>and probable</em> the room will be awarded out of the attendee block at the attendee rate.
+        </p>
+    </div>
+    {% endif %}
 {% endblock %}

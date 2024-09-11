@@ -292,6 +292,7 @@ c.STATIC_HASH_LIST = {
     "deps/selectToAutocomplete/jquery-ui.min.js": "sha384-TkwOpfRia7iUdElqSOlUgVT6+cZb8lR/wsXT91RPkrUYQAoCyG3SlfVX8c0Ey5IR",
     "deps/selectToAutocomplete/jquery.select-to-autocomplete.js": "sha384-qUnRY5v9UDiLpcdltjLZlygKiMN2Atj4Ayqp+/YJKRIs/GW1mdEvDuFLohZ9VtIe",
     "deps/selectToAutocomplete/jquery-ui.css": "sha384-+AtlTJbWDkXeuZPY5QE2fE/Y9ASHvGiOEOalfkgCup137/ePKyE7d410ZTPdj6j0",
+    "deps/Sortable.js": "sha384-c7bUzrzrxav4bD0OYbcU3C3XlT51fLeIHdXokx4/pYjDT9TwCr40APgsgQgtisv6",
     "deps/combined.css": "sha384-hWvvvtNskIFIkMQ2Awjfavyf3q5hJuBfm6nvSeNIogGxD1xfKAW71EkcgOMFgeB5",
     "deps/jquery-datetextentry/jquery.datetextentry.js": "sha384-YYLzV0F3OjgMqSlWJnPpkiryR11dMO8nXkBpgeLy5S3qu22uZz3dukciNcBR9Zfc",
     "deps/jquery-datetextentry/jquery.datetextentry.css": "sha384-aAjyN5r8ognDOt6BGc35M+KRFLevxfl+QXzMSltKZT+L/6S5UWuymBgsm/c11+nF",
