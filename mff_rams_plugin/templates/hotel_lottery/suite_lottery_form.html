@@ -6,11 +6,31 @@
 {{ form_macros.form_input(room_or_suite_lottery.shared_fields['room_or_suite_type_preference'],
     help_text="" if c.AFTER_HOTEL_LOTTERY_FORM_START else "The staff (less expensive) Regency suite rate is not available after the staff room lottery closes.",
     readonly=read_only) }}
-<hr/>
+
+{% if not read_only and application[room_text ~ '_step'] <= steps.counter %}
+        <div class="row justify-content-end">
+            <div class="col col-auto">
+                <button type="submit" id="step-{{ steps.counter }}-submit" class="btn btn-primary" name="{{ room_text }}_step" value="{{ steps.counter }}">Save and Continue</button>
+            </div>
+        </div>
+    {% endif %}
 {% endblock %}
 
 {% block terms_desc %}
 {% if not read_only %}
+<p>
+    Suite entries are processed first and prioritized above standard room entries in the lottery. Suites are in extremely high demand, and necessitate special policies:
+    <ul>
+        <li>A one night, non-refundable deposit is required and will be invoiced on confirmation of the suite.</li>
+        <li>Cancellations must be received on or prior to {{ c.HOTEL_LOTTERY_SUITE_CUTOFF|datetime_local }}, otherwise all guests in that suite will be ineligible for future year suite lotteries in addition to forfeiting the deposit.</li>
+        <li>All suites are directly managed by {{ c.EVENT_NAME }}. Suite confirmations are issued by the convention, not the hotel.</li>
+        <li>Additional policies apply to suites. It is essential all attendees requesting a suite read and understand these policies, as you are required to comply as a condition of retaining the suite during the event, and for eligibility in future years.</li>
+    </ul>
+</p>
+<p>If awarded a suite, you will receive additional information via email regarding your suite.</p>
+
+<p>Suite policies, floor plans and other details pertaining to suites may be found on the <a href="https://www.furfest.org/attend/hotels/suites" target="_blank">Suite FAQ</a>.</p>
+
 <p>
     By checking the box below, you certify that you have read, understand and agree to comply with the
     <a href="https://www.furfest.org/attend/hotels/suites#policies" target="_blank">{{ c.EVENT_NAME }} Suite Policies and Rules</a>,
