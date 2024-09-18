@@ -85,6 +85,10 @@ class Group:
     def dealer_payment_due(self):
         if self.approved:
             return self.approved + timedelta(c.DEALER_PAYMENT_DAYS)
+        
+    @property
+    def min_badges_addable(self):
+        return 0
 
     @property
     def dealer_payment_is_late(self):
