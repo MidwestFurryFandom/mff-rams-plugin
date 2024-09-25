@@ -1,72 +1,123 @@
 {% extends "uber/templates/hotel_lottery/room_lottery_form.html" %}
+{% set show_staff_rates = application.attendee.badge_type == c.STAFF_BADGE or c.STAFF_RIBBON in application.attendee.ribbon_ints %}
+{% set show_dealer_rates = application.attendee.is_dealer %}
 
-{% block hotel_ranking_desc %}
+{% block hotel_and_room_type_ranking_desc %}
+<style>
+    td:empty{
+        background-color: #f8f9fa;
+    }
+</style>
+<div class="hotel_and_room_type_ranking">
     <p>
-        {% if read_only %}Below are your selected hotels in order of preference.{% else %}
-        Rank your choice of hotel below by clicking and dragging hotels from "Available" to "Selected" in order of preference.
-        At least one selection is required. Not all hotels need be selected. Accordingly, <em>please do not select hotels you do not wish to stay at</em>.
-        {% endif %}
+        Rank your choice of hotel and standard room type below by clicking and dragging options from "Available" to "Selected" in order of preference.
+        At least one selection is required. Not all hotels/room types need be selected. Accordingly, <em>please do not select hotels or room types you do not wish to stay at</em>.
         For additional room and amenity information, please see <a href="{{ c.HOTEL_LOTTERY_URL }}" target="_blank">our website</a>.
     </p>
 
-    {% if application.attendee.is_dealer %}
-    <script type="text/javascript">
-        var openCloseDealerInfo = function () {
-            $('#dealer-info').toggle();
-            if($('#dealer-info').is(":visible")) {
-                $('#dealer-icon').removeClass('fa-angle-down').addClass('fa-angle-up');
-            } else {
-                $('#dealer-icon').removeClass('fa-angle-up').addClass('fa-angle-down');
-            }
-        }
-    </script>
+    <p>A limited number of small junior suites ("King/Queen Parlor Suites") are available at select hotels. They are awarded along with standard rooms, and are separate from the suite options at the Hyatt Regency O'Hare.</p>
 
-    <h4>Dealer Room Block Information <button type="button" class="btn btn-sm btn-outline-primary" onClick="openCloseDealerInfo()"><i id="dealer-icon" class="fa fa-angle-down" aria-hidden="true"></i></button></h4>
-    <div class="collapse" id="dealer-info">
-        <p>
-            A block of rooms is set aside exclusively for Dealers at the Crowne Plaza, just across from the convention center.
-            <strong>We strongly recommend anyone dealing at MFF include the Crowne Plaza in their hotel choices.</strong>
-            Doing so is not required, and we will still award a room in a higher-ranked choice if one is available just as we do for any other attendee, but this will dramatically increase your chances of obtaining a room.
-        </p>
+    {% if show_dealer_rates %}
+    <h4>Dealer Room Block Information</h4>
+    <p>
+        A block of rooms is set aside exclusively for Dealers at the Crowne Plaza, just across from the convention center.
+        <strong>We strongly recommend anyone dealing at MFF include the Crowne Plaza in their hotel choices.</strong>
+        Doing so is not required, and we will still award a room in a higher-ranked choice if one is available just as we do for any other attendee, but this will dramatically increase your chances of obtaining a room.
+    </p>
 
-        <p>If your dealer application is pending at the time you enter, that is okay. We will check all dealer applications before announcing room results.</p>
+    <p>If your dealer application is pending at the time you enter, that is okay. We will check all dealer applications before announcing room results.</p>
 
-        <p>
-            Room groups <strong>must</strong> have a dealer as the group leader to be eligible for the dealer block.
-        </p>
+    <p>
+        Room groups <strong>must</strong> have a dealer as the group leader to be eligible for the dealer block.
+    </p>
 
-        <p>We encourage people from the same dealer group to room together to help accommodate as many people as possible.</p>
-    </div>
+    <p>We encourage people from the same dealer group to room together to help accommodate as many people as possible.</p>
     {% endif %}
 
-    {% if application.attendee.badge_type == c.STAFF_BADGE or c.STAFF_RIBBON in application.attendee.ribbon_ints %}
-    <script type="text/javascript">
-        var openCloseStaffInfo = function () {
-            $('#staff-info').toggle();
-            if($('#staff-info').is(":visible")) {
-                $('#staff-icon').removeClass('fa-angle-down').addClass('fa-angle-up');
-            } else {
-                $('#staff-icon').removeClass('fa-angle-up').addClass('fa-angle-down');
-            }
-        }
-    </script>
-
-    <h4>Staff Room Rate Information <button type="button" class="btn btn-sm btn-outline-primary" onClick="openCloseStaffInfo()"><i id="staff-icon" class="fa fa-angle-down" aria-hidden="true"></i></button></h4>
-    <div class="collapse" id="staff-info">
-        <img src="../static/images/staff-lottery.png" class="img-fluid">
-        <p>
-            Our hotel contracts set aside a certain number of rooms for staff, sometimes at a reduced rate.
-            During the staff lottery{% if c.BEFORE_HOTEL_LOTTERY_FORM_START %} (that's this one!){% endif %}, we only fill staff blocks at staff rates (when applicable).
-            If all rooms are exhausted in a hotel's staff block, <strong>no more rooms will be booked in that hotel</strong>.
-        </p>
-        <p>
-            During the attendee lottery{% if c.BEFORE_HOTEL_LOTTERY_FORM_START %} starting {{ c.HOTEL_LOTTERY_FORM_START|datetime_local }}{% endif %}, staff will be placed in a staff block <em>if</em> rooms are still available after the staff lottery. Otherwise, rooms are awarded out of the attendee block with the attendee rate.
-        </p>
-        <p>
-            Should your entry be selected during the attendee lottery, it is both possible <em>and probable</em> the room will be awarded out of the attendee block at the attendee rate.
-        </p>
-    </div>
+    {% if show_staff_rates %}
+    <h4>Staff Room Block Information</h4>
+    <p>
+        Our hotel contracts set aside a certain number of rooms for staff, sometimes at a reduced rate.
+        During the staff lottery{% if c.BEFORE_HOTEL_LOTTERY_FORM_START %} (that's this one!){% endif %}, we only fill staff blocks at staff rates (when applicable).
+        If all rooms are exhausted in a hotel's staff block, <strong>no more rooms will be booked in that hotel</strong>.
+    </p>
+    <p>
+        During the attendee lottery{% if c.BEFORE_HOTEL_LOTTERY_FORM_START %} starting {{ c.HOTEL_LOTTERY_FORM_START|datetime_local }}{% endif %}, staff will be placed in a staff block <em>if</em> rooms are still available after the staff lottery. Otherwise, rooms are awarded out of the attendee block with the attendee rate.
+    </p>
+    <p>
+        Should your entry be selected during the attendee lottery, it is both possible <em>and probable</em> the room will be awarded out of the attendee block at the attendee rate.
+    </p>
     {% endif %}
+
+    <h4>Room Rate Information</h4>
+    <p>
+        Please see the table below for the rates of each room type at each hotel. All rates are nightly, excluding taxes and a $4/night booking fee.
+    </p>
+    {% if show_staff_rates or show_dealer_rates %}
+    <p>
+        Any special rates for {% if show_dealer_rates %}dealers{% else %}staff{% endif %} will be shown in <strong>bold</strong>.
+        These rates are <em>NOT</em> available {% if show_dealer_rates %}to dealers outside the dealer block{% else %}after the staff lottery{% endif %}.
+    </p>
+    {% endif %}
+    <table class="table table-bordered table-hover">
+        <thead>
+            <th scope="col"></th>
+            <th scope="col">King</th>
+            <th scope="col">Double/Queen</th>
+            <th scope="col">Other</th>
+        </thead>
+        <tbody>
+            <tr>
+                <th scope="row">Aloft</th>
+                <td>$182</td>
+                <td>$182</td>
+                <td></td>
+            </tr>
+            <tr>
+                <th scope="row">Comfort Inn</th>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <th scope="row">Crowne Plaza</th>
+                <td>$169{% if show_staff_rates or show_dealer_rates %}/<strong>$159</strong>{% endif %}</td>
+                <td>$169{% if show_staff_rates or show_dealer_rates %}/<strong>$159</strong>{% endif %}</td>
+                <td></td>
+            </tr>
+            <tr>
+                <th scope="row">Hilton Garden Inn</th>
+                <td>$159</td>
+                <td>$159</td>
+                <td></td>
+            </tr>
+            <tr>
+                <th scope="row">Holiday Inn</th>
+                <td>$139</td>
+                <td>$149</td>
+                <td></td>
+            </tr>
+            <tr>
+                <th scope="row">Hyatt Regency O'Hare</th>
+                <td>$168</td>
+                <td>$183{% if show_staff_rates %}/<strong>$168</strong>{% endif %}</td>
+                <td></td>
+            </tr>
+            <tr>
+                <th scope="row">Marriott Suites</th>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <th scope="row">Staybridge Suites</th>
+                <td></td>
+                <td></td>
+                <td>$169 (King Suite)</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
 {% endblock %}
 
 {% block ada_info_desc %}

@@ -1,19 +1,19 @@
 {% extends "uber/templates/hotel_lottery/suite_lottery_form.html" %}
 
-{% block hotel_ranking %}{% endblock %}
-
-{% block room_type_ranking_form %}
-{{ form_macros.form_input(room_or_suite_lottery.shared_fields['room_or_suite_type_preference'],
+{% block hotel_and_room_type_ranking_form %}
+<div class="hotel_and_room_type_ranking">
+{{ form_macros.form_input(room_or_suite_lottery.hotel_preference, readonly=read_only) }}
+{{ form_macros.form_input(room_or_suite_lottery.room_type_preference,
     help_text="" if c.AFTER_HOTEL_LOTTERY_FORM_START else "The staff (less expensive) Regency suite rate is not available after the staff room lottery closes.",
     readonly=read_only) }}
-
-{% if not read_only and application[room_text ~ '_step'] <= steps.counter %}
-        <div class="row justify-content-end">
-            <div class="col col-auto">
-                <button type="submit" id="step-{{ steps.counter }}-submit" class="btn btn-primary" name="{{ room_text }}_step" value="{{ steps.counter }}">Save and Continue</button>
-            </div>
+</div>
+{% if not read_only and application.current_step <= steps.counter %}
+    <div class="row justify-content-end">
+        <div class="col col-auto">
+            <button type="submit" id="step-{{ steps.counter }}-submit" class="btn btn-primary" name="current_step" value="{{ steps.counter }}">Save and Continue</button>
         </div>
-    {% endif %}
+    </div>
+{% endif %}
 {% endblock %}
 
 {% block terms_desc %}

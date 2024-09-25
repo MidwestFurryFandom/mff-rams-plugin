@@ -1,19 +1,7 @@
 
 
 {% if c.HOTEL_LOTTERY_OPEN or c.STAFF_HOTEL_LOTTERY_OPEN and (attendee.badge_type == c.STAFF_BADGE or c.STAFF_RIBBON in attendee.ribbon_ints) %}
-{% set which_page = attendee.lottery_application.homepage_link if attendee.lottery_application else 'start?attendee_id=' ~ attendee.id %}
-{% set button_text %}
-    {% if 'suite' in which_page %}
-    Finish Suite Lottery Entry
-    {% elif 'room' in which_page %}
-    Finish Room Lottery Entry
-    {% elif 'index' in which_page %}
-        {% if attendee.lottery_application.parent_application %}View Room Group{% else %}Hotel Lottery Options{% endif %}
-    {% elif 'start' in which_page %}
-    Enter Hotel Lottery
-    {% endif %}
-{% endset %}
-
+{% set which_page, button_text = attendee.lottery_application.homepage_link if attendee.lottery_application else ('start?attendee_id=' ~ attendee.id, 'Enter Hotel Lottery') %}
 {% if attendee.hotel_lottery_eligible %}
 <a href="../hotel_lottery/{{ which_page }}" class="btn btn-sm {{ 'btn-danger' if 'Finish' in button_text else 'btn-secondary' }}">
     <i class="fa fa-hotel"></i>&nbsp; {{ button_text }}
