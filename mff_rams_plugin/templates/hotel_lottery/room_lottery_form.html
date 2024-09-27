@@ -1,5 +1,5 @@
 {% extends "uber/templates/hotel_lottery/room_lottery_form.html" %}
-{% set show_staff_rates = application.attendee.badge_type == c.STAFF_BADGE or c.STAFF_RIBBON in application.attendee.ribbon_ints %}
+{% set show_staff_rates = c.STAFF_HOTEL_LOTTERY_OPEN and application.qualifies_for_staff_lottery %}
 {% set show_dealer_rates = application.attendee.is_dealer %}
 
 {% block hotel_and_room_type_ranking_desc %}
@@ -38,11 +38,11 @@
     <h4>Staff Room Block Information</h4>
     <p>
         Our hotel contracts set aside a certain number of rooms for staff, sometimes at a reduced rate.
-        During the staff lottery{% if c.BEFORE_HOTEL_LOTTERY_FORM_START %} (that's this one!){% endif %}, we only fill staff blocks at staff rates (when applicable).
-        If all rooms are exhausted in a hotel's staff block, <strong>no more rooms will be booked in that hotel</strong>.
+        Your room lottery entry will first go into the staff lottery, where we only fill blocks at staff rates (when applicable).
+        If all rooms are exhausted in a hotel's staff block, <strong>no more rooms will be booked in that hotel</strong> for the staff lottery.
     </p>
     <p>
-        During the attendee lottery{% if c.BEFORE_HOTEL_LOTTERY_FORM_START %} starting {{ c.HOTEL_LOTTERY_FORM_START|datetime_local }}{% endif %}, staff will be placed in a staff block <em>if</em> rooms are still available after the staff lottery. Otherwise, rooms are awarded out of the attendee block with the attendee rate.
+        After the staff lottery closes and rooms are awarded, you will be given the option to enter the attendee lottery. Staff in the attendee lottery will be placed in a staff block <em>if</em> rooms are still available after the staff lottery. Otherwise, rooms are awarded out of the attendee block with the attendee rate.
     </p>
     <p>
         Should your entry be selected during the attendee lottery, it is both possible <em>and probable</em> the room will be awarded out of the attendee block at the attendee rate.
@@ -56,7 +56,7 @@
     {% if show_staff_rates or show_dealer_rates %}
     <p>
         Any special rates for {% if show_dealer_rates %}dealers{% else %}staff{% endif %} will be shown in <strong>bold</strong>.
-        These rates are <em>NOT</em> available {% if show_dealer_rates %}to dealers outside the dealer block{% else %}after the staff lottery{% endif %}.
+        These rates are <em>NOT</em> available {% if show_dealer_rates %}to dealers outside the dealer block{% else %}after the staff lottery ends{% endif %}.
     </p>
     {% endif %}
     <table class="table table-bordered table-hover">
