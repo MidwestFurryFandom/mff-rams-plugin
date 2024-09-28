@@ -64,9 +64,15 @@
             <th scope="col"></th>
             <th scope="col">King</th>
             <th scope="col">Double/Queen</th>
-            <th scope="col">Other</th>
+            <th scope="col">King Parlor Suite</th>
         </thead>
         <tbody>
+            <tr>
+                <th scope="row">Hyatt Regency O'Hare</th>
+                <td>$168</td>
+                <td>$183{% if show_staff_rates %}/<strong>$168</strong>{% endif %}</td>
+                <td></td>
+            </tr>
             <tr>
                 <th scope="row">Aloft</th>
                 <td>$182</td>
@@ -75,9 +81,9 @@
             </tr>
             <tr>
                 <th scope="row">Comfort Inn</th>
-                <td></td>
-                <td></td>
-                <td></td>
+                <td>$119</td>
+                <td>$119*</td>
+                <td>$119</td>
             </tr>
             <tr>
                 <th scope="row">Crowne Plaza</th>
@@ -98,25 +104,32 @@
                 <td></td>
             </tr>
             <tr>
-                <th scope="row">Hyatt Regency O'Hare</th>
-                <td>$168</td>
-                <td>$183{% if show_staff_rates %}/<strong>$168</strong>{% endif %}</td>
+                <th scope="row">Hyatt Place</th>
+                <td>$159</td>
+                <td>$159</td>
+                <td></td>
+            </tr>
+            <tr>
+                <th scope="row">La Quinta</th>
+                <td>$159</td>
+                <td>$159</td>
                 <td></td>
             </tr>
             <tr>
                 <th scope="row">Marriott Suites</th>
+                <td>$199</td>
                 <td></td>
-                <td></td>
-                <td></td>
+                <td>$229</td>
             </tr>
             <tr>
                 <th scope="row">Staybridge Suites</th>
+                <td>$169</td>
                 <td></td>
                 <td></td>
-                <td>$169 (King Suite)</td>
             </tr>
         </tbody>
     </table>
+    <div class="form-text">*The Comfort Inn offers double rooms with two queens and two doubles. We will fill two queen rooms first, followed by two doubles.</div>
 </div>
 {% endblock %}
 
