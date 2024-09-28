@@ -1,6 +1,6 @@
 {% extends "uber/templates/hotel_lottery/room_lottery_form.html" %}
 {% set show_staff_rates = c.STAFF_HOTEL_LOTTERY_OPEN and application.qualifies_for_staff_lottery %}
-{% set show_dealer_rates = application.attendee.is_dealer %}
+{% set show_dealer_info = application.attendee.is_dealer %}
 
 {% block hotel_and_room_type_ranking_desc %}
 <style>
@@ -15,9 +15,9 @@
         For additional room and amenity information, please see <a href="{{ c.HOTEL_LOTTERY_URL }}" target="_blank">our website</a>.
     </p>
 
-    <p>A limited number of small junior suites ("King/Queen Parlor Suites") are available at select hotels. They are awarded along with standard rooms, and are separate from the suite options at the Hyatt Regency O'Hare.</p>
+    <p>A limited number of small junior suites ("King Parlor Suites") are available at select hotels. They are awarded along with standard rooms, and are separate from the suite options at the Hyatt Regency O'Hare.</p>
 
-    {% if show_dealer_rates %}
+    {% if show_dealer_info %}
     <h4>Dealer Room Block Information</h4>
     <p>
         A block of rooms is set aside exclusively for Dealers at the Crowne Plaza, just across from the convention center.
@@ -53,17 +53,17 @@
     <p>
         Please see the table below for the rates of each room type at each hotel. All rates are nightly, excluding taxes and a $4/night booking fee.
     </p>
-    {% if show_staff_rates or show_dealer_rates %}
+    {% if show_staff_rates %}
     <p>
-        Any special rates for {% if show_dealer_rates %}dealers{% else %}staff{% endif %} will be shown in <strong>bold</strong>.
-        These rates are <em>NOT</em> available {% if show_dealer_rates %}to dealers outside the dealer block{% else %}after the staff lottery ends{% endif %}.
+        Any special rates for staff will be shown in <strong>bold</strong>.
+        These rates are unlikely to be available after the staff lottery ends; we will automatically place you in an attendee rate room if staff rates are not available.
     </p>
     {% endif %}
     <table class="table table-bordered table-hover">
         <thead>
             <th scope="col"></th>
             <th scope="col">King</th>
-            <th scope="col">Double/Queen</th>
+            <th scope="col">Double</th>
             <th scope="col">King Parlor Suite</th>
         </thead>
         <tbody>
@@ -82,13 +82,13 @@
             <tr>
                 <th scope="row">Comfort Inn</th>
                 <td>$119</td>
-                <td>$119*</td>
-                <td>$119</td>
+                <td>$119<span class="text-muted">*</span></td>
+                <td></td>
             </tr>
             <tr>
                 <th scope="row">Crowne Plaza</th>
-                <td>$169{% if show_staff_rates or show_dealer_rates %}/<strong>$159</strong>{% endif %}</td>
-                <td>$169{% if show_staff_rates or show_dealer_rates %}/<strong>$159</strong>{% endif %}</td>
+                <td>$169{% if show_staff_rates %}/<strong>$159</strong>{% endif %}</td>
+                <td>$169{% if show_staff_rates %}/<strong>$159</strong>{% endif %}</td>
                 <td></td>
             </tr>
             <tr>
@@ -99,8 +99,8 @@
             </tr>
             <tr>
                 <th scope="row">Holiday Inn</th>
-                <td>$139</td>
-                <td>$149</td>
+                <td>$139<span class="text-muted">**</span></td>
+                <td>$149<span class="text-muted">**</span></td>
                 <td></td>
             </tr>
             <tr>
@@ -123,13 +123,16 @@
             </tr>
             <tr>
                 <th scope="row">Staybridge Suites</th>
-                <td>$169</td>
+                <td>$169<span class="text-muted">**</span></td>
                 <td></td>
                 <td></td>
             </tr>
         </tbody>
     </table>
-    <div class="form-text">*The Comfort Inn offers double rooms with two queens and two doubles. We will fill two queen rooms first, followed by two doubles.</div>
+    <div class="form-text mb-4">
+        <p>*The Comfort Inn offers double rooms with two queens and two doubles. We will fill two queen rooms first, followed by two doubles.</p>
+        <p>**Rates do not include a $1.75/night "Green Engage" fee assessed by the hotel.</p>
+    </div>
 </div>
 {% endblock %}
 
