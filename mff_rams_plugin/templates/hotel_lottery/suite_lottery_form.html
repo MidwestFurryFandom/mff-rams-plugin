@@ -1,5 +1,13 @@
 {% extends "uber/templates/hotel_lottery/suite_lottery_form.html" %}
 
+{% block suite_ranking_desc %}
+    <p>
+        Rank your choice of suite type below by clicking and dragging suites from "Available" to "Selected" in order of preference.
+        At least one selection is required. Not all suite types need be selected.
+        See these links for additional <a href="https://www.furfest.org/attend/hotels/suites" target="_blank">room</a> and <a href="https://www.furfest.org/attend/hotels" target="_blank">amenity</a> information.
+    </p>
+{% endblock %}
+
 {% block suite_ranking_form %}
 {{ form_macros.form_input(suite_lottery.suite_type_preference,
     help_text="" if not c.STAFF_HOTEL_LOTTERY_OPEN else "The staff (less expensive) Regency suite rate is not available after the staff room lottery closes.",
