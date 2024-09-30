@@ -64,6 +64,7 @@ AutomatedEmailFixture(
     AttendeeAccount,
     '{EVENT_NAME} Hotel Lottery Instructions',
     'hotel_lottery/instructions.html',
-    lambda aa: aa.hotel_eligible_attendees,
+    lambda aa: aa.hotel_eligible_attendees and c.AFTER_HOTEL_LOTTERY_FORM_START and (
+        len(aa.hotel_eligible_staff) != len(aa.hotel_eligible_attendees)),
     sender=c.HOTELS_EMAIL,
     ident='hotel_lottery_instructions')

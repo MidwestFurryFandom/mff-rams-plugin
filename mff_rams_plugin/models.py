@@ -300,8 +300,8 @@ class Attendee:
 class AttendeeAccount:
     @property
     def hotel_eligible_dealers(self):
-        return [attendee for attendee in self.hotel_eligible_attendees if attendee.is_dealer]
-    
+        return [attendee for attendee in self.hotel_eligible_attendees if attendee.is_dealer and attendee.badge_status != c.UNAPPROVED_DEALER_STATUS]
+
     @property
     def hotel_eligible_staff(self):
-        return any([a.badge_type == c.STAFF_BADGE or c.STAFF_RIBBON in a.ribbon_ints for a in self.hotel_eligible_attendees])
+        return [a for a in self.hotel_eligible_attendees if a.badge_type == c.STAFF_BADGE or c.STAFF_RIBBON in a.ribbon_ints]

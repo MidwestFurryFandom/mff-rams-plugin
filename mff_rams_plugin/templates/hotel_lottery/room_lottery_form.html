@@ -1,6 +1,6 @@
 {% extends "uber/templates/hotel_lottery/room_lottery_form.html" %}
 {% set show_staff_rates = c.STAFF_HOTEL_LOTTERY_OPEN and application.qualifies_for_staff_lottery %}
-{% set show_dealer_info = application.attendee.is_dealer %}
+{% set show_dealer_info = application.attendee.is_dealer and application.attendee.badge_status != c.UNAPPROVED_DEALER_STATUS %}
 
 {% block hotel_and_room_type_ranking_desc %}
 <style>
