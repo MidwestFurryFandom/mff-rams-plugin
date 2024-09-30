@@ -14,6 +14,7 @@ c.MENU.append_menu_item(
     MenuItem(name='Midwest FurFest', submenu=[
         MenuItem(name='Comped Badges', href='../mff_reports/comped_badges'),
         MenuItem(name='Daily Attendance', href='../mff_reports/attendance_graph'),
+        MenuItem(name='Hotel Lottery Admin', href='../hotel_lottery_admin/'),
     ])
 )
 
