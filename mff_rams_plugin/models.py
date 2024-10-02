@@ -53,6 +53,11 @@ class Group:
             self.status = c.APPROVED
 
     @presave_adjustment
+    def unset_power(self):
+        if self.power == -1 or not self.is_dealer:
+            self.power = 0
+
+    @presave_adjustment
     def set_power_fee(self):
         if self.auto_recalc:
             self.power_fee = self.power_fee if self.default_power_fee is None else self.default_power_fee
@@ -66,11 +71,6 @@ class Group:
     def float_table_to_int(self):
         # Fix some data weirdness with prior year groups
         self.tables = int(self.tables)
-
-    @presave_adjustment
-    def no_dealer_no_power(self):
-        if not self.is_dealer:
-            self.power = 0
 
     @property
     def default_power_fee(self):
@@ -294,7 +294,7 @@ class Attendee:
     @property
     def has_personalized_badge(self):
         return True
-    
+
 
 @Session.model_mixin
 class AttendeeAccount:

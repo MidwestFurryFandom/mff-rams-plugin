@@ -19,8 +19,6 @@ def table_cost(group, new_group=None):
     old_tables = int(group.tables)
     new_tables = int(new_group.tables)
 
-    log.error(new_tables)
-
     if old_tables == new_tables:
         return
     
@@ -43,7 +41,7 @@ def power_cost(group, new_group=None):
         if group.default_power_fee:
             return (f"Tier {group.power} Power", int(group.default_power_fee) * 100, 'power')
         elif group.power_fee:
-            return (f"Tier {group.power} Power (Custom Fee)", group.power_fee * 100, 'power_fee')
+            return (f"Tier {group.power} Power (Custom Fee)", int(group.power_fee) * 100, 'power_fee')
         return
 
     old_cost = group.power_fee if group.default_power_fee is None else int(group.default_power_fee)
