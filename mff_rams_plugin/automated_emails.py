@@ -32,7 +32,7 @@ MarketplaceEmailFixture(
 MarketplaceEmailFixture(
     'Your {EVENT_NAME} ({EVENT_DATE}) dealer application has been waitlisted',
     'dealers/pending_waitlisted.txt',
-    lambda g: g.status == c.WAITLISTED and g.registered < c.DEALER_REG_DEADLINE,
+    lambda g: g.status == c.WAITLISTED and (not c.DEALER_REG_DEADLINE or g.registered < c.DEALER_REG_DEADLINE),
     ident='dealer_pending_now_waitlisted_mff')
 
 MarketplaceEmailFixture(
