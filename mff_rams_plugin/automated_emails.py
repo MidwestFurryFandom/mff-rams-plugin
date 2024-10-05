@@ -1,6 +1,6 @@
 from uber.automated_emails import ArtShowAppEmailFixture, AutomatedEmailFixture, MarketplaceEmailFixture, StopsEmailFixture
 from uber.config import c
-from uber.models import Attendee, AttendeeAccount, AutomatedEmail
+from uber.models import Attendee, AttendeeAccount, AutomatedEmail, LotteryApplication
 from uber.utils import before, days_before
 
 
@@ -59,6 +59,15 @@ StopsEmailFixture(
     'volunteer_update.html',
     lambda a: c.VOLUNTEER_RIBBON in a.ribbon_ints,
     ident='volunteer_update')
+
+AutomatedEmailFixture(
+    LotteryApplication,
+    'Information Needed for {EVENT_NAME} Hotel Lottery',
+    'hotel_lottery/lottery_phone.html',
+    lambda a: a.cellphone == '' and a.attendee and a.attendee.cellphone == '' and a.status == c.COMPLETE and a.current_step == 0,
+    sender=c.HOTELS_EMAIL,
+    ident='lottery_phone'
+)
 
 AutomatedEmailFixture(
     AttendeeAccount,

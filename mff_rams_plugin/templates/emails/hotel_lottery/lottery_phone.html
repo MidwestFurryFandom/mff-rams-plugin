@@ -1,0 +1,25 @@
+{% set app = lottery_application %}
+<html>
+<head></head>
+<body>
+<p>
+    Hi {{ app.attendee.full_name }},
+    <br/>You recently completed an entry for the {{ c.EVENT_NAME }} hotel lottery (confirmation # {{ app.confirmation_num }}), but we are missing your phone number.
+</p>
+<p>
+    Hotels require a phone number in order to reserve a room. You can now add your phone number to your lottery application using either
+    <a href="{{ c.URL_BASE }}/hotel_lottery/{{ 'suite' if app.entry_type == c.SUITE_ENTRY else 'room' }}_lottery?id={{ app.id }}">this direct URL</a> or the following steps:
+    <ol>
+        <li>Log into your <a href="{{ c.URL_BASE }}/preregistration/homepage">preregistration homepage</a>.</li>
+        <li>Click "View {{ 'Suite' if app.entry_type == c.SUITE_ENTRY else 'Room' }} Lottery Entry" next to your badge details.</li>
+        <li>Click the blue "Edit" button next to your lottery application details.</li>
+    </ol>
+    You should see the step "Check-in Name & Phone Number". Once you have entered your phone number, click "Save and Continue" until you see the confirmation screen.
+</p>
+<p>
+    Please do this as soon as possible, as the lottery closes at {{ c.HOTEL_LOTTERY_FORM_DEADLINE|datetime_local }}.
+    We apologize for the short notice and we will ensure this oversight is not repeated in future years.
+</p>
+
+</body>
+</html>
