@@ -64,7 +64,7 @@ AutomatedEmailFixture(
     LotteryApplication,
     'Information Needed for {EVENT_NAME} Hotel Lottery',
     'hotel_lottery/lottery_phone.html',
-    lambda a: a.cellphone == '' and a.attendee and a.attendee.cellphone == '' and a.status == c.COMPLETE and a.current_step == 0,
+    lambda a: a.cellphone == '' and a.attendee and a.attendee.cellphone == '' and a.status == c.COMPLETE and a.current_step == (a.last_step - 5),
     sender=c.HOTELS_EMAIL,
     ident='lottery_phone'
 )

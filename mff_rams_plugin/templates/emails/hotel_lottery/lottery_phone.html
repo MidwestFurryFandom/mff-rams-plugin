@@ -1,4 +1,3 @@
-{% set app = lottery_application %}
 <html>
 <head></head>
 <body>
@@ -7,10 +6,10 @@
     <br/>You recently completed an entry for the {{ c.EVENT_NAME }} hotel lottery (confirmation # {{ app.confirmation_num }}), but we are missing your phone number.
 </p>
 <p>
-    Hotels require a phone number in order to reserve a room. You can now add your phone number to your lottery application using either
-    <a href="{{ c.URL_BASE }}/hotel_lottery/{{ 'suite' if app.entry_type == c.SUITE_ENTRY else 'room' }}_lottery?id={{ app.id }}">this direct URL</a> or the following steps:
+    Our partner hotels require a phone number in order to reserve a room. You can now add your phone number to your lottery application using either
+    <a href="{{ c.URL_BASE }}/hotel_lottery/{{ 'suite' if app.entry_type == c.SUITE_ENTRY else 'room' }}_lottery?id={{ app.id }}" target="_blank">this direct URL</a> or the following steps:
     <ol>
-        <li>Log into your <a href="{{ c.URL_BASE }}/preregistration/homepage">preregistration homepage</a>.</li>
+        <li>Log into your account at <a href="{{ c.URL_BASE }}" target="_blank">{{ c.URL_BASE }}</a>.</li>
         <li>Click "View {{ 'Suite' if app.entry_type == c.SUITE_ENTRY else 'Room' }} Lottery Entry" next to your badge details.</li>
         <li>Click the blue "Edit" button next to your lottery application details.</li>
     </ol>
