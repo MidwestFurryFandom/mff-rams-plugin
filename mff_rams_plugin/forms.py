@@ -167,3 +167,10 @@ class TableInfo:
 class AdminTableInfo:
     location = StringField('Table Assignment', render_kw={'placeholder': "Dealer's table location"})
     power_fee = IntegerField('Power Fee', widget=NumberInputGroup())
+
+@MagForm.form_mixin
+class ArtistMarketplaceForm:
+    def terms_accepted_label(self):
+        return Markup("I have read both the <a href='https://www.furfest.org/vendors/menagerie/rules' target='_blank'>general rules</a> "
+                      " for the artist alley and marketplace and the <a href='https://www.furfest.org/vendors/menagerie/marketplace' target='_blank'>"
+                      f"specific rules</a> for the artist marketplace and understand the requirements, including the ${c.ARTIST_MARKETPLACE_FEE} fee.")

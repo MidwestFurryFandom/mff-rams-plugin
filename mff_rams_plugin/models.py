@@ -114,10 +114,8 @@ class Group:
 
 
 @Session.model_mixin
-class MarketplaceApplication:
-    MATCHING_DEALER_FIELDS = ['categories', 'categories_text', 'description', 'special_needs', 'tax_number']
-
-    tax_number = Column(UnicodeText)
+class ArtistMarketplaceApplication:
+    MATCHING_DEALER_FIELDS = ['email_address', 'website', 'name', 'tax_number']
 
 
 @Session.model_mixin
