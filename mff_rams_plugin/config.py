@@ -15,6 +15,7 @@ c.MENU.append_menu_item(
         MenuItem(name='Comped Badges', href='../mff_reports/comped_badges'),
         MenuItem(name='Daily Attendance', href='../mff_reports/attendance_graph'),
         MenuItem(name='Hotel Lottery Admin', href='../hotel_lottery_admin/'),
+        MenuItem(name='Artist Marketplace Admin', href='../marketplace_admin/'),
     ])
 )
 
@@ -65,6 +66,16 @@ class ExtraConfig:
         return [(-1, "Select a Power Level")] + self.DEALER_POWER_OPTS
 
     def get_table_price(self, table_count):
+        if table_count == 0:
+            return 0
+        
+        max_tables = max(self.TABLE_PRICES.keys())
+        if table_count > max_tables:
+            # We don't have a set price higher than max_tables
+            # Add the default cost times number of extra tables
+            extra_table_cost = self.TABLE_PRICES[0] * (table_count - max_tables)
+            return self.TABLE_PRICES[max_tables] + extra_table_cost
+
         return self.TABLE_PRICES[table_count]
     
     def get_badge_count_by_type(self, badge_type):
