@@ -19,7 +19,7 @@
       </tr>
     </thead>
     <tbody>
-  {% for group in groups if group.is_dealer and (show_all or (group.status not in [c.DECLINED, c.IMPORTED, c.CANCELLED])) %}
+  {% for group in all_groups if group.is_dealer and (show_all or (group.status not in [c.DECLINED, c.IMPORTED, c.CANCELLED])) %}
       <tr{% if c.SIGNNOW_DEALER_TEMPLATE_ID and not group.signnow_document_signed or group.status in [c.DECLINED, c.CANCELLED] %} class="danger"{% endif %}>
           <td style="text-align:left" data-order="{{ group.name }}" data-search="{{ group.name }}"> 
             <a href="form?id={{ group.id }}">{{ group.name|default('?????', boolean=True) }}</a></td>
