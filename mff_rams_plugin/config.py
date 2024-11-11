@@ -11,6 +11,14 @@ config = parse_config("mff_rams_plugin", Path(__file__).parents[0])
 c.include_plugin_config(config)
 
 c.MENU.append_menu_item(
+    MenuItem(name='Reg Admin', submenu=[
+        MenuItem(name='Promo Codes', href='../promo_codes/index'),
+        MenuItem(name='Automated Transactions', href='../reg_admin/automated_transactions'),
+        MenuItem(name='Attendees Without Accounts', href='../reg_admin/orphaned_attendees'),
+    ])
+)
+
+c.MENU.append_menu_item(
     MenuItem(name='Midwest FurFest', submenu=[
         MenuItem(name='Comped Badges', href='../mff_reports/comped_badges'),
         MenuItem(name='Daily Attendance', href='../mff_reports/attendance_graph'),
@@ -18,9 +26,6 @@ c.MENU.append_menu_item(
         MenuItem(name='Artist Marketplace Admin', href='../marketplace_admin/'),
     ])
 )
-
-c.MENU['People'].append_menu_item(MenuItem(name='Promo Codes',
-                                               href='../promo_codes/index'), position=3)
 
 
 @Config.mixin
