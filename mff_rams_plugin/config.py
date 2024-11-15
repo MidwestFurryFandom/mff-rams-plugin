@@ -13,6 +13,7 @@ c.include_plugin_config(config)
 c.MENU.append_menu_item(
     MenuItem(name='Reg Admin', submenu=[
         MenuItem(name='Promo Codes', href='../promo_codes/index'),
+        MenuItem(name='Escalation Tickets', href='../reg_admin/escalation_tickets'),
         MenuItem(name='Automated Transactions', href='../reg_admin/automated_transactions'),
         MenuItem(name='Attendees Without Accounts', href='../reg_admin/orphaned_attendees'),
     ])
