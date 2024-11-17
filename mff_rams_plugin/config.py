@@ -16,6 +16,7 @@ c.MENU.append_menu_item(
         MenuItem(name='Escalation Tickets', href='../reg_admin/escalation_tickets'),
         MenuItem(name='Automated Transactions', href='../reg_admin/automated_transactions'),
         MenuItem(name='Attendees Without Accounts', href='../reg_admin/orphaned_attendees'),
+        MenuItem(name='Manage Workstations', href='../reg_admin/manage_workstations'),
     ])
 )
 
