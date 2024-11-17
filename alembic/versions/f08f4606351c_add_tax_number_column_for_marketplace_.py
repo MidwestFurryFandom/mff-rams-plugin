@@ -11,11 +11,11 @@ Create Date: 2019-08-27 23:57:55.936896
 revision = 'f08f4606351c'
 down_revision = '0f7426266803'
 branch_labels = None
-depends_on = '318d761a5c62'
+depends_on = '9e721eb0b45c'
 
 from alembic import op
 import sqlalchemy as sa
-
+from sqlalchemy.engine.reflection import Inspector
 
 
 try:
@@ -52,8 +52,16 @@ sqlite_reflect_kwargs = {
 
 
 def upgrade():
-    op.add_column('artist_marketplace_application', sa.Column('tax_number', sa.Unicode(), server_default='', nullable=False))
+    conn = op.get_bind()
+    inspector = Inspector.from_engine(conn)
+    tables = inspector.get_table_names()
+    if 'artist_marketplace_application' not in tables:
+        op.add_column('marketplace_application', sa.Column('tax_number', sa.Unicode(), server_default='', nullable=False))
 
 
 def downgrade():
-    op.drop_column('artist_marketplace_application', 'tax_number')
+    conn = op.get_bind()
+    inspector = Inspector.from_engine(conn)
+    tables = inspector.get_table_names()
+    if 'artist_marketplace_application' not in tables:
+        op.drop_column('marketplace_application', 'tax_number')
