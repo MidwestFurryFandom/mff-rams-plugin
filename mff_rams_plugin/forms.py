@@ -115,6 +115,18 @@ class Consents:
 
 
 @MagForm.form_mixin
+class CheckInForm:
+    kwarg_overrides = {'badge_printed_name': {'maxlength': 30}}
+
+    # TODO: Overrides should also apply when a form uses another form's field
+    def badge_printed_name_validators(self, field):
+        return [validator for validator in (field.validators or []) if not isinstance(validator, validators.Length)] + [
+            validators.DataRequired("Please enter a name for your custom-printed badge."),
+            validators.Length(max=30, message="Your printed badge name is too long. \
+                              Please use less than 30 characters.")]
+
+
+@MagForm.form_mixin
 class TableInfo:
     power = IntegerField('Power Level', validators=[
         validators.InputRequired("Please select what power level you want, or no power."),
