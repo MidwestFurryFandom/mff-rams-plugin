@@ -222,6 +222,19 @@ class Attendee:
             return ' / '.join(ribbon_labels)
         else:
             return self.badge_type_label
+        
+    @property
+    def check_in_notes(self):
+        notes = []
+        if self.age_group_conf['consent_form']:
+            notes.append("Before checking this attendee in, please collect a signed parental consent form, \
+                         which must be notarized if the guardian is not there. If the guardian is there, and \
+                         they have not already completed one, have them sign one in front of you.")
+
+        if self.regdesk_info:
+            notes.append(self.regdesk_info)
+
+        return "<br/><br/>".join(notes)
 
     @property
     def paid_for_a_shirt(self):
