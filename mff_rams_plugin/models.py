@@ -224,6 +224,10 @@ class Attendee:
             return self.badge_type_label
         
     @property
+    def logged_in_name(self):
+        return self.badge_or_masked_name
+        
+    @property
     def check_in_notes(self):
         notes = []
         if self.age_group_conf['consent_form']:
