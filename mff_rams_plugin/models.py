@@ -14,6 +14,7 @@ from uber.utils import add_opt, localized_now, localize_datetime, remove_opt, no
 from uber.models import Attendee as BaseAttendee
 from uber.models.types import Choice, DefaultColumn as Column, MultiChoice
 from uber.decorators import presave_adjustment
+from uber.tasks.registration import update_receipt
 
 
 @Session.model_mixin
@@ -148,11 +149,17 @@ class Attendee:
             self.paid = c.NEED_NOT_PAY
             self.comped_reason = "Automated: Not Attending badge status."
 
+            if not self.is_new:
+                update_receipt(self.id, {'paid': c.NEED_NOT_PAY})
+
     @presave_adjustment
     def pit_need_not_pay(self):
         if self.badge_type == c.PARENT_IN_TOW_BADGE:
             self.paid = c.NEED_NOT_PAY
             self.comped_reason = "Automated: Parent in Tow badge."
+
+            if not self.is_new:
+                update_receipt(self.id, {'paid': c.NEED_NOT_PAY})
 
     def calculate_badge_cost(self, use_promo_code=False, include_price_override=True):
         # Adds overrides for a couple special cases where a badge should be free
