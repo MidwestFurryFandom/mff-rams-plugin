@@ -52,7 +52,8 @@ def no_approval_without_power_fee(group):
 
 @validation.Attendee
 def need_comped_reason(attendee):
-    if attendee.paid == c.NEED_NOT_PAY and not attendee.comped_reason and (
+    if attendee.paid == c.NEED_NOT_PAY and not attendee.comped_reason and attendee.badge_type not in [
+        c.KID_IN_TOW_BADGE, c.PARENT_IN_TOW_BADGE] and (
             c.STAFF_RIBBON not in attendee.ribbon_ints and attendee.badge_type != c.STAFF_BADGE) and (
             not attendee.promo_code and not attendee.promo_code_code):
         return ('comped_reason', 'You must enter a reason for comping this attendee\'s badge.')
