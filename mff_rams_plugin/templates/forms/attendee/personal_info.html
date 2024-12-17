@@ -11,7 +11,7 @@
         var birthdate = $('#{{ personal_info.birthdate.id }}').val();
         $.ajax({
               method: 'GET',
-              url: '../preregistration/check_consent_form',
+              url: '../preregistration/_check_consent_form',
               dataType: 'json',
               data: {
                   birthdate: birthdate
