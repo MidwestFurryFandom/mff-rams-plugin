@@ -9,6 +9,10 @@ from uber.models import Attendee, Group
 from uber.utils import localized_now
 
 
+def get_dict_sum(dict_to_sum):
+    return sum([dict_to_sum[key] * key for key in dict_to_sum])
+
+
 class RegistrationDataOneYear:
     def __init__(self):
         self.event_name = ""
@@ -308,8 +312,95 @@ class Root:
             ])
 
     def dealer_cost_summary(self, session, message=''):
-        paid_groups = session.query(Group.power_fee, Group.name, Group.tables, Group.cost).filter(Group.is_dealer == True,
-                                                                                                  Group.amount_paid > 0)
+        dealers = session.query(Group).filter(Group.is_dealer == True,  # noqa: E712
+                                              Group.attendees_have_badges == True, Group.cost > 0)  # noqa: E712
+        
+        paid_total = 0
+        paid_custom = defaultdict(int)
+        paid_tables = defaultdict(int)
+        paid_table_sums = defaultdict(int)
+        paid_badges = defaultdict(int)
+        paid_power = defaultdict(int)
+        paid_power_sums = defaultdict(int)
+
+        unpaid_total = 0
+        unpaid_custom = defaultdict(int)
+        unpaid_tables = defaultdict(int)
+        unpaid_table_sums = defaultdict(int)
+        unpaid_badges = defaultdict(int)
+        unpaid_power = defaultdict(int)
+        unpaid_power_sums = defaultdict(int)
+
+        for group in dealers:
+            if group.is_paid:
+                paid_total += 1
+                if not group.auto_recalc:
+                    paid_custom['count'] += 1
+                    paid_custom['sum'] += group.cost
+                else:
+                    paid_tables[group.tables] += 1
+                    paid_badges[group.badges_purchased] += 1
+                    if group.power > 0 and group.default_power_fee is None:
+                        paid_custom['power_count'] += 1
+                        paid_custom['power_sum'] += group.power_fee
+                    elif group.power > 0:
+                        paid_power[group.power] += 1
+            else:
+                unpaid_total += 1
+                if not group.auto_recalc:
+                    unpaid_custom['count'] += 1
+                    unpaid_custom['sum'] += group.cost
+                else:
+                    unpaid_tables[group.tables] += 1
+                    unpaid_badges[group.badges_purchased] += 1
+                    if group.power > 0 and group.default_power_fee is None:
+                        unpaid_custom['power_count'] += 1
+                        unpaid_custom['power_sum'] += group.power_fee
+                    elif group.power > 0:
+                        unpaid_power[group.power] += 1
+
+        for dict in [paid_tables, paid_badges, unpaid_tables, unpaid_badges]:
+            dict.pop(0, None)
+
+        for tables in paid_tables:
+            paid_table_sums[tables] = c.get_table_price(tables) * paid_tables[tables]
+        for tables in unpaid_tables:
+            unpaid_table_sums[tables] = c.get_table_price(tables) * unpaid_tables[tables]
+
+        for power in paid_power:
+            paid_power_sums[power] = int(c.POWER_PRICES[power]) * paid_power[power]
+        for power in unpaid_power:
+            unpaid_power_sums[power] = int(c.POWER_PRICES[power]) * unpaid_power[power]
+
+        return {
+            'total_dealers': dealers.count(),
+            'paid_total': paid_total,
+            'paid_custom': paid_custom,
+            'paid_tables': paid_tables,
+            'paid_tables_total': get_dict_sum(paid_tables),
+            'paid_table_sums': paid_table_sums,
+            'all_paid_tables_sum': sum(paid_table_sums.values()),
+            'paid_badges': paid_badges,
+            'paid_badges_total': get_dict_sum(paid_badges),
+            'paid_power': paid_power,
+            'paid_power_total': get_dict_sum(paid_power),
+            'paid_power_sums': paid_power_sums,
+            'all_paid_power_sum': sum(paid_power_sums.values()) + paid_custom['power_sum'],
+            'unpaid_total': unpaid_total,
+            'unpaid_custom': unpaid_custom,
+            'unpaid_tables': unpaid_tables,
+            'unpaid_tables_total': get_dict_sum(unpaid_tables),
+            'unpaid_table_sums': unpaid_table_sums,
+            'all_unpaid_tables_sum': sum(unpaid_table_sums.values()),
+            'unpaid_badges': unpaid_badges,
+            'unpaid_badges_total': get_dict_sum(unpaid_badges),
+            'unpaid_power': unpaid_power,
+            'unpaid_power_total': get_dict_sum(unpaid_power),
+            'unpaid_power_sums': unpaid_power_sums,
+            'all_unpaid_power_sum': sum(unpaid_power_sums.values()) + unpaid_custom['power_sum'],
+            'now': localized_now(),
+        }
+
         custom_fee_groups = paid_groups.filter(Group.auto_recalc == False)
         auto_recalc_groups = paid_groups.filter(Group.auto_recalc == True)
         table_cost_list = defaultdict(int)
