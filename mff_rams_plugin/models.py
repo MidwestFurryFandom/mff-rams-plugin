@@ -3,6 +3,7 @@ from datetime import timedelta
 
 from residue import CoerceUTF8 as UnicodeText
 from pockets import cached_classproperty
+from pockets.autolog import log
 from sqlalchemy import and_, or_, not_
 from sqlalchemy.types import Boolean, Integer, Numeric
 from sqlalchemy.ext.hybrid import hybrid_property
@@ -13,6 +14,7 @@ from uber.utils import add_opt, localized_now, localize_datetime, remove_opt, no
 from uber.models import Attendee as BaseAttendee
 from uber.models.types import Choice, DefaultColumn as Column, MultiChoice
 from uber.decorators import presave_adjustment
+from uber.tasks.registration import update_receipt
 
 
 @Session.model_mixin
@@ -23,6 +25,13 @@ class SessionMixin:
             Attendee.ribbon == c.STAFF_RIBBON,
             Attendee.badge_type == c.GUEST_BADGE))\
             .order_by(Attendee.full_name).all()
+
+
+@Session.model_mixin
+class LotteryApplication:
+    @property
+    def qualifies_for_staff_lottery(self):
+        return self.attendee.badge_type == c.STAFF_BADGE or c.STAFF_RIBBON in self.attendee.ribbon_ints
 
 
 @Session.model_mixin
@@ -45,12 +54,19 @@ class Group:
             self.status = c.APPROVED
 
     @presave_adjustment
+    def unset_power(self):
+        if self.power == -1 or not self.is_dealer:
+            self.power = 0
+
+    @presave_adjustment
     def set_power_fee(self):
         if self.auto_recalc:
-            self.power_fee = self.default_power_fee or self.power_fee
+            self.power_fee = self.power_fee if self.default_power_fee is None else self.default_power_fee
 
         if self.power_fee == None:
             self.power_fee = 0
+        else:
+            self.power_fee = int(self.power_fee)
 
     @presave_adjustment
     def float_table_to_int(self):
@@ -60,6 +76,18 @@ class Group:
     @property
     def default_power_fee(self):
         return c.POWER_PRICES.get(int(self.power), None)
+    
+    def convert_to_shared(self, session):
+        self.tables = 0
+        self.power = 0
+        self.power_fee = 0
+
+        if len(self.floating) < abs(1 - self.badges):
+            new_badges_count = self.badges - len(self.floating)
+        else:
+            new_badges_count = 1
+
+        session.assign_badges(self, new_badges_count)
 
     @property
     def dealer_payment_due(self):
@@ -85,54 +113,15 @@ class Group:
     def dealer_max_badges(self):
         return c.MAX_DEALERS or min(math.ceil(self.tables) * 3, 12)
 
-    def calc_group_price_change(self, **kwargs):
-        preview_group = Group(**self.to_dict())
-        current_cost = int(self.cost * 100)
-        new_cost = None
-
-        if 'cost' in kwargs:
-            try:
-                preview_group.cost = int(kwargs['cost'])
-            except TypeError:
-                preview_group.cost = 0
-            new_cost = preview_group.cost * 100
-        if 'power_fee' in kwargs:
-            try:
-                preview_group.power_fee = int(kwargs['power_fee'])
-            except TypeError:
-                preview_group.power_fee = 0
-            return self.power_fee * 100, (preview_group.power_fee * 100) - (self.power_fee * 100)
-        if 'power' in kwargs:
-            preview_group.power = int(kwargs['power'])
-            if preview_group.default_power_fee is not None:
-                new_power_fee = int(preview_group.default_power_fee)
-                return self.power_fee * 100, (new_power_fee * 100) - (self.power_fee * 100)
-            elif preview_group.default_power_fee == 0:
-                return self.power_fee * 100, self.power_fee * 100 * -1
-            else:
-                # We changed the power option but that didn't actually change their power fee
-                return 0, 0
-        if 'tables' in kwargs:
-            preview_group.tables = int(kwargs['tables'])
-            return self.default_table_cost * 100, (preview_group.default_table_cost * 100) - (self.default_table_cost * 100)
-        if 'badges' in kwargs:
-            num_new_badges = int(kwargs['badges']) - self.badges
-            return self.current_badge_cost * 100, self.new_badge_cost * num_new_badges * 100
-
-        if not new_cost:
-            new_cost = int(preview_group.default_cost * 100)
-        return current_cost, new_cost - current_cost
-
 
 @Session.model_mixin
-class MarketplaceApplication:
-    MATCHING_DEALER_FIELDS = ['categories', 'categories_text', 'description', 'special_needs', 'tax_number']
-
-    tax_number = Column(UnicodeText)
+class ArtistMarketplaceApplication:
+    MATCHING_DEALER_FIELDS = ['email_address', 'website', 'name', 'tax_number']
 
 
 @Session.model_mixin
 class Attendee:
+    consent_form_email = Column(UnicodeText)
     comped_reason = Column(UnicodeText, default='', admin_only=True)
     fursuiting = Column(Boolean, default=False)
     accessibility_requests = Column(MultiChoice(c.ACCESSIBILITY_SERVICE_OPTS))
@@ -144,8 +133,11 @@ class Attendee:
 
     @presave_adjustment
     def save_group_cost(self):
-        if self.group and self.group.auto_recalc:
-            self.group.cost = self.group.calc_default_cost()
+        if self.group and self.group.auto_recalc and not self.is_new:
+            try:
+                self.group.cost = self.group.calc_default_cost()
+            except Exception:
+                log.exception("Problem when saving group cost from save_group_cost!")
 
     @presave_adjustment
     def never_spam(self):
@@ -157,24 +149,28 @@ class Attendee:
             self.paid = c.NEED_NOT_PAY
             self.comped_reason = "Automated: Not Attending badge status."
 
+            if not self.is_new:
+                update_receipt(self.id, {'paid': c.NEED_NOT_PAY})
+
     @presave_adjustment
     def pit_need_not_pay(self):
         if self.badge_type == c.PARENT_IN_TOW_BADGE:
             self.paid = c.NEED_NOT_PAY
             self.comped_reason = "Automated: Parent in Tow badge."
 
-    def calculate_badge_cost(self, use_promo_code=False):
+            if not self.is_new:
+                update_receipt(self.id, {'paid': c.NEED_NOT_PAY})
+
+    def calculate_badge_cost(self, use_promo_code=False, include_price_override=True):
         # Adds overrides for a couple special cases where a badge should be free
         if self.paid == c.NEED_NOT_PAY or self.badge_status == c.NOT_ATTENDING or self.badge_type == c.PARENT_IN_TOW_BADGE:
             return 0
-        elif self.overridden_price is not None:
+        elif self.overridden_price is not None and include_price_override:
             return self.overridden_price
         elif self.is_dealer:
             return c.DEALER_BADGE_PRICE
-        elif self.promo_code_groups:
+        elif self.promo_code_groups or (self.group and self.group.cost and self.paid == c.PAID_BY_GROUP):
             return c.get_group_price()
-        elif self.in_promo_code_group:
-            return self.promo_code.cost
         else:
             cost = self.new_badge_cost
 
@@ -207,6 +203,10 @@ class Attendee:
         if self.age_now_or_at_con and self.age_now_or_at_con < 7 and self.badge_type == c.ATTENDEE_BADGE:
             self.badge_type = c.KID_IN_TOW_BADGE
 
+    def cc_emails_for_ident(self, ident=''):
+        if ident == 'under_18_parental_consent_reminder' and self.email != self.consent_form_email:
+            return self.consent_form_email
+
     def undo_extras(self):
         if self.active_receipt:
             return "Could not undo extras, this attendee has an open receipt!"
@@ -231,15 +231,17 @@ class Attendee:
             return self.badge_type_label
 
     @property
-    def age_discount(self):
-        import math
-        if self.badge_type in [c.SPONSOR_BADGE, c.SHINY_BADGE]:
-            return 0
-        elif self.age_now_or_at_con and self.age_now_or_at_con < 13:
-            half_off = math.ceil(self.new_badge_cost / 2)
-            if not self.age_group_conf['discount'] or self.age_group_conf['discount'] < half_off:
-                return -half_off
-        return -self.age_group_conf['discount']
+    def check_in_notes(self):
+        notes = []
+        if self.age_group_conf['consent_form']:
+            notes.append("Before checking this attendee in, please collect a signed parental consent form, \
+                         which must be notarized if the guardian is not there. If the guardian is there, and \
+                         they have not already completed one, have them sign one in front of you.")
+
+        if self.regdesk_info:
+            notes.append(self.regdesk_info)
+
+        return "<br/><br/>".join(notes)
 
     @property
     def paid_for_a_shirt(self):
@@ -307,26 +309,17 @@ class Attendee:
 
         return merch
     
-    is_valid = BaseAttendee.is_valid
-    badge_status = BaseAttendee.badge_status
+    @property
+    def has_personalized_badge(self):
+        return True
 
-    @hybrid_property
-    def hotel_lottery_eligible(self):
-        return self.is_valid and self.badge_status not in [c.REFUNDED_STATUS, c.NOT_ATTENDING, c.DEFERRED_STATUS]
-    
-    @hotel_lottery_eligible.expression
-    def hotel_lottery_eligible(cls):
-        return and_(cls.is_valid,
-            not_(cls.badge_status.in_([c.REFUNDED_STATUS, c.NOT_ATTENDING, c.DEFERRED_STATUS])
-            ))
-    
 
 @Session.model_mixin
 class AttendeeAccount:
     @property
-    def hotel_eligible_attendees(self):
-        return [attendee for attendee in self.attendees if attendee.hotel_lottery_eligible]
-    
-    @property
     def hotel_eligible_dealers(self):
-        return [attendee for attendee in self.hotel_eligible_attendees if attendee.is_dealer]
+        return [attendee for attendee in self.hotel_eligible_attendees if attendee.is_dealer and attendee.badge_status != c.UNAPPROVED_DEALER_STATUS]
+
+    @property
+    def hotel_eligible_staff(self):
+        return [a for a in self.hotel_eligible_attendees if a.badge_type == c.STAFF_BADGE or c.STAFF_RIBBON in a.ribbon_ints]

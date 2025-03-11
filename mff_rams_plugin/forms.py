@@ -12,13 +12,40 @@ from uber.custom_tags import popup_link, format_currency, pluralize, table_price
 
 @MagForm.form_mixin
 class PersonalInfo:
+    field_validation, new_or_changed_validation = CustomValidation(), CustomValidation()
+    kwarg_overrides = {'badge_printed_name': {'maxlength': 30}}
+    consent_form_email = EmailField('Email for Consent Forms', validators=[
+        validators.DataRequired("Please enter an email address for us to send consent forms to."),
+        validators.Length(max=255, message="Email addresses cannot be longer than 255 characters."),
+        validators.Email(granular_message=True),
+        ],
+        description="We will send consent forms to this email address.",
+        render_kw={'placeholder': 'test@example.com'})
+
     def get_optional_fields(self, attendee, is_admin=False):
         optional_list = self.super_get_optional_fields(attendee)
 
         if c.STAFF_RIBBON in attendee.ribbon_ints and 'onsite_contact' not in optional_list:
             optional_list.append('onsite_contact')
+        
+        if not attendee.birthdate or not attendee.age_group_conf['consent_form']:
+            optional_list.append('consent_form_email')
 
         return optional_list
+
+    def badge_printed_name_validators(self, field):
+        # TODO: Add an upgrade to load_forms later that does this find and replace for you
+        return [validator for validator in (field.validators or []) if not isinstance(validator, validators.Length)] + [
+            validators.DataRequired("Please enter a name for your custom-printed badge."),
+            validators.Length(max=30, message="Your printed badge name is too long. \
+                              Please use less than 30 characters.")]
+    
+    def badge_printed_name_desc(self):
+        return "Badge names have a maximum of 30 characters and must not include emoji."
+    
+    @field_validation.cellphone
+    def not_same_cellphone_ec(form, field):
+        return
 
 @MagForm.form_mixin
 class OtherInfo:
@@ -58,16 +85,6 @@ class BadgeExtras:
         elif field.data == c.SHINY_BADGE and not c.SHINY_BADGE_AVAILABLE:
             raise ValidationError("Shiny Sponsor badges have sold out.")
 
-    def badge_printed_name_validators(self, field):
-        # TODO: Add an upgrade to load_forms later that does this find and replace for you
-        return [validator for validator in (field.validators or []) if not isinstance(validator, validators.Length)] + [
-            validators.DataRequired("Please enter a name for your custom-printed badge."),
-            validators.Length(max=20, message="Your printed badge name is too long. \
-                              Please use less than 20 characters.")]
-    
-    def badge_printed_name_desc(self):
-        return "Badge names have a maximum of 20 characters and must not include emoji."
-
     def badge_type_desc(self):
         return Markup('<span class="popup"><a href="https://www.furfest.org/registration" target="_blank"><i class="fa fa-question-circle" aria-hidden="true"></i> Badge details, pickup information, and refund policy</a></span>')
 
@@ -95,7 +112,19 @@ class Consents:
     
     def pii_consent_desc(self):
         return ""
-    
+
+
+@MagForm.form_mixin
+class CheckInForm:
+    kwarg_overrides = {'badge_printed_name': {'maxlength': 30}}
+
+    # TODO: Overrides should also apply when a form uses another form's field
+    def badge_printed_name_validators(self, field):
+        return [validator for validator in (field.validators or []) if not isinstance(validator, validators.Length)] + [
+            validators.DataRequired("Please enter a name for your custom-printed badge."),
+            validators.Length(max=30, message="Your printed badge name is too long. \
+                              Please use less than 30 characters.")]
+
 
 @MagForm.form_mixin
 class TableInfo:
@@ -150,3 +179,10 @@ class TableInfo:
 class AdminTableInfo:
     location = StringField('Table Assignment', render_kw={'placeholder': "Dealer's table location"})
     power_fee = IntegerField('Power Fee', widget=NumberInputGroup())
+
+@MagForm.form_mixin
+class ArtistMarketplaceForm:
+    def terms_accepted_label(self):
+        return Markup("I have read both the <a href='https://www.furfest.org/vendors/menagerie/rules' target='_blank'>general rules</a> "
+                      " for the artist alley and marketplace and the <a href='https://www.furfest.org/vendors/menagerie/marketplace' target='_blank'>"
+                      f"specific rules</a> for the artist marketplace and understand the requirements, including the ${c.ARTIST_MARKETPLACE_FEE} fee.")

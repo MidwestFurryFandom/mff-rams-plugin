@@ -1,4 +1,4 @@
-{% extends "./preregistration/preregbase.html" %}
+{% extends "uber/templates/preregistration/preregbase.html" %}
 {% set title_text = "Registration Step 4 of 4: Preregistration Successful" %}
 {% block content %}
 <div class="card">
@@ -18,7 +18,7 @@
         </p>
     {% else %}
         <p>
-            You will receive a confirmation email sent to you shortly.
+            You will receive a confirmation email shortly.
             {% if preregs|length > 1 %}All attendees will get their own confirmation email.{% endif %}
         </p>
     {% endif %}

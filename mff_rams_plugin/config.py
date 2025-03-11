@@ -1,19 +1,32 @@
-from sideboard.lib import parse_config, request_cached_property
 from collections import defaultdict
 from datetime import timedelta
 from pockets.autolog import log
+from pathlib import Path
 
-from uber.config import c, Config, dynamic
+from uber.config import c, Config, dynamic, parse_config, request_cached_property
 from uber.menu import MenuItem
 from uber.utils import localized_now
 
-config = parse_config(__file__)
+config = parse_config("mff_rams_plugin", Path(__file__).parents[0])
 c.include_plugin_config(config)
+
+c.MENU.append_menu_item(
+    MenuItem(name='Reg Admin', submenu=[
+        MenuItem(name='Promo Codes', href='../promo_codes/index'),
+        MenuItem(name='Escalation Tickets', href='../reg_admin/escalation_tickets'),
+        MenuItem(name='Automated Transactions', href='../reg_admin/automated_transactions'),
+        MenuItem(name='Attendees Without Accounts', href='../reg_admin/orphaned_attendees'),
+        MenuItem(name='Manage Workstations', href='../reg_admin/manage_workstations'),
+        MenuItem(name='Checkins Per Hour', href='../reg_reports/checkins_by_hour')
+    ])
+)
 
 c.MENU.append_menu_item(
     MenuItem(name='Midwest FurFest', submenu=[
         MenuItem(name='Comped Badges', href='../mff_reports/comped_badges'),
         MenuItem(name='Daily Attendance', href='../mff_reports/attendance_graph'),
+        MenuItem(name='Hotel Lottery Admin', href='../hotel_lottery_admin/'),
+        MenuItem(name='Artist Marketplace Admin', href='../marketplace_admin/'),
     ])
 )
 
@@ -59,10 +72,19 @@ class ExtraConfig:
     @property
     def PREREG_DEALER_POWER_OPTS(self):
         return [(-1, "Select a Power Level")] + self.DEALER_POWER_OPTS
-    
-    @property
-    def HOTEL_LOTTERY_OPEN(self):
-        return c.AFTER_HOTEL_LOTTERY_START and c.BEFORE_HOTEL_LOTTERY_DEADLINE
+
+    def get_table_price(self, table_count):
+        if table_count == 0:
+            return 0
+        
+        max_tables = max(self.TABLE_PRICES.keys())
+        if table_count > max_tables:
+            # We don't have a set price higher than max_tables
+            # Add the default cost times number of extra tables
+            extra_table_cost = self.TABLE_PRICES[0] * (table_count - max_tables)
+            return self.TABLE_PRICES[max_tables] + extra_table_cost
+
+        return self.TABLE_PRICES[table_count]
     
     def get_badge_count_by_type(self, badge_type):
         # Since sponsor and shiny sponsor badges are upgrades with limited availability,
@@ -180,8 +202,10 @@ class ExtraConfig:
                 opts.append((self.ONE_DAY_BADGE, 'Single Day Badge (${})'.format(self.ONEDAY_BADGE_PRICE)))
         return opts
 
+
 # TODO: Why do we need to redefine this?
 c.TERMINAL_ID_TABLE = {k.lower().replace('-', ''): v for k, v in config['secret']['terminal_ids'].items()}
+
 
 c.STATIC_HASH_LIST = {
     "fullcalendar-5.3.2/examples/js/theme-chooser.js": "sha384-w5FSPeW6DBrsVHTk/juh/qrSOKuxuqkRcgf+J8hPe+2yZj87TCF1q5sp/l2zV9pm",
@@ -280,6 +304,7 @@ c.STATIC_HASH_LIST = {
     "deps/selectToAutocomplete/jquery-ui.min.js": "sha384-TkwOpfRia7iUdElqSOlUgVT6+cZb8lR/wsXT91RPkrUYQAoCyG3SlfVX8c0Ey5IR",
     "deps/selectToAutocomplete/jquery.select-to-autocomplete.js": "sha384-qUnRY5v9UDiLpcdltjLZlygKiMN2Atj4Ayqp+/YJKRIs/GW1mdEvDuFLohZ9VtIe",
     "deps/selectToAutocomplete/jquery-ui.css": "sha384-+AtlTJbWDkXeuZPY5QE2fE/Y9ASHvGiOEOalfkgCup137/ePKyE7d410ZTPdj6j0",
+    "deps/Sortable.js": "sha384-c7bUzrzrxav4bD0OYbcU3C3XlT51fLeIHdXokx4/pYjDT9TwCr40APgsgQgtisv6",
     "deps/combined.css": "sha384-hWvvvtNskIFIkMQ2Awjfavyf3q5hJuBfm6nvSeNIogGxD1xfKAW71EkcgOMFgeB5",
     "deps/jquery-datetextentry/jquery.datetextentry.js": "sha384-YYLzV0F3OjgMqSlWJnPpkiryR11dMO8nXkBpgeLy5S3qu22uZz3dukciNcBR9Zfc",
     "deps/jquery-datetextentry/jquery.datetextentry.css": "sha384-aAjyN5r8ognDOt6BGc35M+KRFLevxfl+QXzMSltKZT+L/6S5UWuymBgsm/c11+nF",

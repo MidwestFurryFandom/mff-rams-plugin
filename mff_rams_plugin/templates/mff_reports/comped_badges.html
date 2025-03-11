@@ -1,4 +1,4 @@
-{% extends "base.html" %}{% set admin_area=True %}
+{% extends "uber/templates/base.html" %}{% set admin_area=True %}
 {% block title %}Comped Badges Report{% endblock %}
 {% block content %}
 
@@ -47,7 +47,7 @@
     </tr>
 {% endfor %}
 	<caption align="bottom">
-		<ul class="pagination"></ul>
+		<ul class="pagination flex-wrap flex-wrap"></ul>
 	</caption>
 </table>
 </div>

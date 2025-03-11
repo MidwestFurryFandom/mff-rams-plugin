@@ -1,21 +1,21 @@
-"""Add tax number column for marketplace apps
+"""Add consent form email
 
-Revision ID: f08f4606351c
-Revises: 0f7426266803
-Create Date: 2019-08-27 23:57:55.936896
+Revision ID: 9bc0f579039c
+Revises: e86fcf34f217
+Create Date: 2024-08-13 18:55:51.932075
 
 """
 
 
 # revision identifiers, used by Alembic.
-revision = 'f08f4606351c'
-down_revision = '0f7426266803'
+revision = '9bc0f579039c'
+down_revision = 'e86fcf34f217'
 branch_labels = None
-depends_on = '9e721eb0b45c'
+depends_on = None
 
 from alembic import op
 import sqlalchemy as sa
-from sqlalchemy.engine.reflection import Inspector
+
 
 
 try:
@@ -52,16 +52,8 @@ sqlite_reflect_kwargs = {
 
 
 def upgrade():
-    conn = op.get_bind()
-    inspector = Inspector.from_engine(conn)
-    tables = inspector.get_table_names()
-    if 'artist_marketplace_application' not in tables:
-        op.add_column('marketplace_application', sa.Column('tax_number', sa.Unicode(), server_default='', nullable=False))
+    op.add_column('attendee', sa.Column('consent_form_email', sa.Unicode(), server_default='', nullable=False))
 
 
 def downgrade():
-    conn = op.get_bind()
-    inspector = Inspector.from_engine(conn)
-    tables = inspector.get_table_names()
-    if 'artist_marketplace_application' not in tables:
-        op.drop_column('marketplace_application', 'tax_number')
+    op.drop_column('attendee', 'consent_form_email')

@@ -6,7 +6,7 @@
 {{ c.EVENT_NAME }} this coming {{ event_dates() }} and your payment of {{ (group.amount_paid / 100)|format_currency }} has been received.</p>
 
 {% if group.is_dealer %}
-<p>Your group will have a {{ group.tables_repr }} in the Dealers Den. The Dealers Den manager will continue to be in touch with you to keep you informed of Dealers Den rules and procedures.
+<p>{% if group.status == c.SHARED %}Your group will share a table{% if group.shared_with %} with {{ group.shared_with.name }}{% endif %}{% else %}Your group will have a {{ group.tables_repr }}{% endif %} in the Dealers Den. The Dealers Den manager will continue to be in touch with you to keep you informed of Dealers Den rules and procedures.
 </p>
 {% endif %}
 
