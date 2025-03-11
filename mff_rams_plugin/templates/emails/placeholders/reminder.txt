@@ -1,6 +1,8 @@
 {{ attendee.first_name }},
 
-You still haven't accepted your {{ attendee.badge_type_label }} badge for this year's {{ c.EVENT_NAME }}.  We need to know whether you're coming, so please let us know by your registration at {{ c.URL_BASE }}/preregistration/confirm?id={{ attendee.id }}
+You still haven't accepted your {{ attendee.badge_type_label }} badge for this year's {{ c.EVENT_NAME }}.
+
+We need to know whether you're coming, so please let us know by accepting your registration{% if attendee.amount_unpaid %},{% else %} and{% endif %} completing your profile{% if attendee.amount_unpaid %}, and paying your outstanding balance of {{ attendee.amount_unpaid|format_currency }}{% endif %} at {{ c.URL_BASE }}/preregistration/confirm?id={{ attendee.id }}
 
 You won't be able to check-in at the event until your registration is complete!
 

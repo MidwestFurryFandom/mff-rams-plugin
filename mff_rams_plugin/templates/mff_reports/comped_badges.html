@@ -1,23 +1,25 @@
-{% extends "base.html" %}{% set admin_area=True %}
+{% extends "uber/templates/base.html" %}{% set admin_area=True %}
 {% block title %}Comped Badges Report{% endblock %}
 {% block content %}
 
-<ol class="breadcrumb">
-  <li><a href="../accounts/homepage">Home</a></li>
-  <li>People</li>
-  <li class="active">Comped Badges Report</li>
-</ol>
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="../accounts/homepage">Home</a></li>
+    <li class="breadcrumb-item">People</li>
+    <li class="breadcrumb-item active">Comped Badges Report</li>
+  </ol>
+</nav>
 
-<div class="panel panel-default">
+<div class="card">
     <b>Total:</b> {{ all_comped }} comped badges <br/>
     <strong>Claimed:</strong> {{ claimed_comped }} <br/>
     <strong>Unclaimed:</strong> {{ unclaimed_comped }}
 </div>
 
-<div class="panel panel-default">
+<div class="card">
 </div>
 
-<div class="panel panel-default">
+<div class="card">
 <ul class="nav nav-tabs" role="tablist">
   <li {% if show == "all" %}class="active"{% endif %}><a href="comped_badges?show=all">All</a></li>
   <li {% if show == "claimed" %}class="active"{% endif %}><a href="comped_badges?show=claimed">Claimed</a></li>
@@ -45,7 +47,7 @@
     </tr>
 {% endfor %}
 	<caption align="bottom">
-		<ul class="pagination"></ul>
+		<ul class="pagination flex-wrap flex-wrap"></ul>
 	</caption>
 </table>
 </div>

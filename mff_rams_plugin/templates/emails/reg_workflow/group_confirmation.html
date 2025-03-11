@@ -6,7 +6,7 @@
 {{ c.EVENT_NAME }} this coming {{ event_dates() }} and your payment of {{ (group.amount_paid / 100)|format_currency }} has been received.</p>
 
 {% if group.is_dealer %}
-<p>Your group will have a {{ group.tables_repr }} in the Dealers Den. The Dealers Den manager will continue to be in touch with you to keep you informed of Dealers Den rules and procedures.
+<p>{% if group.status == c.SHARED %}Your group will share a table{% if group.shared_with %} with {{ group.shared_with.name }}{% endif %}{% else %}Your group will have a {{ group.tables_repr }}{% endif %} in the Dealers Den. The Dealers Den manager will continue to be in touch with you to keep you informed of Dealers Den rules and procedures.
 </p>
 {% endif %}
 
@@ -21,7 +21,7 @@ You may preassign your badges on your <a href="{{ c.URL_BASE }}/preregistration/
 
 {% if group.is_dealer %}
 <p>If you would like to add badges to your group, then please email us as {{ c.MARKETPLACE_EMAIL }}.<br />
-Badges for preregistered Dealers and Helpers will be available for pickup at the Dealers Den Operations table. Note that a photo ID is required to pick up your badge. The location and hours of the Dealers Den Operations desk will be e-mailed prior to the event.
+Badges for preregistered Dealers and Helpers will be available for pickup at the Dealers Den Operations table. Note that a photo ID is required to pick up your badge. The location and hours of the Dealers Den Operations desk will be emailed prior to the event.
 </p>
 {{ c.MARKETPLACE_EMAIL_SIGNATURE }}
 {% endif %}

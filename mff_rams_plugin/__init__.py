@@ -3,6 +3,7 @@ from os.path import join
 from uber.jinja import template_overrides
 from uber.utils import mount_site_sections, static_overrides
 from .config import config
+from . import forms  # noqa: F401
 from . import models  # noqa: F401
 from . import model_checks  # noqa: F401
 from . import automated_emails  # noqa: F401

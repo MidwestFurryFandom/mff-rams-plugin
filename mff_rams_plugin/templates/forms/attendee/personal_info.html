@@ -1,0 +1,49 @@
+{% extends 'uber/templates/forms/attendee/personal_info.html' %}
+
+{% block age %}
+<div class="row g-sm-3">
+  <div class="col-12 col-sm-6">
+    {{ form_macros.form_input(personal_info.birthdate, admin_text=attendee.age_group_conf.desc) }}
+    {% if not admin_area %}{{ form_macros.form_input(personal_info.consent_form_email) }}{% endif %}
+
+    <script type="text/javascript">
+      var toggleConsentFormEmail = function() {
+        var birthdate = $('#{{ personal_info.birthdate.id }}').val();
+        $.ajax({
+              method: 'GET',
+              url: '../preregistration/_check_consent_form',
+              dataType: 'json',
+              data: {
+                  birthdate: birthdate
+              },
+              success: function (json) {
+                $('#{{ personal_info.consent_form_email.id }}').closest('.form-floating').toggle(json.consent_form)
+                $('#{{ personal_info.consent_form_email.id }}').prop('required', json.consent_form);
+                $('#{{ personal_info.consent_form_email.id }}').siblings('label').children('.required-indicator').toggle(json.consent_form);
+              },
+              error: function () {
+                  showErrorMessage('Unable to connect to server, please try again.');
+              }
+          });
+      }
+      $().ready(function () {
+        toggleConsentFormEmail();
+        $("#{{ personal_info.birthdate.id }}").change(toggleConsentFormEmail);
+      });
+    </script>
+  </div>
+
+  <div class="col-12 col-sm-6">
+    {% if admin_area %}
+    {{ form_macros.form_input(personal_info.consent_form_email) }}
+    {% else %}
+    <div class="alert alert-warning" role="alert">
+      <em>
+        Please review our <a href="https://www.furfest.org/support/parents-guide" target="_blank">Parent's Guide</a> for more information about FurFest's policies 
+        regarding the attendance of those under 18 years of age.
+      </em>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

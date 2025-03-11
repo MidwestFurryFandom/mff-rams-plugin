@@ -10,10 +10,10 @@ this coming {{ event_dates() }}. Below is a copy of your application. You may
     <li><strong>Dealer Table Name</strong>: {{ group.name }}</li>
     <li><strong>Tables</strong>: {{ group.tables_repr }} ({{ group.default_table_cost|format_currency }}) </li>
     <li><strong>Badges</strong>: {{ group.badges }} badge{{ group.badges|pluralize }} ({{ group.default_badge_cost|format_currency }}) </li>
-    {% if group.power %}
-    <li><strong>Power</strong>: {{ c.PREREG_DEALER_POWER_OPTS[group.power][1] }}
+    {% if group.power > 0 %}
+    <li><strong>Tier {{ group.power }} Power</strong>: {{ group.power_label[8:] if group.default_power_fee else "Custom power level" }} for {{ group.power_usage }}{% if not group.default_power_fee and group.power_fee %} ({{ group.power_fee|format_currency }}){% endif %}
     {% endif %}
-    <li><strong>Total Price</strong>: {{ group.cost|format_currency }}{% if not group.default_power_fee %} plus custom power fee{% endif %}</li>
+    <li><strong>Total Price</strong>: {{ group.cost|format_currency }}{% if group.power and not group.default_power_fee and not group.power_fee %} plus custom power fee{% endif %}</li>
     <li><strong>Description</strong>: {{ group.description }}</li>
     {% if group.special_needs %}<li><strong>Table Requests and Special Requests</strong>: {{ group.special_needs }}</li>{% endif %}
     <li><strong>Website URL</strong>: {{ group.website }}</li>
@@ -22,7 +22,7 @@ this coming {{ event_dates() }}. Below is a copy of your application. You may
 </ul>
 
 {% if c.AFTER_DEALER_REG_DEADLINE %}
-    Because our dealers room is currently full, your submission has been automatically placed on our waitlist.  We'll let you know if your application is later approved.
+Because your application was filed after the initial 48-hour application period, your submission has been automatically placed on our waitlist. We'll let you know if your application is later approved.
 {% else %}
   Your application will be reviewed and you should receive a decision within the next three to four weeks. If your application is approved you will receive an email with a payment link and further information on Dealers Den policies. 
 {% endif %}

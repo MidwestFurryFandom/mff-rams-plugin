@@ -1,41 +1,187 @@
-{% extends "base.html" %}{% set admin_area=True %}
+{% set admin_area=True %}
+{% extends "base.html" %}
 {% block title %}Dealer Cost Summary{% endblock %}
 {% block content %}
-<h3 align="center">Dealer Cost Report -- {{ now|datetime("%m/%d/%Y, %-I:%M%p") }}</h3>
-<div class="panel panel-default">
-<table class="table table-bordered" style="margin: 20px; width: calc(100% - 40px);">
+<h3 class="text-center">Dealer Cost Report -- {{ now|datetime("%m/%d/%Y, %-I:%M%p") }}</h3>
+<p>Please note that 
+  {% if c.HAS_DEALER_REPORTS_ACCESS %}
+  <a href="../dealer_reports/dealer_receipt_discrepancies" target="_blank">receipt discrepancies</a>
+  {% else %}receipt discrepancies{% endif %} and partially-paid groups may contribute to a different total intake than the amounts listed below.</p>
+  <table class="table table-bordered bg-body" style="margin: 20px; width: calc(100% - 40px);">
   <tr>
-    <td colspan="2"><strong>Total Fees</strong></td><td width="75%">{{ (table_sum + badge_sum + custom_fee_sum + power_fee_sum)|format_currency }}</td>
+    <td><strong>Total Dealers</strong></td><td colspan="5">{{ total_dealers }}</td><td><em>Total</em></td><td><em>Grand Total</em></td>
   </tr>
   <tr>
-    <td></td><td>Badges</td><td>{{ badge_sum|format_currency }}</td>
+    <td><strong>Paid Dealers</strong></td>
+    <td colspan="5">{{ paid_total }}</td>
+    <td></td>
+    <td>{{ (paid_custom['sum'] + all_paid_tables_sum + all_paid_power_sum + (paid_badges_total * c.DEALER_BADGE_PRICE))|format_currency }}</td>
   </tr>
   <tr>
-    <td></td><td>Tables</td><td>{{ table_sum|format_currency }}</td>
+    <td></td><td></td>
+    <td colspan="4">{{ paid_custom['count'] }} paid custom fees</td>
+    <td>{{ paid_custom['sum']|format_currency }}</td>
+    <td></td>
   </tr>
   <tr>
-    <td></td><td>Power</td><td>{{ power_fee_sum|format_currency }}</td>
+    <td></td><td></td>
+    <td colspan="4">{{ paid_tables_total }} paid tables</td>
+    <td>{{ all_paid_tables_sum|format_currency }}</td>
+    <td></td>
   </tr>
+  {% for tables in paid_tables.keys()|sort() %}
+  {% if loop.first %}
   <tr>
-    <td></td><td>Custom Fees</td><td>{{ custom_fee_sum|format_currency }}</td>
+    <td></td><td></td><td></td>
+    <td width="10%"><em># Tables</em></td><td width="10%"><em># Dealers</em></td><td width="10%"><em>Total</em></td>
+    <td></td>
   </tr>
-  <tr></tr>
+  {% endif %}
   <tr>
-    <td colspan="2"><strong># of Paid Groups</strong></td><td>{{ num_custom_groups + num_auto_groups }}</td>
-  </tr>
-  <tr>
-    <td colspan="2"><strong># of Paid Groups with Custom Fees</strong></td><td>{{ num_custom_groups }}</td>
-  </tr>
-  <tr></tr>
-  <tr>
-    <td colspan="2"><strong>Table Fee Breakdown</strong></td><td></td>
-  </tr>
-  {% for desc, sum in table_breakdown %}
-  <tr>
-    <td></td><td>{{ desc }}</td><td>{{ sum|format_currency }}</td>
+    <td></td><td></td><td></td>
+    <td>{{ tables }}</td>
+    <td>{{ paid_tables[tables] }}</td>
+    <td>{{ paid_table_sums[tables]|format_currency }}</td>
+    <td></td>
+    <td></td>
   </tr>
   {% endfor %}
-  <tr></tr>
+  <tr>
+    <td></td><td></td>
+    <td colspan="4">{{ paid_badges_total }} paid badges</td>
+    <td>{{ (paid_badges_total * c.DEALER_BADGE_PRICE)|format_currency }}</td><td></td>
+  </tr>
+  {% for count in paid_badges.keys()|sort() %}
+  {% if loop.first %}
+  <tr>
+    <td></td><td></td><td></td>
+    <td width="10%"><em># Badges</em></td><td width="10%"><em># Dealers</em></td><td width="10%"><em>Total</em></td>
+    <td></td>
+  </tr>
+  {% endif %}
+  <tr>
+    <td></td><td></td><td></td>
+    <td>{{ count }}</td>
+    <td>{{ paid_badges[count] }}</td>
+    <td>{{ (paid_badges[count] * count * c.DEALER_BADGE_PRICE)|format_currency }}</td>
+    <td></td><td></td>
+  </tr>
+  {% endfor %}
+  <tr>
+    <td></td><td></td>
+    <td colspan="4">{{ paid_power_total }} paid power fees</td>
+    <td>{{ all_paid_power_sum|format_currency }}</td>
+    <td></td>
+  </tr>
+  {% for power in paid_power.keys()|sort() %}
+  {% if loop.first %}
+  <tr>
+    <td></td><td></td><td></td>
+    <td width="10%"><em>Power Level</em></td><td width="10%"><em># Dealers</em></td><td width="10%"><em>Total</em></td>
+    <td></td>
+  </tr>
+  {% endif %}
+  <tr>
+    <td></td><td></td><td></td>
+    <td>Tier {{ power }}: {{ c.DEALER_POWERS[power] }}</td>
+    <td>{{ paid_power[power] }}</td>
+    <td>{{ paid_power_sums[power]|format_currency }}</td>
+    <td></td>
+    <td></td>
+  </tr>
+  {% endfor %}
+  {% if paid_custom['power_count'] %}
+  <tr>
+    <td></td><td></td><td></td>
+    <td>Tier 4: Custom</td>
+    <td>{{ paid_custom['power_count'] }}</td>
+    <td>{{ paid_custom['power_sum'] }}</td>
+  </tr>
+  {% endif %}
+
+  <tr>
+    <td><strong>Unpaid Dealers</strong></td>
+    <td colspan="5">{{ unpaid_total }}</td>
+    <td></td>
+    <td>({{ (unpaid_custom['sum'] + all_unpaid_tables_sum + (unpaid_badges_total * c.DEALER_BADGE_PRICE))|format_currency }})</td>
+  </tr>
+  <tr>
+    <td></td><td></td>
+    <td colspan="4">{{ unpaid_custom['count'] }} unpaid custom fees</td>
+    <td>({{ unpaid_custom['sum']|format_currency }})</td><td></td>
+  </tr>
+  <tr>
+    <td></td><td></td>
+    <td colspan="4">{{ unpaid_tables_total }} unpaid tables</td>
+    <td>({{ all_unpaid_tables_sum|format_currency }})</td><td></td>
+  </tr>
+  {% for tables in unpaid_tables.keys()|sort() %}
+  {% if loop.first %}
+  <tr>
+    <td></td><td></td><td></td>
+    <td width="10%"><em># Tables</em></td><td width="10%"><em># Dealers</em></td><td width="10%"><em>Total</em></td>
+    <td></td>
+  </tr>
+  {% endif %}
+  <tr>
+    <td></td><td></td><td></td>
+    <td>{{ tables }}</td>
+    <td>{{ unpaid_tables[tables] }}</td>
+    <td>({{ unpaid_table_sums[tables]|format_currency }})</td>
+    <td></td><td></td>
+  </tr>
+  {% endfor %}
+  <tr>
+    <td></td><td></td>
+    <td colspan="4">{{ unpaid_badges_total }} unpaid badges</td>
+    <td>({{ (unpaid_badges_total * c.DEALER_BADGE_PRICE)|format_currency }})</td><td></td>
+  </tr>
+  {% for count in unpaid_badges.keys()|sort() %}
+  {% if loop.first %}
+  <tr>
+    <td></td><td></td><td></td>
+    <td width="10%"><em># Badges</em></td><td width="10%"><em># Dealers</em></td><td width="10%"><em>Total</em></td>
+    <td></td>
+  </tr>
+  {% endif %}
+  <tr>
+    <td></td><td></td><td></td>
+    <td>{{ count }}</td>
+    <td>{{ unpaid_badges[count] }}</td>
+    <td>({{ (unpaid_badges[count] * count * c.DEALER_BADGE_PRICE)|format_currency }})</td>
+    <td></td><td></td>
+  </tr>
+  {% endfor %}
+  <tr>
+    <td></td><td></td>
+    <td colspan="4">{{ unpaid_power_total }} unpaid power fees</td>
+    <td>{{ all_unpaid_power_sum|format_currency }}</td>
+    <td></td>
+  </tr>
+  {% for power in unpaid_power.keys()|sort() %}
+  {% if loop.first %}
+  <tr>
+    <td></td><td></td><td></td>
+    <td width="10%"><em>Power Level</em></td><td width="10%"><em># Dealers</em></td><td width="10%"><em>Total</em></td>
+    <td></td>
+  </tr>
+  {% endif %}
+  <tr>
+    <td></td><td></td><td></td>
+    <td>Tier {{ power }}: {{ c.DEALER_POWERS[power] }}</td>
+    <td>{{ unpaid_power[power] }}</td>
+    <td>{{ unpaid_power_sums[power]|format_currency }}</td>
+    <td></td>
+    <td></td>
+  </tr>
+  {% endfor %}
+  {% if unpaid_custom['power_count'] %}
+  <tr>
+    <td></td><td></td><td></td>
+    <td>Tier 4: Custom</td>
+    <td>{{ unpaid_custom['power_count'] }}</td>
+    <td>{{ unpaid_custom['power_sum'] }}</td>
+  </tr>
+  {% endif %}
 </table>
-</div>
 {% endblock %}

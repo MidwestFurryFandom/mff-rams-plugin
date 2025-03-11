@@ -1,0 +1,51 @@
+{% extends "uber/templates/hotel_lottery/suite_lottery_form.html" %}
+
+{% block suite_ranking_desc %}
+    <p>
+        Rank your choice of suite type below by clicking and dragging suites from "Available" to "Selected" in order of preference.
+        At least one selection is required. Not all suite types need be selected.
+        See these links for additional <a href="https://www.furfest.org/attend/hotels/suites" target="_blank">room</a> and <a href="https://www.furfest.org/attend/hotels" target="_blank">amenity</a> information.
+    </p>
+{% endblock %}
+
+{% block suite_ranking_form %}
+{{ form_macros.form_input(suite_lottery.suite_type_preference,
+    help_text="" if not c.STAFF_HOTEL_LOTTERY_OPEN else "The staff (less expensive) Regency suite rate is not available after the staff room lottery closes.",
+    readonly=read_only, show_staff_rates=c.STAFF_HOTEL_LOTTERY_OPEN and application.qualifies_for_staff_lottery) }}
+{% if not read_only and application.current_step <= steps.counter %}
+    <div class="row justify-content-end">
+        <div class="col col-auto">
+            <button type="submit" id="step-{{ steps.counter }}-submit" class="btn btn-primary" name="current_step" value="{{ steps.counter }}">Save and Continue</button>
+        </div>
+    </div>
+{% endif %}
+{% if not read_only and application.status != c.COMPLETE %}
+    <div class="collapse text-end" id="step-{{ steps.counter }}-save-reminder">
+        <em>Scroll down to your current step and click "Save and Continue" to save changes.</em>
+    </div>
+{% endif %}
+{% endblock %}
+
+{% block terms_desc %}
+{% if not read_only %}
+<p>
+    Suite entries are processed first and prioritized above standard room entries in the lottery. Suites are in extremely high demand, and necessitate special policies:
+    <ul>
+        <li>A one night, non-refundable deposit is required and will be invoiced on confirmation of the suite.</li>
+        <li>Cancellations must be received on or prior to {{ c.HOTEL_LOTTERY_SUITE_CUTOFF|datetime_local }}, otherwise all guests in that suite will be ineligible for future year suite lotteries in addition to forfeiting the deposit.</li>
+        <li>All suites are directly managed by {{ c.EVENT_NAME }}. Suite confirmations are issued by the convention, not the hotel.</li>
+        <li>Additional policies apply to suites. It is essential all attendees requesting a suite read and understand these policies, as you are required to comply as a condition of retaining the suite during the event, and for eligibility in future years.</li>
+    </ul>
+</p>
+<p>If awarded a suite, you will receive additional information via email regarding your suite.</p>
+
+<p>Suite policies, floor plans and other details pertaining to suites may be found on the <a href="https://www.furfest.org/attend/hotels/suites" target="_blank">Suite FAQ</a>.</p>
+
+<p>
+    By checking the box below, you certify that you have read, understand and agree to comply with the
+    <a href="https://www.furfest.org/attend/hotels/suites#policies" target="_blank">{{ c.EVENT_NAME }} Suite Policies and Rules</a>,
+    including social/party policies, payment and cancellation requirements.
+    You further understand that failure to comply may result in the hotel disallowing any social gatherings and/or becoming ineligible for suites in future years.
+</p>
+{% endif %}
+{% endblock %}

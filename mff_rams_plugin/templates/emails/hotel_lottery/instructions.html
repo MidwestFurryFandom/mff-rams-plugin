@@ -1,0 +1,49 @@
+<html>
+<head></head>
+<body>
+
+<p>Greetings!</p>
+
+<p>
+    The {{ c.EVENT_NAME }} hotel lottery is NOW OPEN! We have <strong>new, extra streamlined process</strong> so please take the time to read about it below.
+</p>
+
+<p>
+    The hotel lottery will end at 
+    {{ c.HOTEL_LOTTERY_FORM_DEADLINE|datetime_local }}. Being first doesn't matter for the lottery, so please take your time when entering!</p>
+
+<p style="margin-bottom:0px;"><strong>To enter the hotel room lottery:</strong></p>
+<ol>
+    <li><a href="{{ c.URL_BASE }}/preregistration/homepage" target="_blank">Log into your account homepage</a>. You'll see a list of badges you've registered{% if account.hotel_eligible_dealers %}, including any dealer assistant's badges{% endif %}.</li>
+    <li>
+        If you are planning on rooming with others, designate someone to be the 'room group leader' and have them enter the lottery first.
+        You can then use their lottery confirmation number and email address to enter the lottery as part of their room group.
+    </li>
+    <li>
+        Next to the details for each badge that you can enter, there will be a button that says "<strong>Enter Hotel Lottery</strong>". Click on this button to start your lottery entry.
+    </li>
+    <li>Carefully read and agree to the lottery terms and data policies. You'll see three options:</li>
+    <ul>
+        <li><strong>Join Room Group</strong>: This allows you to enter as a roommate under another person's room group. You'll need their lottery confirmation number and their email address.</li>
+        <li><strong>Enter Room Lottery</strong>: Start a lottery entry for ONLY a standard room. This option includes the ability to request an ADA room.</li>
+        <li><strong>Enter Suite Lottery</strong>: Start a lottery entry for a suite AND, optionally, a standard room.</li>
+    </ul>
+    <li>If you're entering the room or suite lottery, complete all the steps entering the details of your lottery.</li>
+    {% if account.hotel_eligible_dealers %}
+        <li>When entering the lottery as a dealer, you are entitled to space in the dealers block. Make sure to <strong>include the "Crowne Plaza" as a hotel option</strong> to be included in the dealers block. Also remember, you or another dealer must be the primary contact on the hotel room (the "group leader") to qualify for the dealer block.</li>
+    {% endif %}
+    <li>If you're joining a room group, you will be shown the policies for room groups. Read them carefully, then click "Continue". Look up the group using its confirmation number and the group leader's email address, then confirm that you want to join that group.</li>
+    <li>Once you have completed your entry, you will get an entry confirmation to your email address with all the information you submitted, along with your lottery confirmation number. If you completed a room or suite entry, you will also be able to create a room group.</li>
+    {% if account.hotel_eligible_attendees|length > 1 %}<li>You can return to your homepage to enter on behalf of the other people under your account. Registrations on your account will NOT be automatically added to your room group.</li>{% endif %}
+</ol>
+
+<p>Once you have finished registering, you can now relax and we'll let you know if you were selected soon after the lottery closes!</p>
+
+<p>Full instructions, hotel lottery FAQs and a list of the hotels, along with pricing, can be found <a href="{{ c.HOTEL_LOTTERY_FAQ_URL }}" target="_blank">on our convention website.</a>
+<br/>If you have questions about your registration, please reach out to {{ c.REGDESK_EMAIL|email_only|email_to_link }}
+{% if account.hotel_eligible_dealers %}<br/>If you have questions about your dealers application, please reach out to {{ c.MARKETPLACE_EMAIL|email_only|email_to_link }}{% endif %}
+<br/>If you have questions about the hotel lottery, please reach out to {{ c.HOTELS_EMAIL|email_only|email_to_link }}
+<br/>Thank you again!</p>
+
+</body>
+</html>

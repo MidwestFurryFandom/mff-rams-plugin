@@ -1,35 +1,10 @@
-{% extends "./preregistration/preregbase.html" %}
-{% block title %}Preregistration Successful{% endblock %}
-{% block backlink %}{% endblock %}
+{% extends "uber/templates/preregistration/preregbase.html" %}
+{% set title_text = "Registration Step 4 of 4: Preregistration Successful" %}
 {% block content %}
-<div class="masthead">
-</div>
+<div class="card">
+  <div class="card-body">
+  {{ macros.prereg_wizard(c.PAGE_PATH, is_prereg_dealer) }}
 
-<div class="panel panel-default">
-<div class="row bs-wizard" style="border-bottom:0;border-top:0;">
-    <div class="col-xs-4 bs-wizard-step complete">
-      <div class="text-center bs-wizard-stepnum">Step 1</div>
-      <div class="progress"><div class="progress-bar"></div></div>
-      <a class="bs-wizard-dot"></a>
-      <div class="bs-wizard-info text-center">Enter Info</div>
-    </div>
-    <div class="col-xs-4 bs-wizard-step complete">
-      <div class="text-center bs-wizard-stepnum">Step 2</div>
-      <div class="progress"><div class="progress-bar"></div></div>
-      <a class="bs-wizard-dot"></a>
-      <div class="bs-wizard-info text-center">Review &amp; Pay</div>
-    </div>
-    <div class="col-xs-4 bs-wizard-step active">
-      <div class="text-center bs-wizard-stepnum">Step 3</div>
-      <div class="progress"><div class="progress-bar"></div></div>
-      <a class="bs-wizard-dot"></a>
-      <div class="bs-wizard-info text-center">Done</div>
-    </div>
-</div>
-
-
-<div class="row">
-  <div class="well col-md-offset-1 col-md-10">
     <h1>Registration Complete</h1>
     <p>
       Congratulations! Your registration was successful.
@@ -43,23 +18,18 @@
         </p>
     {% else %}
         <p>
-            You will receive a confirmation email sent to you shortly.
+            You will receive a confirmation email shortly.
             {% if preregs|length > 1 %}All attendees will get their own confirmation email.{% endif %}
         </p>
     {% endif %}
-  </div>
-</div>
+  
 
-<div class="row">
-  <div class="col-md-offset-1 col-md-10">
-    <a href="index">
-      <button class="btn btn-primary">Add Another Registration</button>
-    </a>
+    <a href="../preregistration/form" class="btn btn-primary">Add Another Registration</a>
     {% if c.ATTENDEE_ACCOUNTS_ENABLED %}
     <a href="../preregistration/homepage" class="btn btn-info">Manage Your Registrations</a>
-    <a href="../preregistration/logout" class="btn btn-danger">Log Out</a>
     {% endif %}
-
-{% include "preregistration/disclaimers.html" %}
+  
+  </div>
+</div>
 
 {% endblock %}

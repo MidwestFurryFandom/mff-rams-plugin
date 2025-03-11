@@ -1,4 +1,4 @@
-{% extends "base.html" %}{% set admin_area=True %}
+{% extends "uber/templates/base.html" %}{% set admin_area=True %}
 {% block title %}Group Admin{% endblock %}
 {% block content %}
 
@@ -7,15 +7,16 @@
         window.location = "index?order={{ order }}&show=" + $(dropdown).val();
     }
 </script>
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="../accounts/homepage">Home</a></li>
+      <li class="breadcrumb-item">People</li>
+      <li class="breadcrumb-item active">Groups</li>
+    </ol>
+</nav>
 
-<ol class="breadcrumb">
-  <li><a href="../accounts/homepage">Home</a></li>
-  <li>People</li>
-  <li class="active">Groups</li>
-</ol>
 
-
-<div class="panel panel-default">
+<div class="card">
     <b>Total:</b> {{ total_groups }} groups ({{ total_badges }} badges, {{ tables }} tables)
     &nbsp;&nbsp;&nbsp;&nbsp;
     <b>With Tables:</b> {{ tabled_groups }} groups ({{ tabled_badges }} badges)
@@ -25,10 +26,10 @@
     {{ approved_tables }} approved tables / {{ waitlisted_tables }} waitlisted tables / {{ unapproved_tables }} unapproved tables
 </div>
 
-<div class="panel panel-default">
+<div class="card">
     <div class="col-md-4">
-    <a class="btn btn-default" href="form?id=None">Add a group</a>
-    <a class="btn btn-default" href="form?id=None&new_dealer=true">Add a dealer</a>
+    <a class="btn btn-outline-secondary" href="form?id=None">Add a group</a>
+    <a class="btn btn-outline-secondary" href="form?id=None&new_dealer=true">Add a dealer</a>
     </div>
 
 <ul class="nav nav-tabs" role="tablist">
@@ -38,7 +39,7 @@
 </ul>
 </div>
 
-<div class="panel panel-default">
+<div class="card">
 <table class="table table-striped datatable">
 <thead><tr>
     <th>Name</th>
@@ -76,7 +77,7 @@
     </tr>
 {% endfor %}
 	<caption align="bottom">
-		<ul class="pagination"></ul>
+		<ul class="pagination flex-wrap flex-wrap"></ul>
 	</caption>
 </table>
 {% endblock %}

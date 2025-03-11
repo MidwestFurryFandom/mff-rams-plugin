@@ -58,7 +58,6 @@ def upgrade():
     op.add_column('group', sa.Column('power_fee', sa.Integer(), server_default='0', nullable=False))
     op.add_column('group', sa.Column('power_usage', residue.CoerceUTF8(), nullable=False))
     op.add_column('group', sa.Column('table_fee', sa.Integer(), server_default='0', nullable=False))
-    # ### end Alembic commands ###
 
 
 def downgrade():

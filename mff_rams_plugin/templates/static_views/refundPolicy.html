@@ -1,0 +1,58 @@
+{% extends 'static_views/static_base.html' %}
+{% block page %}
+<div class="container">
+<h1 class="text-center">Midwest FurFest Badge Policies</h1>
+<h2>When Can I Pick Up My Badge?</h2>
+<p>Badges may be picked up at Registration in Hall A of the Donald E. Stephens Convention Center during the following times:</p>
+
+<p>Thursday, December 5, 2024:</p>
+
+<p>
+    3PM - 5PM - Sponsor and Shiny Sponsor Preregistration Only
+    <br/>5PM - 7PM - Preregistration Attendees Only
+    <br/>7PM - 10PM - All Preregistration and At The Door Attendees
+</p>
+
+<p>Friday, December 6, 2024:</p>
+
+<p>10AM - 8PM - All Preregistration and At The Door Attendees</p>
+
+<p>Saturday, December 7, 2024:</p>
+
+<p>10AM - 6PM - All Preregistration and At The Door Attendees</p>
+
+<p>Sunday, December 8, 2024:</p>
+
+<p>10AM - 3PM - All Preregistration and At The Door Attendees</p>
+
+<p>All attendees will be required to show ID to a Registration staffer in order to receive a badge. 
+    In addition, some minors may be required to have additional paperwork. Minors and Parents should 
+    read our <a href="https://www.furfest.org/support/parents-guide" target="_blank">Parent's and Minor's Guide</a> 
+    for a complete set of questions, and forms which may be required.</p>
+
+<h2>What is the Midwest FurFest Refund Policy?</h2>
+<p>Refunds for your Midwest FurFest registration can be obtained in one of the following ways:</p>
+<ul>
+    <li>You may log into your Furfest Account on our <a href="https://reg.furfest.org" target="_blank">Registration Site</a>.
+        Then, select "Cancel Registration" next to the registration you want refunded.</li>
+    <li>You may request a refund by sending an email to {{ "registration@furfest.org"|email_to_link }}.
+        Refund requests must be sent from the email address associated with the registration account requesting the refund.
+    </li>
+</ul>
+
+<strong>All refunds will be sent to the original payment method.</strong>
+
+<p>Attendees can request a full refund through 11:59PM Central Standard Time on Saturday, December 14, 2024.</p>
+
+<p>Sponsors and Shiny Sponsors can request a full refund through 11:59PM Central Standard Time on Wednesday, December 4, 2024. A partial refund equal to the amount of the pre-registration Attendee registration can be requested until 11:59PM Central Standard Time on Saturday, December 14, 2024.</p>
+
+<p>Any badge that is marked as Checked In or Picked Up on Thursday, December 5, 2024 or later is not eligible for a refund.</p>
+
+<h2>What Do I Do If I Have Other Questions?</h2>
+<p>Please, first check out our <a href="https://www.furfest.org/attend/register/faq" target="_blank">Frequently Asked Questions</a>
+    page. Many common questions have been answered there.</p>
+
+<p>If you have any other questions not covered by the FAQ, please reach out to {{ "registration@furfest.org"|email_to_link }} 
+    and we will be happy to assist you.</p>
+</div>
+{% endblock %}

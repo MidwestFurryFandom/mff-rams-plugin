@@ -1,10 +1,9 @@
-{% extends "./preregistration/preregbase.html" %}
-{% block title %}Dealer Application Received{% endblock %}
-{% block backlink %}{% endblock %}
+{% extends "uber/templates/preregistration/preregbase.html" %}
+{% set title_text = "Dealer Registration Step 4 of 4: " ~ c.DEALER_APP_TERM|title ~ " Received" %}
 {% block content %}
-<div class="masthead">
-</div>
-<div class="panel panel-default" style="padding:15px;">
+<div class="card">
+    <div class="card-body">
+        {{ macros.prereg_wizard(c.PAGE_PATH, is_prereg_dealer) }}
     <h2>{% if c.AFTER_DEALER_REG_DEADLINE %}You've been added to our waitlist!{% else %}Thanks for applying as a Dealer!{% endif %}</h2>
 
     We've received your application for {{ group.name }} to purchase a Dealer registration for {{ c.EVENT_NAME }}.
@@ -14,9 +13,10 @@
         Since the Dealers Room is currently full, you've been added to our waitlist, and we'll let you know if a spot opens up for you.
     {% else %}
         We receive a flood of applications every year, so application processing takes a considerable amount of time.
-        Approvals will be done as promptly as possible; usually withing <strong>two weeks</strong> of when the initial application period closes.
+        Approvals will be done as promptly as possible; usually within <strong>three to four weeks</strong> of when the initial application period closes.
     {% endif %}
 
+    <br/><br/>
     <h3>What Happens Next</h3>
     After approval, you will be emailed a link to manage your dealer registration. From this link, you will be able to:
     <ul>
@@ -32,8 +32,6 @@
     <br/><br/>Approximately two to three weeks before the convention you will be sent an email with specifics on loading instructions and other information.
 
     <br/><br/>If your application is not approved you will be sent an email with information on our Waiting List policies.
-  
-
-    {% include "preregistration/disclaimers.html" %}
+    </div>
 </div>
 {% endblock %}

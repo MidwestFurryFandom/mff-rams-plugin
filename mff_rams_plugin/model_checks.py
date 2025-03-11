@@ -1,43 +1,18 @@
 import re
 
-from uber.decorators import prereg_validation, validation
+from datetime import date
+from pockets import classproperty
+from wtforms import validators
+from wtforms.validators import ValidationError, StopValidation
+
+from uber.badge_funcs import get_real_badge_type
 from uber.config import c
-from uber.model_checks import ignore_unassigned_and_placeholders
-
-
-@prereg_validation.Attendee
-def need_fursuit_option(attendee):
-    if not attendee.fursuiting:
-        return "Please tell us if you are planning to suit or not."
-
-
-@validation.Attendee
-def shirt_for_sponsors(attendee):
-    if attendee.badge_type in [c.SPONSOR_BADGE, c.SHINY_BADGE] and attendee.shirt == c.NO_SHIRT:
-        return "Please select a shirt size."
-
-
-@prereg_validation.Attendee
-def no_more_sponsors(attendee):
-    if attendee.badge_type == c.SPONSOR_BADGE and not c.SPONSOR_BADGE_AVAILABLE and (attendee.is_new or attendee.orig_value_of('badge_type') != attendee.badge_type):
-        return "Sponsor badges have sold out."
-
-
-@prereg_validation.Attendee
-def no_more_shiny_sponsors(attendee):
-    if attendee.badge_type == c.SHINY_BADGE and not c.SHINY_BADGE_AVAILABLE and (attendee.is_new or attendee.orig_value_of('badge_type') != attendee.badge_type):
-        return "Shiny Sponsor badges have sold out."
-
-
-@validation.Attendee
-def need_comped_reason(attendee):
-    if attendee.paid == c.NEED_NOT_PAY and not attendee.comped_reason and (
-                c.STAFF_RIBBON not in attendee.ribbon_ints and attendee.badge_type != c.STAFF_BADGE):
-        return 'You must enter a reason for comping this attendee\'s badge.'
+from uber.decorators import prereg_validation, validation
 
 
 @validation.Attendee
 @validation.Group
+@validation.ArtShowApplication
 def no_emojis(model):
     for column in model.__table__.columns:
         emojis = re.compile(
@@ -66,78 +41,33 @@ def no_emojis(model):
             r'|[\U0001F980-\U0001F984]|\U0001F9C0'
             r'|[\U0001F1E6-\U0001F1FC][\U0001F1E6-\U0001F1FF])')
         if re.search(emojis, str(getattr(model, column.name))):
-            return 'Fields cannot contain emoji'
-
-
-@validation.Attendee
-@ignore_unassigned_and_placeholders
-def badge_printed_name(attendee):
-    if not attendee.badge_printed_name:
-        return 'Please enter a name for your custom-printed badge.'
-
-
-@validation.Attendee
-def allowed_to_register(attendee):
-    if not attendee.age_group_conf['can_register']:
-        return 'Attendees {} years of age do not need to register, ' \
-            'but MUST be accompanied by a parent or legal guardian with a valid registration at all times!'.format(attendee.age_group_conf['desc'].lower())
-
-
-@validation.Attendee
-def not_in_range(attendee):
-    # Staff always keep their badge number regardless of their badge type.
-    if c.STAFF_RIBBON not in attendee.ribbon_ints:
-        lower_bound, upper_bound = c.BADGE_RANGES[attendee.badge_type_real]
-        if attendee.badge_num and not (lower_bound <= attendee.badge_num <= upper_bound):
-            return 'Badge number {} is out of range for badge type {} ({} - {})'.format(attendee.badge_num, 
-                                                                                        c.BADGES[attendee.badge_type_real], 
-                                                                                        lower_bound, 
-                                                                                        upper_bound)
-
-
-@prereg_validation.Group
-def dealer_wares(group):
-    pass
-
-
-@prereg_validation.Group
-def dealer_description(group):
-    if group.tables and not group.description:
-        return 'Please provide a description for us to evaluate ' \
-               'your submission and use in listings.'
-
-
-@prereg_validation.Group
-def selected_power(group):
-    if not group.power and group.power != 0:
-        return 'Please select what power level you want, or no power.'
-
-
-@prereg_validation.Group
-def power_usage(group):
-    if group.power and not group.power_usage:
-        return 'Please provide a list of what powered devices you expect to use.'
-
-
-@prereg_validation.Group
-def ibt_num(group):
-    if group.is_dealer and group.tax_number and not re.match("^[0-9-]*$", group.tax_number):
-        return 'Please use only numbers and hyphens for your IBT number.'
-
-
-@prereg_validation.Group
-def dealer_categories(group):
-    if group.is_dealer and not group.categories:
-        return "Please select at least one category your wares fall under."
-
-
-@prereg_validation.Group
-def edit_only_correct_statuses(group):
-    if group.status not in [c.APPROVED, c.WAITLISTED, c.UNAPPROVED]:
-        return "You cannot change your {} after it has been {}.".format(c.DEALER_APP_TERM, group.status_label)
+            return ('', 'Fields cannot contain emoji.')
 
 
 @validation.Group
 def no_approval_without_power_fee(group):
     if group.status == c.APPROVED and group.auto_recalc and not group.power_fee and group.default_power_fee == None:
         return "Please set a power fee. To provide free power, turn off automatic recalculation."
+
+
+@validation.Attendee
+def need_comped_reason(attendee):
+    if attendee.paid == c.NEED_NOT_PAY and not attendee.comped_reason and attendee.badge_type not in [
+        c.KID_IN_TOW_BADGE, c.PARENT_IN_TOW_BADGE] and abs(attendee.age_discount) < attendee.new_badge_cost and (
+            c.STAFF_RIBBON not in attendee.ribbon_ints and attendee.badge_type != c.STAFF_BADGE) and (
+            not attendee.promo_code and not attendee.promo_code_code):
+        return ('comped_reason', 'You must enter a reason for comping this attendee\'s badge.')
+
+
+@validation.Attendee
+def not_in_range(attendee):
+    if c.STAFF_RIBBON in attendee.ribbon_ints or not attendee.badge_num:
+        return
+    
+    badge_type = get_real_badge_type(attendee.badge_type)
+    lower_bound, upper_bound = c.BADGE_RANGES[badge_type]
+    if not (lower_bound <= attendee.badge_num <= upper_bound):
+        return ('badge_num', 'Badge number {} is out of range for badge type {} ({} - {})'.format(attendee.badge_num, 
+                                                                                    c.BADGES[attendee.badge_type],
+                                                                                    lower_bound, 
+                                                                                    upper_bound))

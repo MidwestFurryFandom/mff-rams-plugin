@@ -1,0 +1,166 @@
+{% extends "uber/templates/hotel_lottery/room_lottery_form.html" %}
+{% set show_staff_rates = c.STAFF_HOTEL_LOTTERY_OPEN and application.qualifies_for_staff_lottery %}
+{% set show_dealer_info = application.attendee.is_dealer and application.attendee.badge_status != c.UNAPPROVED_DEALER_STATUS %}
+
+{% block hotel_and_room_type_ranking_desc %}
+<style>
+    td:empty{
+        background-color: #f8f9fa;
+    }
+</style>
+<div class="hotel_and_room_type_ranking">
+    <p>
+        Rank your choice of hotel and standard room type below by clicking and dragging options from "Available" to "Selected" in order of preference.
+        At least one selection is required. Not all hotels/room types need be selected. Accordingly, <em>please do not select hotels or room types you do not wish to stay at</em>.
+        For additional room and amenity information, please see <a href="{{ c.HOTEL_LOTTERY_URL }}" target="_blank">our website</a>.
+    </p>
+
+    <p>A limited number of small junior suites ("King Parlor Suites") are available at select hotels. They are awarded along with standard rooms, and are separate from the suite options at the Hyatt Regency O'Hare.</p>
+
+    {% if show_dealer_info %}
+    <h4>Dealer Room Block Information</h4>
+    <p>
+        A block of rooms is set aside exclusively for Dealers at the Crowne Plaza, just across from the convention center.
+        <strong>We strongly recommend anyone dealing at MFF include the Crowne Plaza in their hotel choices.</strong>
+        Doing so is not required, and we will still award a room in a higher-ranked choice if one is available just as we do for any other attendee, but this will dramatically increase your chances of obtaining a room.
+    </p>
+
+    <p>If your dealer application is pending at the time you enter, that is okay. We will check all dealer applications before announcing room results.</p>
+
+    <p>
+        Room groups <strong>must</strong> have a dealer as the group leader to be eligible for the dealer block.
+    </p>
+
+    <p>We encourage people from the same dealer group to room together to help accommodate as many people as possible.</p>
+    {% endif %}
+
+    {% if show_staff_rates %}
+    <h4>Staff Room Block Information</h4>
+    <p>
+        Our hotel contracts set aside a certain number of rooms for staff, sometimes at a reduced rate.
+        Your room lottery entry will first go into the staff lottery, where we only fill blocks at staff rates (when applicable).
+        If all rooms are exhausted in a hotel's staff block, <strong>no more rooms will be booked in that hotel</strong> for the staff lottery.
+    </p>
+    <p>
+        After the staff lottery closes and rooms are awarded, you will be given the option to enter the attendee lottery. Staff in the attendee lottery will be placed in a staff block <em>if</em> rooms are still available after the staff lottery. Otherwise, rooms are awarded out of the attendee block with the attendee rate.
+    </p>
+    <p>
+        Should your entry be selected during the attendee lottery, it is both possible <em>and probable</em> the room will be awarded out of the attendee block at the attendee rate.
+    </p>
+    {% endif %}
+
+    <h4>Room Rate Information</h4>
+    <p>
+        Please see the table below for the rates of each room type at each hotel. All rates are nightly, excluding taxes and a non-refundable $4/night booking fee.
+    </p>
+    {% if show_staff_rates %}
+    <p>
+        Any special rates for staff will be shown in <strong>bold</strong>.
+        These rates are unlikely to be available after the staff lottery ends; we will automatically place you in an attendee rate room if staff rates are not available.
+    </p>
+    {% endif %}
+    <table class="table table-bordered table-hover">
+        <thead>
+            <th scope="col"></th>
+            <th scope="col">King</th>
+            <th scope="col">Double</th>
+            <th scope="col">King Parlor Suite</th>
+        </thead>
+        <tbody>
+            <tr>
+                <th scope="row">Hyatt Regency O'Hare</th>
+                <td>$168</td>
+                <td>$183{% if show_staff_rates %}/<strong>$168</strong>{% endif %}</td>
+                <td></td>
+            </tr>
+            <tr>
+                <th scope="row">Aloft</th>
+                <td>$182</td>
+                <td>$182</td>
+                <td></td>
+            </tr>
+            <tr>
+                <th scope="row">Comfort Inn</th>
+                <td>$119</td>
+                <td>$119<span class="text-muted">*</span></td>
+                <td></td>
+            </tr>
+            <tr>
+                <th scope="row">Comfort Suites</th>
+                <td>$150</td>
+                <td>$150</td>
+                <td></td>
+            </tr>
+            <tr>
+                <th scope="row">Courtyard</th>
+                <td>$149</td>
+                <td>$169</td>
+                <td></td>
+            </tr>
+            <tr>
+                <th scope="row">Crowne Plaza</th>
+                <td>$169{% if show_staff_rates %}/<strong>$159</strong>{% endif %}</td>
+                <td>$169{% if show_staff_rates %}/<strong>$159</strong>{% endif %}</td>
+                <td></td>
+            </tr>
+            <tr>
+                <th scope="row">Hilton Garden Inn</th>
+                <td>$159</td>
+                <td>$159</td>
+                <td></td>
+            </tr>
+            <tr>
+                <th scope="row">Holiday Inn</th>
+                <td>$139<span class="text-muted">**</span></td>
+                <td>$149<span class="text-muted">**</span></td>
+                <td></td>
+            </tr>
+            <tr>
+                <th scope="row">Hyatt Place</th>
+                <td>$159</td>
+                <td>$159</td>
+                <td></td>
+            </tr>
+            <tr>
+                <th scope="row">La Quinta</th>
+                <td>$159</td>
+                <td>$159</td>
+                <td></td>
+            </tr>
+            <tr>
+                <th scope="row">Marriott Suites</th>
+                <td>$199</td>
+                <td></td>
+                <td>$229</td>
+            </tr>
+            <tr>
+                <th scope="row">Staybridge Suites</th>
+                <td></td>
+                <td></td>
+                <td>$169<span class="text-muted">**</span></td>
+            </tr>
+        </tbody>
+    </table>
+    <div class="form-text mb-4">
+        <p>*The Comfort Inn offers double rooms with two queens and two doubles. We will fill two queen rooms first, followed by two doubles.</p>
+        <p>**Rates do not include a $1.75/night "Green Engage" fee assessed by the hotel.</p>
+        <p>***Staybridge King rooms are suites with a parlor. IF YOU WANT THIS ROOM TYPE, include "King Parlor Suite" in your room selection.</p>
+    </div>
+</div>
+{% endblock %}
+
+{% block ada_info_desc %}
+<p>
+    We have a wide variety of ADA-compliant rooms which can accommodate those with mobility, hearing, or visual impairments.
+    Note that {{ c.EVENT_NAME }} will likely receive more ADA requests than available rooms; once ADA rooms are exhausted, standard rooms are awarded.
+</p>
+<p>
+    At the conclusion of the lottery, MFF Accessibility Services reaches out to all room awards with an ADA request, regardless of the awarded room type.
+    If an ADA request is made but the available rooms cannot accommodate your needs, your reservation may be canceled without penalty.
+</p>
+<p>
+    If you do <strong>not</strong> require an ADA-compliant room, but would like to request an accomodation for medical need(s) (e.g., quiet floor placement, low floor placement, close proximity to elevators/stairs), please leave the checkbox below <strong>unchecked</strong>.
+    Instead, if you are awarded a room after the lottery's conclusion, please reach out to <a href="mailto:accessibility@furfest.org" target="_blank">MFF Accessibility Services</a> to discuss available options. If the available rooms cannot accommodate your needs, the reservation may be canceled without penalty.
+</p>
+<p><strong>Please note</strong>: At this time, no intra-hotel shuttles are equipped with wheelchair lifts.</p>
+{% endblock %}
