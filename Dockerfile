@@ -6,4 +6,4 @@ ENV uber_plugins=["mff_rams_plugin"]
 # install plugins
 COPY . plugins/mff_rams_plugin/
 
-RUN $HOME/.local/bin/uv pip install --system -r plugins/mff/requirements.txt
+RUN $HOME/.local/bin/uv pip install --system -r plugins/mff_rams_plugin/requirements.txt
