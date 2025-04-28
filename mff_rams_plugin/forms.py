@@ -6,7 +6,7 @@ from wtforms.validators import ValidationError, StopValidation
 from pockets.autolog import log
 
 from uber.config import c
-from uber.forms import AddressForm, CustomValidation, MultiCheckbox, MagForm, IntSelect, SwitchInput, NumberInputGroup, HiddenIntField
+from uber.forms import TableInfo, CustomValidation, MultiCheckbox, MagForm, IntSelect, SwitchInput, NumberInputGroup, HiddenIntField
 from uber.custom_tags import popup_link, format_currency, pluralize, table_prices
 
 
@@ -72,6 +72,14 @@ class OtherInfo:
     def validate_accessibility_requests(form, field):
         if field.data and c.OTHER in field.data and not form.other_accessibility_requests.data:
             raise ValidationError("Please describe what other accommodations you need.")
+
+
+@MagForm.form_mixin
+class PreregOtherInfo:
+    group_name = TableInfo.name
+
+    def name_label(self):
+        return "Table Name"
 
 
 @MagForm.form_mixin

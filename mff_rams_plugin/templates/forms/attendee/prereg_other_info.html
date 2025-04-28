@@ -1,6 +1,26 @@
 {% extends "uber/templates/forms/attendee/prereg_other_info.html" %}
 
 {% block staffing %}
+{% if attendee.group and attendee.group.name == attendee.full_name %}
+<div class="row g-sm-3 mt-2">
+    <div class="col-12 col-sm-6">
+        <div class="alert alert-warning" role="alert">
+        <em>
+            Your table name is the same as your first and last name.
+            Please make sure you want to vend under your name, or change your table name below.
+        </em>
+        </div>
+    </div>
+</div>
+<div class="row g-sm-3">
+    <div class="col-12 col-sm-6">
+        {{ form_macros.form_input(other_info.group_name, value=attendee.group.name) }}
+    </div>
+</div>
+{% else %}
+{{ form_macros.form_input(other_info.group_name, value=attendee.group.name, force_hidden=True) }}
+{% endif %}
+
 {% set include_cellphone = 'cellphone' in other_info and not other_info.cellphone.data %}
 {% set staffing_message = "" %}
 {% if not admin_area %}
