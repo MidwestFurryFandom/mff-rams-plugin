@@ -11,7 +11,6 @@ from sqlalchemy.ext.hybrid import hybrid_property
 from uber.models import Session
 from uber.config import c
 from uber.utils import add_opt, localized_now, localize_datetime, remove_opt, normalize_email_legacy
-from uber.models import Attendee as BaseAttendee
 from uber.models.types import Choice, DefaultColumn as Column, MultiChoice
 from uber.decorators import presave_adjustment
 from uber.tasks.registration import update_receipt
