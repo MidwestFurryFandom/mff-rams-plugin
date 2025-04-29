@@ -112,6 +112,11 @@ class Group:
     def dealer_max_badges(self):
         return c.MAX_DEALERS or min(math.ceil(self.tables) * 3, 12)
 
+    @property
+    def can_add_existing_badges(self):
+        if self.is_dealer:
+            return True
+
 
 @Session.model_mixin
 class ArtistMarketplaceApplication:
