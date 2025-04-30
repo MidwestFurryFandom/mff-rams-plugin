@@ -136,9 +136,9 @@ class CheckInForm:
 
 @MagForm.form_mixin
 class TableInfo:
+    new_or_changed_validation = CustomValidation()
+
     power = IntegerField('Power Level', validators=[
-        validators.InputRequired("Please select what power level you want, or no power."),
-        validators.NumberRange(min=0, message="Please select what power level you want, or no power."),
         validators.NumberRange(max=max(c.DEALER_POWERS.keys()), message="Please select a valid power level.")
         ], widget=IntSelect())
     power_usage = TextAreaField('Power Usage', description="Please provide a listing of what devices you will be using.")
@@ -171,6 +171,11 @@ class TableInfo:
             locked_fields.append('power')
         
         return locked_fields
+
+    @new_or_changed_validation.power
+    def power_level_required(self, field):
+        if field.data is None or field.data == '' or field.data < 0:
+            raise ValidationError("Please select what power level you want, or no power.")
 
     def special_needs_validators(self, field):
         return (field.validators or []) + [
