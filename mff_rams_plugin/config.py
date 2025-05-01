@@ -115,6 +115,8 @@ class ExtraConfig:
         for badge_type in self.BADGE_TYPE_PRICES:
             if badge_type not in types:
                 types.append(badge_type)
+        if self.ONE_DAYS_ENABLED and self.PRESELL_ONE_DAYS:
+            types.extend([c.FRIDAY, c.SATURDAY, c.SUNDAY])
         return types
 
     @request_cached_property
@@ -131,21 +133,46 @@ class ExtraConfig:
     
     @request_cached_property
     @dynamic
-    def FORMATTED_BADGE_TYPES(self):
+    def SOLD_OUT_BADGES_SINGLE(self):
+        opts = []
+
+        if not self.FRIDAY_AVAILABLE:
+            opts.append(self.FRIDAY)
+        if not self.SATURDAY_AVAILABLE:
+            opts.append(self.SATURDAY)
+        if not self.SUNDAY_AVAILABLE:
+            opts.append(self.SUNDAY)
+
+        return opts
+
+    def single_day_opt(self, day_name):
+        price = self.BADGE_PRICES['single_day'].get(day_name) or self.DEFAULT_SINGLE_DAY
+        badge = getattr(self, day_name.upper())
+        if getattr(self, day_name.upper() + '_AVAILABLE', None):
+            return {
+                        'name': day_name,
+                        'desc': "Can be upgraded to an Attendee badge later.",
+                        'value': badge,
+                        'price': price,
+                    }
+        
+    @request_cached_property
+    @dynamic
+    def FORMATTED_SINGLE_BADGES(self):
         badge_types = []
-        if c.AT_THE_CON and self.ONE_DAYS_ENABLED:
-            if self.PRESELL_ONE_DAYS and localized_now().date() >= self.EPOCH.date() or True:
-                day_name = localized_now().strftime('%A')
-                if day_name in ["Friday", "Saturday", "Sunday"]:
-                    price = self.BADGE_PRICES['single_day'].get(day_name) or self.DEFAULT_SINGLE_DAY
-                    badge = getattr(self, day_name.upper())
-                    if getattr(self, day_name.upper() + '_AVAILABLE', None):
-                        badge_types.append({
-                            'name': day_name,
-                            'desc': "Can be upgraded to an Attendee badge later.",
-                            'value': badge,
-                            'price': price,
-                        })
+        if self.ONE_DAYS_ENABLED:
+            if self.PRESELL_ONE_DAYS and c.BEFORE_PREREG_TAKEDOWN:
+                for day_name in ["Friday", "Saturday", "Sunday"]:
+                    new_opt = self.single_day_opt(day_name)
+                    badge_types += [new_opt] if new_opt is not None else []
+            elif self.PRESELL_ONE_DAYS and localized_now().date() >= self.EPOCH.date():
+                after_today = False
+                today_name = localized_now().strftime('%A')
+                for day_name in ["Friday", "Saturday", "Sunday"]:
+                    if after_today or day_name == today_name:
+                        new_opt = self.single_day_opt(day_name)
+                        badge_types += [new_opt] if new_opt is not None else []
+                        after_today = True
             elif self.ONE_DAY_BADGE_AVAILABLE:
                 badge_types.append({
                     'name': 'Single Day',
@@ -153,6 +180,27 @@ class ExtraConfig:
                     'value': c.ONE_DAY_BADGE,
                     'price': self.DEFAULT_SINGLE_DAY
                 })
+        return badge_types
+    
+    @request_cached_property
+    @dynamic
+    def FORMATTED_ATTENDANCE_TYPES(self):
+        attendance_types = [{
+            'name': c.ATTENDANCE_TYPES[c.SINGLE_DAY],
+            'desc': "Allows access to the convention for one day.",
+            'value': c.SINGLE_DAY,
+        },
+        {
+            'name': c.ATTENDANCE_TYPES[c.WEEKEND],
+            'desc': "Allows access to the convention for its duration.",
+            'value': c.WEEKEND,
+        }]
+        return attendance_types
+
+    @request_cached_property
+    @dynamic
+    def FORMATTED_BADGE_TYPES(self):
+        badge_types = []
         badge_types.append({
             'name': 'Attendee',
             'desc': 'Allows access to the convention for its duration.',

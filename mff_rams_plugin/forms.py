@@ -84,7 +84,10 @@ class PreregOtherInfo:
 
 @MagForm.form_mixin
 class BadgeExtras:
+    field_aliases = {'badge_type': ['badge_type_single']}
     new_or_changed_validation = CustomValidation()
+    attendance_type = HiddenIntField('Single Day or Weekend Badge?')
+    badge_type_single = HiddenIntField('Badge Type')
 
     @new_or_changed_validation.badge_type
     def badge_upgrade_sold_out(form, field):
@@ -94,6 +97,9 @@ class BadgeExtras:
             raise ValidationError("Shiny Sponsor badges have sold out.")
 
     def badge_type_desc(self):
+        return Markup('<span class="popup"><a href="https://www.furfest.org/registration" target="_blank"><i class="fa fa-question-circle" aria-hidden="true"></i> Badge details, pickup information, and refund policy</a></span>')
+    
+    def badge_type_single_desc(self):
         return Markup('<span class="popup"><a href="https://www.furfest.org/registration" target="_blank"><i class="fa fa-question-circle" aria-hidden="true"></i> Badge details, pickup information, and refund policy</a></span>')
 
 
