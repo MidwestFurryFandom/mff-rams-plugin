@@ -78,8 +78,18 @@ class OtherInfo:
 class PreregOtherInfo:
     group_name = TableInfo.name
 
-    def name_label(self):
+    def group_name_label(self):
         return "Table Name"
+    
+    def get_optional_fields(self, attendee, is_admin=False):
+        optional_list = []
+        if not self.requested_accessibility_services.data:
+            optional_list.append('accessibility_requests')
+
+        if not attendee.is_dealer:
+            optional_list.append('group_name')
+
+        return optional_list
 
 
 @MagForm.form_mixin
