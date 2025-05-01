@@ -78,13 +78,26 @@ class OtherInfo:
 class PreregOtherInfo:
     group_name = TableInfo.name
 
-    def name_label(self):
+    def group_name_label(self):
         return "Table Name"
+    
+    def get_optional_fields(self, attendee, is_admin=False):
+        optional_list = []
+        if not self.requested_accessibility_services.data:
+            optional_list.append('accessibility_requests')
+
+        if not attendee.is_dealer:
+            optional_list.append('group_name')
+
+        return optional_list
 
 
 @MagForm.form_mixin
 class BadgeExtras:
+    field_aliases = {'badge_type': ['badge_type_single']}
     new_or_changed_validation = CustomValidation()
+    attendance_type = HiddenIntField('Single Day or Weekend Badge?')
+    badge_type_single = HiddenIntField('Badge Type')
 
     @new_or_changed_validation.badge_type
     def badge_upgrade_sold_out(form, field):
@@ -94,6 +107,9 @@ class BadgeExtras:
             raise ValidationError("Shiny Sponsor badges have sold out.")
 
     def badge_type_desc(self):
+        return Markup('<span class="popup"><a href="https://www.furfest.org/registration" target="_blank"><i class="fa fa-question-circle" aria-hidden="true"></i> Badge details, pickup information, and refund policy</a></span>')
+    
+    def badge_type_single_desc(self):
         return Markup('<span class="popup"><a href="https://www.furfest.org/registration" target="_blank"><i class="fa fa-question-circle" aria-hidden="true"></i> Badge details, pickup information, and refund policy</a></span>')
 
 
