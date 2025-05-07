@@ -30,6 +30,26 @@
 {% endif %}
 {% endblock %}
 
+{% block name_desc %}
+{% if not is_prereg_dealer and (group.status in c.DEALER_ACCEPTED_STATUSES or admin_area) %}
+{% if not admin_area %}<p>Congratulations on being approved! Please fill in the fields below to help us with at-event planning.</p>{% endif %}
+<div class="row g-sm-3">
+    <div class="col-12 col-sm-6">{{ form_macros.form_input(table_info.display_height) }}</div>
+    <div class="col-12 col-sm-6">{{ form_macros.form_input(table_info.at_con_standby, extra_field=form_macros.form_input(table_info.at_con_standby_text)) }}</div>
+    {{ form_macros.toggle_fields_js(table_info.at_con_standby, [table_info.at_con_standby_text], toggle_required=True, closest_hide_selector='.form-floating') }}
+</div>
+<div class="row g-sm-3">
+    <div class="col-12 col-sm-6">{{ form_macros.form_input(table_info.shipping_boxes) }}</div>
+    <div class="col-12 col-sm-6">{{ form_macros.form_input(table_info.vehicle_access) }}</div>
+</div>
+<button type="submit" class="btn btn-primary">Save</button>
+{% endif %}
+
+<hr/>
+
+{{ super() }}
+{% endblock %}
+
 {% block badges_tables %}
 {{ super() }}
 
@@ -52,6 +72,32 @@
     <div class="col-12">{{ form_macros.form_input(table_info.special_needs) }}</div>
 </div>
 <div class="row g-sm-3">
-    <div class="col-12">{{ form_macros.form_input(table_info.review_notes) }}</div>
+    <div class="col-12 col-sm-6">{{ form_macros.form_input(table_info.social_media) }}</div>
+    <div class="col-12 col-sm-6">{{ form_macros.form_input(table_info.review_notes) }}</div>
+</div>
+<div class="row g-sm-3">
+    <div class="col-12 col-sm-6">{{ form_macros.form_input(table_info.mff_alumni) }}</div>
+    <div class="col-12 col-sm-6">{{ form_macros.form_input(table_info.art_show_intent) }}</div>
+</div>
+<div class="row g-sm-3">
+    <div class="col-12 col-sm-6">{{ form_macros.form_input(table_info.adult_content) }}</div>
+    <div class="col-12 col-sm-6">{{ form_macros.form_input(table_info.ip_issues) }}</div>
+</div>
+<div class="row g-sm-3">
+    <div class="col-12 col-sm-6">{{ form_macros.form_input(table_info.other_cons) }}</div>
+    <div class="col-12 col-sm-6">
+        {{ form_macros.form_input(table_info.table_photo) }}
+    </div>
+</div>
+{% if is_prereg_dealer or not admin_area and group.status not in c.DEALER_ACCEPTED_STATUSES %}
+<div class="row g-sm-3">
+    <div class="col-12">{{ form_macros.form_input(table_info.shipping_boxes) }}</div>
+</div>
+{% endif %}
+<div class="row g-sm-3">
+    <div class="col-12">{{ form_macros.form_input(table_info.agreed_to_dealer_policies) }}</div>
+</div>
+<div class="row g-sm-3">
+    <div class="col-12">{{ form_macros.form_input(table_info.agreed_to_ip_policy) }}</div>
 </div>
 {% endblock %}
