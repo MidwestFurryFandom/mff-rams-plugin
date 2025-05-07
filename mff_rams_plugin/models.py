@@ -1,6 +1,6 @@
 import math
 from datetime import timedelta
-
+from markupsafe import Markup
 from residue import CoerceUTF8 as UnicodeText
 from pockets import cached_classproperty
 from pockets.autolog import log
@@ -41,7 +41,27 @@ class Group:
     location = Column(UnicodeText, default='', admin_only=True)
     table_fee = Column(Integer, default=0)
     tax_number = Column(UnicodeText)
+    social_media = Column(UnicodeText)
     review_notes = Column(UnicodeText)
+    mff_alumni = Column(Boolean, default=False)
+    art_show_intent = Column(Boolean, default=False)
+    adult_content = Column(Choice(c.DEALER_ADULT_OPTS), default=0)
+    ip_issues = Column(Choice(c.DEALER_IP_OPTS), default=0)
+    other_cons = Column(UnicodeText)
+    table_photo_filename = Column(UnicodeText)
+    table_photo_content_type = Column(UnicodeText)
+    shipping_boxes = Column(Boolean, default=False)
+    agreed_to_dealer_policies = Column(Boolean, default=False)
+    agreed_to_ip_policy = Column(Boolean, default=False)
+    vehicle_access = Column(Boolean, default=False)
+    display_height = Column(UnicodeText)
+    at_con_standby = Column(Boolean, default=False)
+    at_con_standby_text = Column(UnicodeText)
+    socials_checked = Column(Boolean, default=False)
+    table_seen = Column(Boolean, default=False)
+    ip_concerns = Column(UnicodeText)
+    other_concerns = Column(UnicodeText)
+
 
     @cached_classproperty
     def import_fields(cls):
@@ -116,6 +136,40 @@ class Group:
     def can_add_existing_badges(self):
         if self.is_dealer:
             return True
+    
+    @property
+    def table_photo(self):
+        if not self.table_photo_filename:
+            return ''
+        return Markup(f"""
+                      <a href="../mff_reports/view_table_photo?id={self.id}" target="_blank">
+                      {self.table_photo_filename}
+                      </a>""")
+
+    @table_photo.setter
+    def table_photo(self, value):
+        import shutil
+        import cherrypy
+
+        if not isinstance(value, cherrypy._cpreqbody.Part):
+            log.error(f"Tried to set table_photo for group {self.name} with invalid value type: {type(value)}")
+            return
+
+        self.table_photo_filename = value.filename
+        self.table_photo_content_type = value.content_type.value
+
+        with open(self.table_photo_filepath, 'wb') as f:
+            shutil.copyfileobj(value.file, f)
+
+    @property
+    def table_photo_download_filename(self):
+        name = ''.join(s for s in self.name.strip() if s.isalnum() or s == ' ')
+        return ' '.join(name.split()).replace(' ', '_') + '_' + self.table_photo_filename
+
+    @property
+    def table_photo_filepath(self):
+        import os
+        return os.path.join(c.GROUPS_TABLE_PHOTOS_DIR, str(self.id))
 
 
 @Session.model_mixin

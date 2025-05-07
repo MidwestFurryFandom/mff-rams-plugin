@@ -8,3 +8,15 @@
     <div class="col-12 col-sm-6">{{ form_macros.form_input(table_info.location) }}</div>
 </div>
 {% endblock %}
+
+{% block group_status %}
+{{ super() }}
+<div class="row g-sm-3">
+    <div class="col-12 col-sm-6">{{ form_macros.form_input(table_info.socials_checked) }}</div>
+    <div class="col-12 col-sm-6">{{ form_macros.form_input(table_info.table_seen) }}</div>
+</div>
+<div class="row g-sm-3">
+    <div class="col-12 col-sm-6">{{ form_macros.form_input(table_info.ip_concerns) }}</div>
+    <div class="col-12 col-sm-6">{{ form_macros.form_input(table_info.other_concerns) }}</div>
+</div>
+{% endblock %}

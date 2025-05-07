@@ -1,7 +1,7 @@
 from markupsafe import Markup
 from wtforms import (BooleanField, DecimalField, EmailField, Form, FormField,
                      HiddenField, SelectField, SelectMultipleField, IntegerField,
-                     StringField, TelField, validators, TextAreaField)
+                     StringField, FileField, validators, TextAreaField)
 from wtforms.validators import ValidationError, StopValidation
 from pockets.autolog import log
 
@@ -152,7 +152,7 @@ class CheckInForm:
 
 @MagForm.form_mixin
 class TableInfo:
-    new_or_changed_validation = CustomValidation()
+    field_validation, new_or_changed_validation = CustomValidation(), CustomValidation()
 
     power = IntegerField('Power Level', validators=[
         validators.NumberRange(max=max(c.DEALER_POWERS.keys()), message="Please select a valid power level.")
@@ -169,13 +169,42 @@ class TableInfo:
     ], description="""
                 Please provide any additional information which you feel could assist in our selection process. 
                 This could include additional links other than your website or more detailed merchandise 
-                descriptions. If your website includes merchandise which may be in violation of our 
-                Intellectual Property rules, please confirm that you will not be bringing this merchandise 
-                for sale at MFF.""")
+                descriptions.""")
     description = StringField('Merchandise Description', validators=[
         validators.DataRequired("Please provide a description for us to evaluate your submission and use in listings.")
         ], description="This will be used both for dealer selection (if necessary) and in all dealer listings.")
     wares = HiddenField('Wares', validators=[validators.Optional()])
+    social_media = TextAreaField("Social Media Details",
+                                 description="Please list any social media accounts you use that should be included in the review process.")
+    mff_alumni = BooleanField('I have vended at Midwest FurFest before.')
+    art_show_intent = BooleanField('I plan to apply to the Midwest FurFest Art Show.')
+    adult_content = SelectField('Selling 18+ Content?', coerce=int, choices=[(0, 'Please select an option')] + c.DEALER_ADULT_OPTS,
+                                validators=[validators.DataRequired("Please tell us if you are selling 18+ content.")])
+    ip_issues = SelectField('IP Policy History', coerce=int, choices=[(0, 'Please select an option')] + c.DEALER_IP_OPTS,
+                            validators=[validators.DataRequired("Please tell us if you have had any IP policy issues in the past.")])
+    other_cons = StringField('Other Events',
+                             description="Please list any events besides Midwest FurFest that you've vended at before.")
+    table_photo = FileField('Table Setup', description='Please upload a photo of your table setup (up to 5MB).', render_kw={'accept': "image/*"})
+    shipping_boxes = BooleanField('I plan on or may be shipping boxes or pallets to the convention center.')
+    agreed_to_dealer_policies = BooleanField(Markup(f'I have read and agree to the Midwest FurFest policies for dealers.'),
+                             validators=[validators.InputRequired("You must agree to Midwest Furfest's dealer policies.")])
+    agreed_to_ip_policy = BooleanField(Markup(f'<strong>I have read and agree to the Midwest FurFest IP policies for dealers.</strong>'),
+                             validators=[validators.InputRequired("You must agree to the IP policies for dealers.")])
+    vehicle_access = BooleanField('I will need vehicle access for load-in.')
+    display_height = StringField('Display Height', description="Please provide the estimated display height of your table, in inches.")
+    at_con_standby = BooleanField('I will be available on a stand-by basis during the convention.')
+    at_con_standby_text = TextAreaField('On-site Contact Info', description="Please provide the quickest way to contact you on-site.",
+                                        validators=[validators.DataRequired("Please provide on-site contact info.")])
+
+    def agreed_to_dealer_policies_label(self):
+        return Markup(f"""
+                      I have read and agree to the <strong><a href="" target="_blank">Midwest FurFest dealer policies</a></strong>.
+                      """)
+
+    def agreed_to_ip_policy_label(self):
+        return Markup(f"""<strong>
+                      I have read and agree to the <a href="" target="_blank">Midwest FurFest IP policies</a> for dealers.
+                      </strong>""")
 
     def get_non_admin_locked_fields(self, group):
         locked_fields = self.super_get_non_admin_locked_fields(group)
@@ -187,6 +216,29 @@ class TableInfo:
             locked_fields.append('power')
         
         return locked_fields
+
+    def get_optional_fields(self, attendee, is_admin=False):
+        optional_list = self.super_get_optional_fields(attendee)
+        if not self.at_con_standby.data:
+            optional_list.append('at_con_standby_text')
+
+        return optional_list
+
+    @field_validation.table_photo
+    def table_photo_is_image(self, field):
+        if field.data:
+            content_type = field.data.content_type.value
+            if not content_type.startswith('image'):
+                raise ValidationError(f"Table setup photo ({field.data.filename}) is not a valid image.")
+
+    @field_validation.table_photo
+    def table_photo_size(self, field):
+        if field.data:
+            field.data.file.seek(0)
+            file_size = len(field.data.file.read()) / (1024 * 1024)
+            field.data.file.seek(0)
+            if file_size > 5:
+                raise ValidationError("Please make sure your table setup photo is under 5MB.")
 
     @new_or_changed_validation.power
     def power_level_required(self, field):
@@ -208,6 +260,10 @@ class TableInfo:
 class AdminTableInfo:
     location = StringField('Table Assignment', render_kw={'placeholder': "Dealer's table location"})
     power_fee = IntegerField('Power Fee', widget=NumberInputGroup())
+    socials_checked = BooleanField('Socials Checked')
+    table_seen = BooleanField('Table Setup Seen')
+    ip_concerns = TextAreaField('IP Concerns')
+    other_concerns = TextAreaField('Other Concerns')
 
 @MagForm.form_mixin
 class ArtistMarketplaceForm:
