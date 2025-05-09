@@ -27,13 +27,6 @@ class SessionMixin:
 
 
 @Session.model_mixin
-class LotteryApplication:
-    @property
-    def qualifies_for_staff_lottery(self):
-        return self.attendee.badge_type == c.STAFF_BADGE or c.STAFF_RIBBON in self.attendee.ribbon_ints
-
-
-@Session.model_mixin
 class Group:
     power = Column(Choice(c.DEALER_POWER_OPTS), default=-1)
     power_fee = Column(Integer, default=0)
@@ -386,6 +379,10 @@ class Attendee:
     @property
     def has_personalized_badge(self):
         return True
+
+    @property
+    def staff_hotel_lottery_eligible(self):
+        return self.badge_type == c.STAFF_BADGE or c.STAFF_RIBBON in self.ribbon_ints
 
 
 @Session.model_mixin
