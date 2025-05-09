@@ -9,7 +9,11 @@
                                 c.FORMATTED_ATTENDANCE_TYPES,
                                 target_field_id=id_upgrade_prepend ~ "attendance_type") }}
     </div>
+    <div id="one-day-alert" class="row">
+        <div class="col"><div class="alert alert-info mb-0"><em>Please select which day you would like to attend.</em></div></div>
+    </div>
     <div class="row g-sm-3">
+        <input type="hidden" id="badge_type_single" /> {# Dummy attribute to make validation message hideable #}
         {{ form_macros.card_select(badge_extras.badge_type_single,
                                     attendee.available_single_badge_opts, disabled_opts=c.SOLD_OUT_BADGES_SINGLE[1:] if attendee.badge_type in c.SOLD_OUT_BADGES_SINGLE else c.SOLD_OUT_BADGES_SINGLE,
                                     target_field_id=id_upgrade_prepend ~ "badge_type") }}
@@ -18,6 +22,7 @@
         var switchBadgeTypeOpts = function() {
             let attendanceType = $('#{{ id_upgrade_prepend }}attendance_type').val();
             setVisible($('#badge_type_single-select').parents('.row'), attendanceType == '{{ c.SINGLE_DAY }}');
+            setVisible($('#one-day-alert'), attendanceType == '{{ c.SINGLE_DAY }}');
             setVisible($('#badge_type-select').parents('.row'), attendanceType == '{{ c.WEEKEND }}');
         }
         $(function () {
