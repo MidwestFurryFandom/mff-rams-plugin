@@ -13,7 +13,7 @@ from uber.custom_tags import popup_link, format_currency, pluralize, table_price
 @MagForm.form_mixin
 class PersonalInfo:
     field_validation, new_or_changed_validation = CustomValidation(), CustomValidation()
-    kwarg_overrides = {'badge_printed_name': {'maxlength': 30}}
+    kwarg_overrides = {'badge_printed_name': {'maxlength': 30}} # TODO: Remove
     consent_form_email = EmailField('Email for Consent Forms', validators=[
         validators.DataRequired("Please enter an email address for us to send consent forms to."),
         validators.Length(max=255, message="Email addresses cannot be longer than 255 characters."),
@@ -231,14 +231,14 @@ class TableInfo:
 
     @field_validation.table_photo
     def table_photo_is_image(self, field):
-        if field.data:
+        if field.data and field.data.file:
             content_type = field.data.content_type.value
             if not content_type.startswith('image'):
                 raise ValidationError(f"Table setup photo ({field.data.filename}) is not a valid image.")
 
     @field_validation.table_photo
     def table_photo_size(self, field):
-        if field.data:
+        if field.data and field.data.file:
             field.data.file.seek(0)
             file_size = len(field.data.file.read()) / (1024 * 1024)
             field.data.file.seek(0)
