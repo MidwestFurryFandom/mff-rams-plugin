@@ -9,14 +9,11 @@
     {% set staffing_message = "Please " ~ 'go to the Gophers desk to change your volunteer status.' if c.AT_THE_CON else 'unassign yourself from shifts before changing your volunteer status.' %}
     {% endif %}
 {% endif %}
-<div class="row g-sm-3">
-    <div class="col-12">{{ form_macros.toggle_checkbox(staffing_info.staffing, 
-        [staffing_info.requested_depts_ids], toggle_required=True, help_text=staffing_message) }}</div>
-</div>
+    <div class="col-12">{{ form_macros.input(staffing_info.staffing, help_text=staffing_message, **{'x-model.boolean':'staffing'}) }}</div>
 
 {% if c.PUBLIC_DEPARTMENT_OPTS_WITH_DESC|length > 1 %}
-<div class="row g-sm-3">
-    <div class="col-12">{{ form_macros.form_input(staffing_info.requested_depts_ids) }}</div>
 </div>
+<div class="row g-sm-3 mb-3" x-show="staffing">
+    <div class="col-12">{{ form_macros.input(staffing_info.requested_depts_ids, required_if="staffing") }}</div>
 {% endif %}
 {% endblock %}

@@ -1,13 +1,15 @@
 {% extends "uber/templates/forms/attendee/admin_badge_flags.html" %}
 
+{% block x_data %}
+{{ super() }}
+get compedReason() { return this.paid == {{ c.NEED_NOT_PAY|tojson }} && this.badge_type != {{ c.STAFF_BADGE|tojson }} && !this.badge_ribbons.includes({{ c.STAFF_RIBBON|tojson }}) }
+{% endblock %}
+
 {% block paid_status %}
 {{ super() }}
-
-<div class="row g-sm-3">
-    <div class="col-12 col-sm-6">
-        {{ form_macros.form_input(badge_flags.comped_reason, admin_text="Enter a reason for this badge being comped, if they are not staff.")}}
-        {{ form_macros.toggle_fields_js(badge_flags.paid, [badge_flags.comped_reason], on_values=[c.NEED_NOT_PAY], toggle_required=c.STAFF_RIBBON not in attendee.ribbon_ints) }}
-        {# TODO: toggling staff ribbon should make this not be required but there's already another toggle JS function for ribbons #}
-    </div>
 </div>
+<div class="row g-sm-3 mb-3">
+    <div class="col-sm-6" x-show="compedReason">
+        {{ form_macros.input(badge_flags.comped_reason, admin_text="Enter a reason for this badge being comped, if they are not staff.", required_if="compedReason") }}
+    </div>
 {% endblock %}
