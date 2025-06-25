@@ -6,6 +6,15 @@ from uber.validations import (ignore_unassigned_and_placeholders, TableInfo, Per
                               BadgeExtras, CheckInForm, ContactInfo)
 
 
+def country_exclusions(form, field):
+    if field.data and field.data in c.EXCLUDED_COUNTRIES:
+        raise ValidationError("Midwest FurFest membership, registration, and other MFF-related services are unavailable for your region.")
+
+
+PersonalInfo.field_validation.validations['country']['exclude'] = country_exclusions
+ContactInfo.field_validation.validations['country']['exclude'] = country_exclusions
+
+
 PersonalInfo.field_validation.required_fields.update({
     'consent_form_email': ("Please enter an email address for us to send consent forms to.",
                            'consent_form_email',
