@@ -33,7 +33,7 @@ get mffCellphoneRequired() { return (this.dealer || this.badge_type == {{ c.STAF
 
   <div class="col-sm">
     {% if admin_area %}
-    {{ form_macros.input(personal_info.consent_form_email) }}
+    <div x-show="consent_form">{{ form_macros.input(personal_info.consent_form_email, required_if="consent_form && !badge_placeholder") }}</div>
     {% else %}
     <div class="alert alert-warning" role="alert">
       <em>

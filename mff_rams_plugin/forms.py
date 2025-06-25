@@ -54,6 +54,8 @@ class BadgeExtras:
     field_validation, new_or_changed_validation = CustomValidation(), CustomValidation()
     attendance_type = HiddenIntField('Single Day or Weekend Badge?')
     badge_type_single = HiddenIntField('Badge Type', default=c.ATTENDEE_BADGE)
+    has_restrictions = BooleanField("I have a dietary restriction that needs accommodating for convention-sponsored meals.")
+    dietary_restrictions = StringField("Dietary Restriction(s)")
 
     def badge_type_desc(self):
         return Markup('<span class="popup"><a href="https://www.furfest.org/registration" target="_blank"><i class="fa fa-question-circle" aria-hidden="true"></i> Badge details, pickup information, and refund policy</a></span>')

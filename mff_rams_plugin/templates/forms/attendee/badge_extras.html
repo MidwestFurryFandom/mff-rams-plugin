@@ -2,7 +2,9 @@
 
 {% block x_data %}
 {{ super() }}
-get mffShirtSize() { return this.shirtSize || this.badge_type == {{ c.SPONSOR_BADGE|tojson }} || this.badge_type == {{ c.SHINY_BADGE|tojson }} }
+has_restrictions: {{ badge_extras.dietary_restrictions.data|boolean|tojson }},
+get showDietaryRestrictions() { return {{ [c.STAFF_BADGE, c.SPONSOR_BADGE, c.SHINY_BADGE]|tojson }}.includes(this.badge_type) || this.ribbons.includes({{ c.STAFF_RIBBON|tojson }}) },
+get mffShirtSize() { return this.shirtSize || this.badge_type == {{ c.SPONSOR_BADGE|tojson }} || this.badge_type == {{ c.SHINY_BADGE|tojson }} },
 {% endblock %}
 
 {% block badge_type %}
@@ -44,8 +46,13 @@ get mffShirtSize() { return this.shirtSize || this.badge_type == {{ c.SPONSOR_BA
 
 {% block perk_info %}
 {% if (c.ADDONS_ENABLED and (not receipt or upgrade_modal)) or attendee.gets_any_kind_of_shirt or admin_area %}
-<div class="row g-sm-3 mb-3" x-show="mffShirtSize">
-    <div class="col-12">{{ form_macros.input(badge_extras.shirt, required_if="mffShirtSize") }}</div>
+    <div class="col-12" x-show="mffShirtSize">{{ form_macros.input(badge_extras.shirt, required_if="mffShirtSize") }}</div>
 </div>
+<div class="row g-sm-3 mb-3">
 {% endif %}
+    <div class="col-12" x-show="showDietaryRestrictions">
+        {% call form_macros.input(badge_extras.has_restrictions, alpine_model="has_restrictions") %}
+        <div x-show="has_restrictions">{{ form_macros.input(badge_extras.dietary_restrictions, required_if="has_restrictions") }}</div>
+        {% endcall %}
+    </div>
 {% endblock %}

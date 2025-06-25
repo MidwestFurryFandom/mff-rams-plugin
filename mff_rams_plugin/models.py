@@ -177,6 +177,7 @@ class Attendee:
     fursuiting = Column(Boolean, default=False)
     accessibility_requests = Column(MultiChoice(c.ACCESSIBILITY_SERVICE_OPTS))
     other_accessibility_requests = Column(UnicodeText)
+    dietary_restrictions = Column(UnicodeText)
 
     @classproperty
     def skip_placeholder_fields(self):

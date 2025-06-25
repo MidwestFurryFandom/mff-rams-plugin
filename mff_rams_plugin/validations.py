@@ -55,6 +55,11 @@ PreregOtherInfo.field_validation.required_fields['group_name'] = (
     "Please confirm your table name.", 'group_name', lambda x: x.form.model.is_dealer)
 
 
+BadgeExtras.field_validation.required_fields['dietary_restrictions'] = (
+    "Please describe your dietary restriction(s).", 'has_restrictions'
+)
+
+
 @BadgeExtras.new_or_changed('badge_type')
 def badge_upgrade_sold_out(form, field):
     if form.is_admin:
