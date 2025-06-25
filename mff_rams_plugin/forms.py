@@ -28,7 +28,7 @@ class OtherInfo:
     fursuiting = BooleanField('I plan on fursuiting at the event.', widget=SwitchInput(), description="This is just to help us prepare; it's okay if your plans change!")
 
     def staffing_desc(self):
-        return 
+        return ""
 
     def requested_accessibility_services_label(self):
         return "I have an accessibility request."
@@ -40,6 +40,12 @@ class PreregOtherInfo:
 
     def group_name_label(self):
         return "Table Name"
+
+
+@MagForm.form_mixin
+class StaffingInfo:
+    def staffing_desc(self):
+        return ""
 
 
 @MagForm.form_mixin
