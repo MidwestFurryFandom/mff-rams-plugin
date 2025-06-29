@@ -22,6 +22,9 @@ jobs:
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
+      
+      - name: Set Docker image name to lowercase
+        run: echo "IMAGE_NAME=$(echo ${{ github.repository }} | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
 
       - name: Build and Push Docker Image
         uses: docker/build-push-action@v6
@@ -29,7 +32,7 @@ jobs:
           build-args: BRANCH=${{ github.ref_name }}
           context: "."
           push: true
-          tags: ghcr.io/${{ vars.UBER_REPO || github.repository }}:${{ github.ref_name }}
+          tags: ghcr.io/${{ env.IMAGE_NAME }}:${{ github.ref_name }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
           platforms: linux/amd64,linux/arm64
