@@ -1,4 +1,4 @@
-ARG BRANCH=mffmp
+ARG BRANCH=main
 ARG REPO=ghcr.io/midwestfurryfandom/rams
 FROM ${REPO}:${BRANCH}
 ENV uber_plugins=["mff_rams_plugin"]
