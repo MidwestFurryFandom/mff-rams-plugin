@@ -1,22 +1,30 @@
 {% extends "uber/templates/forms/attendee/other_info.html" %}
 
+{% block x_data %}
+{{ super() }}
+requested_accessibility_services: {{ other_info.requested_accessibility_services.data|boolean|tojson }},
+accessibility_requests: {{ other_info.accessibility_requests.data|tojson }},
+get otherRequests() { return this.accessibility_requests.includes(String({{ c.OTHER|tojson }})) },
+{% endblock %}
+
 {% block interests %}
 {{ super() }}
-<div class="row g-sm-3">
-    <div class="col-12">{{ form_macros.form_input(other_info.fursuiting) }}</div>
 </div>
+<div class="row g-sm-3 mb-3">
+    <div class="col">{{ form_macros.input(other_info.fursuiting) }}</div>
 {% endblock %}
 
 {% block accessibility %}
-{{ super() }}
-
-<div class="row g-sm-3">
-    <div class="col-12">
-        {% if c.ACCESSIBILITY_SERVICES_ENABLED and (c.HAS_OTHER_REPORTS_ACCESS or not admin_area) %}
-        {{ form_macros.form_input(other_info.accessibility_requests, extra_field=form_macros.form_input(other_info.other_accessibility_requests, no_margin=True)) }}
-        {{ form_macros.toggle_fields_js(other_info.requested_accessibility_services, [other_info.accessibility_requests], toggle_required=True) }}
-        {{ form_macros.toggle_fields_js(other_info.accessibility_requests, [other_info.other_accessibility_requests], on_values=[c.OTHER], toggle_required=True, closest_hide_selector='.col') }}
-        {% endif %}
-    </div>
+{% if c.ACCESSIBILITY_SERVICES_ENABLED and (not admin_area or c.HAS_OTHER_REPORTS_ACCESS) %}
+    <div class="col-12">{{ form_macros.input(other_info.requested_accessibility_services, alpine_model="requested_accessibility_services") }}</div>
+{% endif %}
 </div>
+<div class="row g-sm-3 mb-3" x-show="requested_accessibility_services">
+    <div class="col">
+        {% call form_macros.input(other_info.accessibility_requests, alpine_model="accessibility_requests", required_if="requested_accessibility_services") %}
+            <div x-show="otherRequests">
+                {{ form_macros.input(other_info.other_accessibility_requests, required_if="otherRequests") }}
+            </div>
+        {% endcall %}
+    </div>
 {% endblock %}

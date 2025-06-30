@@ -2,7 +2,7 @@ import math
 from datetime import timedelta
 from markupsafe import Markup
 from residue import CoerceUTF8 as UnicodeText
-from pockets import cached_classproperty
+from pockets import cached_classproperty, classproperty
 from pockets.autolog import log
 from sqlalchemy import and_, or_, not_
 from sqlalchemy.types import Boolean, Integer, Numeric
@@ -177,6 +177,13 @@ class Attendee:
     fursuiting = Column(Boolean, default=False)
     accessibility_requests = Column(MultiChoice(c.ACCESSIBILITY_SERVICE_OPTS))
     other_accessibility_requests = Column(UnicodeText)
+    dietary_restrictions = Column(UnicodeText)
+
+    @classproperty
+    def skip_placeholder_fields(self):
+        return ['birthdate', 'age_group', 'ec_name', 'ec_phone', 'address1', 'city',
+                'region', 'region_us', 'region_canada', 'zip_code', 'country', 'onsite_contact',
+                'badge_printed_name', 'cellphone', 'confirm_email', 'legal_name', 'consent_form_email']
 
     @cached_classproperty
     def import_fields(cls):
