@@ -17,7 +17,7 @@
 <input type="hidden" name="{{ other_info.group_name.name }}" value="{{ attendee.group.name }}" />
 {% endif %}
 
-    <div class="col-12">{{ form_macros.input(other_info.staffing, alpine_model="staffing") }}</div>
+    <div class="col-12">{{ form_macros.input(other_info.staffing, alpine_model="staffing", label_text="I would like to be emailed a link to the volunteer application.") }}</div>
 
 {% if c.PUBLIC_DEPARTMENT_OPTS_WITH_DESC|length > 1 %}
 </div>
