@@ -278,6 +278,45 @@ class Attendee:
                 self.badge_type = c.ATTENDEE_BADGE
 
     @property
+    def cannot_abandon_badge_reason(self):
+        from uber.custom_tags import email_only
+        if self.checked_in:
+            return "This badge has already been picked up."
+        if self.badge_type in [c.STAFF_BADGE, c.CONTRACTOR_BADGE]:
+            return f"Please contact {email_only(c.STAFF_EMAIL)} to cancel or defer your badge."
+        if self.badge_type in c.BADGE_TYPE_PRICES and c.AFTER_EPOCH:
+            return f"Please contact {email_only(c.REGDESK_EMAIL)} to cancel your badge."
+
+        if self.art_show_applications and self.art_show_applications[0].is_valid:
+            return f"Please contact {email_only(c.ART_SHOW_EMAIL)} to cancel your art show application first."
+        if self.art_agent_apps and any(app.is_valid for app in self.art_agent_apps):
+            return "Please ask the artist you're agenting for {} first.".format(
+                "assign a new agent" if c.ONE_AGENT_PER_APP else "unassign you as an agent."
+            )
+
+        reason = ""
+        if c.ATTENDEE_ACCOUNTS_ENABLED and self.managers:
+            account = self.managers[0]
+            other_adult_badges = [a for a in account.valid_adults if a.id != self.id]
+            if account.badges_needing_adults and not other_adult_badges:
+                reason = f"You cannot cancel the last adult badge on an account with an attendee under {c.ACCOMPANYING_ADULT_AGE}."
+
+        if not reason:
+            if self.paid == c.NEED_NOT_PAY and not self.promo_code and self.badge_type not in [c.PARENT_IN_TOW_BADGE,
+                                                                                               c.KID_IN_TOW_BADGE]:
+                reason = "You cannot abandon a comped badge."
+            elif self.is_group_leader and self.group.is_valid:
+                reason = f"As a leader of a group, you cannot {'abandon' if not self.group.cost else 'refund'} your badge."
+            elif self.amount_paid:
+                reason = self.cannot_self_service_refund_reason
+
+        if reason:
+            return reason + " Please {} contact us at {}{}.".format(
+                "transfer your badge instead or" if self.is_transferable else "",
+                email_only(c.REGDESK_EMAIL),
+                " to cancel your badge")
+
+    @property
     def ribbon_and_or_badge(self):
         ribbon_labels = self.ribbon_labels
         if self.badge_type == c.STAFF_BADGE and c.STAFF_RIBBON in self.ribbon_ints:
