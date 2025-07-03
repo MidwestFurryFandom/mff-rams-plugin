@@ -219,22 +219,6 @@ class Attendee:
             if not self.is_new:
                 update_receipt(self.id, {'paid': c.NEED_NOT_PAY})
 
-    @property
-    def attendance_type(self):
-        return c.SINGLE_DAY if self.badge_type in [c.ONE_DAY_BADGE, c.FRIDAY, c.SATURDAY, c.SUNDAY] else c.WEEKEND
-    
-    @property
-    def available_single_badge_opts(self):
-        # You can't switch between single-day badges, so this is all or nothing
-        if self.is_new or self.is_unpaid:
-            return c.FORMATTED_SINGLE_BADGES
-
-        return [{
-            'name': self.badge_type_label,
-            'desc': 'Can be upgraded to an Attendee badge later.',
-            'value': self.badge_type
-            }]
-
     def calculate_badge_cost(self, use_promo_code=False, include_price_override=True):
         # Adds overrides for a couple special cases where a badge should be free
         if self.paid == c.NEED_NOT_PAY or self.badge_status == c.NOT_ATTENDING or self.badge_type == c.PARENT_IN_TOW_BADGE:
@@ -274,7 +258,8 @@ class Attendee:
 
     @presave_adjustment
     def kid_in_tow_badge(self):
-        if self.age_now_or_at_con and self.age_now_or_at_con < 7 and self.badge_type == c.ATTENDEE_BADGE:
+        if self.age_now_or_at_con and self.age_now_or_at_con < 7 and self.badge_type == c.ATTENDEE_BADGE \
+                or self.attendance_type == c.SINGLE_DAY:
             self.badge_type = c.KID_IN_TOW_BADGE
 
     def cc_emails_for_ident(self, ident=''):

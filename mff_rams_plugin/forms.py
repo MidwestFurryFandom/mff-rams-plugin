@@ -52,8 +52,6 @@ class StaffingInfo:
 class BadgeExtras:
     field_aliases = {'badge_type': ['badge_type_single']}
     field_validation, new_or_changed_validation = CustomValidation(), CustomValidation()
-    attendance_type = HiddenIntField('Single Day or Weekend Badge?')
-    badge_type_single = HiddenIntField('Badge Type', default=c.ATTENDEE_BADGE)
     has_restrictions = BooleanField("I have a dietary restriction that needs accommodating for convention-sponsored meals.")
     dietary_restrictions = StringField("Dietary Restriction(s)")
 

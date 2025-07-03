@@ -69,6 +69,12 @@ BadgeExtras.field_validation.required_fields['dietary_restrictions'] = (
 )
 
 
+@BadgeExtras.new_or_changed('attendance_type')
+def pit_must_be_adult(form, field):
+    if field.data and field.data == c.PARENT_IN_TOW_BADGE and form.model.birthdate and form.model.age_now_or_at_con < 17:
+        raise ValidationError(f"{c.BADGES[c.PARENT_IN_TOW_BADGE]} badges must be 17 or older.")
+
+
 @BadgeExtras.new_or_changed('badge_type')
 def badge_upgrade_sold_out(form, field):
     if form.is_admin:
@@ -78,12 +84,6 @@ def badge_upgrade_sold_out(form, field):
         raise ValidationError("Sponsor badges have sold out.")
     elif field.data == c.SHINY_BADGE and not c.SHINY_BADGE_AVAILABLE:
         raise ValidationError("Shiny Sponsor badges have sold out.")
-
-
-@BadgeExtras.field_validation('badge_type_single')
-def must_select_day(form, field):
-    if form.attendance_type.data and form.attendance_type.data == c.SINGLE_DAY and field.data not in [c.FRIDAY, c.SATURDAY, c.SUNDAY]:
-        raise ValidationError("Please select which day you would like to attend.")
 
 
 CheckInForm.field_validation.validations['badge_printed_name'].update(PersonalInfo.field_validation.validations['badge_printed_name'])
