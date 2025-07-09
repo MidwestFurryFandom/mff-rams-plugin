@@ -12,12 +12,14 @@ get mffShirtSize() { return this.shirtSize || this.badge_type == {{ c.SPONSOR_BA
 
 <script type="text/javascript">
     var setParentBadge = function() {
+        orig_badge_type = {{ attendee.badge_type }};
         let attendanceType = $('#{{ id_upgrade_prepend }}attendance_type').val();
         if (attendanceType == '{{ c.PARENT_IN_TOW_BADGE }}') {
-            $('#{{ id_upgrade_prepend }}badge_type').val({{ c.PARENT_IN_TOW_BADGE }});
+            $('#{{ id_upgrade_prepend }}badge_type').val({{ c.PARENT_IN_TOW_BADGE }});   
         } else {
-            $('#{{ id_upgrade_prepend }}badge_type').val({{ c.ATTENDEE_BADGE }});
+            $('#{{ id_upgrade_prepend }}badge_type').val(orig_badge_type);
         }
+        document.getElementById('{{ id_upgrade_prepend }}badge_type').dispatchEvent(new Event('input'));
     }
     $(function () {
         $('#{{ id_upgrade_prepend }}attendance_type').on('change', setParentBadge);

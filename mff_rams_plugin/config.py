@@ -1,6 +1,7 @@
 from collections import defaultdict
 from datetime import timedelta
 from pockets.autolog import log
+from pockets import listify
 from pathlib import Path
 
 from uber.config import c, Config, dynamic, parse_config, request_cached_property
@@ -108,7 +109,7 @@ class ExtraConfig:
 
     @property
     def PREREG_BADGE_TYPES(self):
-        types = [self.ATTENDEE_BADGE, self.PSEUDO_DEALER_BADGE]
+        types = [self.ATTENDEE_BADGE, self.PSEUDO_DEALER_BADGE, self.PARENT_IN_TOW_BADGE]
         for reg_open, badge_type in [(self.BEFORE_GROUP_PREREG_TAKEDOWN, self.PSEUDO_GROUP_BADGE)]:
             if reg_open:
                 types.append(badge_type)
@@ -130,6 +131,46 @@ class ExtraConfig:
             opts.append(self.SHINY_BADGE)
 
         return opts
+
+    @request_cached_property
+    @dynamic
+    def OFFER_PIT_BADGE(self):
+        from uber.models import Session
+        from uber.payments import PreregCart
+
+        with Session() as session:
+            account = session.current_attendee_account()
+            cart = PreregCart(listify(PreregCart.unpaid_preregs.values()))
+            pit_in_cart = any([a for a in cart.attendees if a.badge_type == c.PARENT_IN_TOW_BADGE])
+            paid_minors_in_cart = any([a for a in cart.attendees if a.age_now_or_at_con < c.ACCOMPANYING_ADULT_AGE \
+                                    and a.calculate_badge_cost()])
+            return account.pit_eligible and not pit_in_cart or (not account.pit_badge and not pit_in_cart and paid_minors_in_cart)
+
+    @request_cached_property
+    @dynamic
+    def FORMATTED_ATTENDANCE_TYPES(self):
+        attendance_types = []
+
+        if 'preregistration/form' in c.PAGE_PATH and self.OFFER_PIT_BADGE:
+            attendance_types.append({
+                'name': c.BADGES[c.PARENT_IN_TOW_BADGE],
+                'desc': "A complimentary badge to accompany a paid attendee under 18.",
+                'value': c.PARENT_IN_TOW_BADGE,
+            })
+
+        attendance_types.append({
+            'name': c.ATTENDANCE_TYPES[c.WEEKEND],
+            'desc': "Allows access to the convention for its duration.",
+            'value': c.WEEKEND,
+        })
+        if hasattr(self, 'SINGLE_DAY') and c.SINGLE_DAY in c.ATTENDANCE_TYPES:
+            attendance_types.append({
+            'name': c.ATTENDANCE_TYPES[c.SINGLE_DAY],
+            'desc': "Allows access to the convention for one day.",
+            'value': c.SINGLE_DAY,
+            })
+
+        return attendance_types
 
     @request_cached_property
     @dynamic
