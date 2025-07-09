@@ -14,6 +14,7 @@ from uber.utils import add_opt, localized_now, localize_datetime, remove_opt, no
 from uber.models.types import Choice, DefaultColumn as Column, MultiChoice
 from uber.decorators import presave_adjustment
 from uber.tasks.registration import update_receipt
+from .tasks import check_pit_badge
 
 
 @Session.model_mixin
@@ -200,6 +201,12 @@ class Attendee:
     @presave_adjustment
     def never_spam(self):
         self.can_spam = False
+
+    @presave_adjustment
+    def check_pit_badge(self):
+        if self.badge_status != self.orig_value_of('badge_status') and not self.is_valid \
+                and self.birthdate and self.age_now_or_at_con < c.ACCOMPANYING_ADULT_AGE:
+            check_pit_badge.delay(self.id)
 
     @presave_adjustment
     def kid_in_tow_badge(self):
