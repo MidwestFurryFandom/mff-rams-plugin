@@ -1,0 +1,60 @@
+{% set nonupgraded_parent_badges = cart.attendees|selectattr('age_now_or_at_con', 'ge', 17)|selectattr('badge_type', '!=', c.SPONSOR_BADGE)|selectattr('badge_type', '!=', c.SHINY_BADGE)|list %}
+{% set warn_free_badge = c.ATTENDEE_ACCOUNTS_ENABLED and c.OFFER_PIT_BADGE and nonupgraded_parent_badges %}
+{% if warn_free_badge %}
+<script type="text/javascript">
+    var warnFreeBadge = function() {
+        console.log("Whee")
+        bootbox.confirm({
+        title: "Wait! You qualify for a free badge!",
+        message: `<p>Any account with at least one paid registration under 17 years old can add an "accompanying adult" badge for free.</p> 
+                  <p>To redeem this free badge, click "<strong>Edit</strong>" next to any adult badge in your cart and select the 
+                    "<strong>Accompanying Adult</strong>" option on the next page,
+                    then click "<strong>Update & Go to Cart</strong>".</p>` +
+                  "<p>Alternatively, you can help support the event by paying for the badges in your cart ({{ cart.dollar_amount|format_currency }} total){% if not c.AT_THE_CON %}, or register a free adult badge at another time{% endif %}.</p>",
+        size: 'large',
+        buttons: {
+            confirm: {
+                label: "No thanks, I'll pay for these badges as-is",
+                className: 'btn-primary'
+            },
+            cancel: {
+                label: 'Oops, let me redeem my free badge!',
+                className: 'btn-success'
+            }
+        },
+        callback: function (result) {
+            if(result) {
+                {% if c.AT_THE_CON %}
+                window.location = "at_door_confirmation";
+                {% else %}
+                $('#prereg-payment').click();
+                {% endif %}
+            }
+        }
+        });
+    }
+</script>
+{% endif %}
+<div class="row">
+    <div class="text-center">
+        {% if cart.total_cost > 0 %}
+            {% if c.AT_THE_CON and c.SPIN_TERMINAL_AUTH_KEY %}
+                <a {% if warn_free_badge %}onClick="warnFreeBadge()"{% else %}href="at_door_confirmation"{% endif %} class="btn btn-success">Confirm Registrations and Get Check-in Barcode</a>
+            {% else %}
+                {% if warn_free_badge %}
+                <div class="d-none">{{ stripe_form('prereg_payment', text="Pay with Card Now", stripe_button_id="prereg-payment") }}</div>
+                <button type="button" class="btn btn-info" onClick="warnFreeBadge()">Pay with Card Now</button>
+                {% else %}
+                {{ stripe_form('prereg_payment', text="Pay with Card Now", stripe_button_id="prereg-payment") }}
+                {% endif %}
+                {% if c.AT_THE_CON %}
+                <a {% if warn_free_badge %}onClick="warnFreeBadge()"{% else %}href="at_door_confirmation"{% endif %} class="btn btn-success">Pay with Cash/Card at Desk</a>
+                {% endif %}
+            {% endif %}
+        {% else %}
+            <a href="process_free_prereg">{{ macros.stripe_button("Complete Registration!") }}</a>
+        {% endif %}
+        <br/>or
+        <br/><a href="form">{{ macros.stripe_button("Add Another Registration") }}</a>
+    </div>
+</div>

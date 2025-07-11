@@ -1,0 +1,12 @@
+{% extends "uber/templates/preregistration/homepage.html" %}
+
+{% block multi_cancel_modal_text %}
+{{ super() }}
+{% if account.pit_badge %}
+<p>
+    <strong>Note</strong>: {{ account.pit_badge.full_name }} has a free "{{ account.pit_badge.badge_type_label }}" registration,
+    which will <span class="text-danger fw-bold">automatically be cancelled</span> if you cancel and refund the
+    registration{{ account.paid_minors|length|pluralize }} for {{ account.paid_minors|map(attribute='full_name')|list|readable_join }}.
+</p>
+{% endif %}
+{% endblock %}
