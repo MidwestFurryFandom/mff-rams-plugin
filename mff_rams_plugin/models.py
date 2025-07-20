@@ -210,8 +210,8 @@ class Attendee:
 
     @presave_adjustment
     def kid_in_tow_badge(self):
-        if self.age_now_or_at_con and self.age_now_or_at_con < 7 and self.badge_type == c.ATTENDEE_BADGE \
-                or self.attendance_type == c.SINGLE_DAY:
+        if self.age_now_or_at_con and self.age_now_or_at_con < 7 and (
+                self.badge_type == c.ATTENDEE_BADGE or self.attendance_type == c.SINGLE_DAY):
             self.badge_type = c.KID_IN_TOW_BADGE
 
     @presave_adjustment
