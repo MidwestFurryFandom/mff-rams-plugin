@@ -32,6 +32,7 @@ class Group:
     power = Column(Choice(c.DEALER_POWER_OPTS), default=-1)
     power_fee = Column(Integer, default=0)
     power_usage = Column(UnicodeText)
+    location_preference = Column(Choice(c.DEALER_LOCATION_PREFERENCE_OPTS), default=c.NONE)
     location = Column(UnicodeText, default='', admin_only=True)
     table_fee = Column(Integer, default=0)
     tax_number = Column(UnicodeText)

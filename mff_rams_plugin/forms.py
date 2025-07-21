@@ -82,6 +82,9 @@ class Consents:
 class TableInfo:
     power = IntegerField('Power Level', widget=IntSelect())
     power_usage = TextAreaField('Power Usage', description="Please provide a listing of what devices you will be using.")
+    location_preference = SelectField('Location Preference', default=0, coerce=int,
+                                      choices=[(0, 'Please select an option')] + c.DEALER_LOCATION_PREFERENCE_OPTS,
+                                      description="If you are selected for an endcap, you will be charged an additional $150 fee.")
     tax_number = StringField('Illinois Business Tax Number', description="""
                              If you have an Illinois Business license please provide the number here. Note that this 
                              number is in the format 1234-5678; it is not your Federal Tax ID or any other Tax ID number 

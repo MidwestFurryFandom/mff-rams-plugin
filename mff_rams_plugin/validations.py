@@ -94,6 +94,8 @@ TableInfo.field_validation.required_fields.update({
                     lambda x: x.form.model.is_dealer),
     'power_usage': ("Please provide a list of what powered devices you expect to use.", 'power',
                     lambda x: x > 0),
+    'location_preference': ("Please select if you would like to be considered for a specific kind of location.",
+                            'location_preference', lambda x: x.form.model.is_dealer),
     'adult_content': ("Please tell us if you are selling 18+ content.", 'adult_content',
                       lambda x: x.form.model.is_dealer),
     'ip_issues': ("Please tell us if you have had any IP policy issues in the past.", 'ip_issues',
