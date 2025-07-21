@@ -80,7 +80,7 @@ class Consents:
 
 @MagForm.form_mixin
 class TableInfo:
-    power = IntegerField('Power Level', widget=IntSelect())
+    power = IntegerField('Power Level', widget=IntSelect(), description="Final cost for power is subject to change.")
     power_usage = TextAreaField('Power Usage', description="Please provide a listing of what devices you will be using.")
     location_preference = SelectField('Location Preference', default=0, coerce=int,
                                       choices=[(0, 'Please select an option')] + c.DEALER_LOCATION_PREFERENCE_OPTS,
