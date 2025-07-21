@@ -182,7 +182,7 @@ class ExtraConfig:
             'value': c.ATTENDEE_BADGE,
             'price': c.get_attendee_price()
             })
-        for badge_type in c.BADGE_TYPE_PRICES:
+        for badge_type in sorted(c.BADGE_TYPE_PRICES, key=c.BADGE_TYPE_PRICES.get):
             if c.PRE_CON or badge_type not in c.SOLD_OUT_BADGE_TYPES:
                 badge_types.append({
                     'name': c.BADGES[badge_type],
