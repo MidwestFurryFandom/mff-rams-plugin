@@ -41,7 +41,7 @@ power: {{ table_info.power.data|tojson }},
     {% if not admin_area %}
     <p>Congratulations on being approved! Please fill in the fields below to help us with at-event planning.</p>
     </div>
-    <div class="row g-sm-3 mb-3">
+    <div class="row g-3 mb-3">
     {% endif %}
         <div class="col-sm">{{ form_macros.input(table_info.display_height) }}</div>
         <div class="col-sm">
@@ -50,13 +50,13 @@ power: {{ table_info.power.data|tojson }},
             {% endcall %}
         </div>
     </div>
-    <div class="row g-sm-3 mb-3">
+    <div class="row g-3 mb-3">
         <div class="col-sm">{{ form_macros.input(table_info.shipping_boxes) }}</div>
         <div class="col-sm">{{ form_macros.input(table_info.vehicle_access) }}</div>
     </div>
     <button type="submit" class="btn btn-primary">Save</button>
     <hr/>
-    <div class="row g-sm-3 mb-3">
+    <div class="row g-3 mb-3">
 {% endif %}
 
 {{ super() }}
@@ -65,14 +65,14 @@ power: {{ table_info.power.data|tojson }},
 {% block badges_tables %}
 {{ super() }}
 </div>
-<div class="row g-sm-3 mb-3">
+<div class="row g-3 mb-3">
     <div class="col-sm">
         {{ form_macros.input(table_info.power, choices=c.DEALER_POWER_OPTS if admin_area else c.PREREG_DEALER_POWER_OPTS, disabled=not is_prereg_dealer and not admin_area, alpine_model="power", required_if="is_dealer") }}
     </div>
     <div class="col-sm">
         {{ form_macros.input(table_info.power_usage, required_if="power > 0", **{'x-bind:readonly': "power <= 0"}) }}
     </div>
-</div><div class="row g-sm-3 mb-3">
+</div><div class="row g-3 mb-3">
     <div class="col-sm">{{ form_macros.input(table_info.location_preference, required_if="is_dealer") }}</div>
 {% endblock %}
 
@@ -84,32 +84,32 @@ power: {{ table_info.power.data|tojson }},
 {% block textareas %}
     <div class="col-12">{{ form_macros.input(table_info.special_needs) }}</div>
 </div>
-<div class="row g-sm-3 mb-3">
+<div class="row g-3 mb-3">
     <div class="col-sm">{{ form_macros.input(table_info.social_media) }}</div>
     <div class="col-sm">{{ form_macros.input(table_info.review_notes) }}</div>
 </div>
-<div class="row g-sm-3 mb-3">
+<div class="row g-3 mb-3">
     <div class="col-sm">{{ form_macros.input(table_info.mff_alumni) }}</div>
     <div class="col-sm">{{ form_macros.input(table_info.art_show_intent) }}</div>
 </div>
-<div class="row g-sm-3 mb-3">
+<div class="row g-3 mb-3">
     <div class="col-sm">{{ form_macros.input(table_info.adult_content, required_if="is_dealer") }}</div>
     <div class="col-sm">{{ form_macros.input(table_info.ip_issues, required_if="is_dealer") }}</div>
 </div>
-<div class="row g-sm-3 mb-3">
+<div class="row g-3 mb-3">
     <div class="col-sm">{{ form_macros.input(table_info.other_cons) }}</div>
     <div class="col-sm">
         {{ form_macros.input(table_info.table_photo) }}
     </div>
 {% if is_prereg_dealer or not admin_area and group.status not in c.DEALER_ACCEPTED_STATUSES %}
 </div>
-<div class="row g-sm-3 mb-3">
+<div class="row g-3 mb-3">
     <div class="col-12">{{ form_macros.input(table_info.shipping_boxes) }}</div>
 {% endif %}
 </div>
-<div class="row g-sm-3 mb-3">
+<div class="row g-3 mb-3">
     <div class="col-12">{{ form_macros.input(table_info.agreed_to_dealer_policies, required_if="is_dealer") }}</div>
 </div>
-<div class="row g-sm-3 mb-3">
+<div class="row g-3 mb-3">
     <div class="col-12">{{ form_macros.input(table_info.agreed_to_ip_policy, required_if="is_dealer") }}</div>
 {% endblock %}

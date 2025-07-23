@@ -8,7 +8,7 @@ get compedReason() { return this.paid == {{ c.NEED_NOT_PAY|tojson }} && this.bad
 {% block paid_status %}
 {{ super() }}
 </div>
-<div class="row g-sm-3 mb-3">
+<div class="row g-3 mb-3">
     <div class="col-sm-6" x-show="compedReason">
         {{ form_macros.input(badge_flags.comped_reason, admin_text="Enter a reason for this badge being comped, if they are not staff.", required_if="compedReason") }}
     </div>

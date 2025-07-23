@@ -16,7 +16,7 @@
 
 {% if c.PUBLIC_DEPARTMENT_OPTS_WITH_DESC|length > 1 %}
 </div>
-<div class="row g-sm-3 mb-3" x-show="staffing">
+<div class="row g-3 mb-3" x-show="staffing">
     <div class="col-12">{{ form_macros.input(staffing_info.requested_depts_ids, required_if="staffing") }}</div>
 {% endif %}
 {% endblock %}

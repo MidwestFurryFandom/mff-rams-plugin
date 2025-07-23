@@ -10,7 +10,7 @@ get otherRequests() { return this.accessibility_requests.includes(String({{ c.OT
 {% block interests %}
 {{ super() }}
 </div>
-<div class="row g-sm-3 mb-3">
+<div class="row g-3 mb-3">
     <div class="col">{{ form_macros.input(other_info.fursuiting) }}</div>
 {% endblock %}
 
@@ -19,7 +19,7 @@ get otherRequests() { return this.accessibility_requests.includes(String({{ c.OT
     <div class="col-12">{{ form_macros.input(other_info.requested_accessibility_services, alpine_model="requested_accessibility_services") }}</div>
 {% endif %}
 </div>
-<div class="row g-sm-3 mb-3" x-show="requested_accessibility_services">
+<div class="row g-3 mb-3" x-show="requested_accessibility_services">
     <div class="col">
         {% call form_macros.input(other_info.accessibility_requests, alpine_model="accessibility_requests", required_if="requested_accessibility_services") %}
             <div x-show="otherRequests">

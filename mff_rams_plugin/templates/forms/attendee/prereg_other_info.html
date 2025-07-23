@@ -2,14 +2,14 @@
 
 {% block staffing %}
 {% if attendee.group and attendee.group.name == attendee.full_name %}
-    <div class="alert alert-warning mt-4 mb-0" role="alert">
+    <div class="alert alert-warning mb-0" role="alert">
         <em>
             Your table name is the same as your first and last name.
             Please make sure you want to vend under your name, or change your table name below.
         </em>
     </div>
 </div>
-<div class="row g-sm-3 mb-3">
+<div class="row g-3 mb-3">
     <div class="col-sm">
         {{ form_macros.input(other_info.group_name, value=attendee.group.name) }}
     </div>
@@ -21,7 +21,7 @@
 
 {% if c.PUBLIC_DEPARTMENT_OPTS_WITH_DESC|length > 1 %}
 </div>
-<div class="row g-sm-3 mb-3" x-show="staffing">
+<div class="row g-3 mb-3" x-show="staffing">
     <div class="col-12">{{ form_macros.input(other_info.requested_depts_ids) }}</div>
 {% endif %}
 {% endblock %}
