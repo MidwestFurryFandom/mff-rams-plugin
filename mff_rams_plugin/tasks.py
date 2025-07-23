@@ -25,7 +25,11 @@ from uber.payments import ReceiptManager, TransactionRequest
 @celery.task
 def check_pit_badge(badge_id):
     with Session() as session:
-        badge = session.attendee(badge_id)
+        try:
+            badge = session.attendee(badge_id)
+        except NoResultFound:
+            return
+
         if badge.managers:
             pit_badge = badge.managers[0].pit_badge
             if pit_badge and not badge.managers[0].paid_minors:
