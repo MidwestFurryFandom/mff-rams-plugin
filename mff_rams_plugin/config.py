@@ -306,6 +306,8 @@ c.STATIC_HASH_LIST = {
     "fullcalendar-5.3.2/lib/main.js": "sha384-1Gk3PslZaZU8EEzESD+jT7CZwmyxB+jDFrxpCWoNURUWe5QVWHF5FH33osXwJP42",
     "fullcalendar-5.3.2/lib/locales-all.min.js": "sha384-9DSjmB5snkwTpF4UkLpUAUXKCCcL3Kq4Q6qunUiHFlwynxem0fBKSB/Pdz+4dDL3",
     "fullcalendar-5.3.2/lib/locales-all.js": "sha384-x4145WV6VZ8HGF2fYYuIUBHxjQyYrj63XpMs5F9Wabt3p8qsSpFb7jZARJtdQTnh",
+    "js/alpine.3.14.8.min.js": "sha384-X9kJyAubVxnP0hcA+AMMs21U445qsnqhnUF8EBlEpP3a42Kh/JwWjlv2ZcvGfphb",
+    "js/alpine-mask.js": "sha384-yVnK/Q4Tlw6JGP/UjGMxacfz1eEovg+4HvyR50ZTjmJ38i2ifp4GrmL+zIpeIG6k",
     "js/common-static.js": "sha384-75eWtizzova4ZxRETusdqkk05zrFfYzYWCmoUYlawGuwv8msiP+MxMKjO5kziAuK",
     "js/moment.js": "sha384-7e6uR49PcQsrLgfr25C6sHp5owxwt+kkiaby+/PMbG4xw0FKp1d49+WllI8AicB/",
     "js/warn-before-logout-dealer.js": "sha384-OXrEL7xAoSb+ANl19Ersw+KAlXTYfY0RsPnCNnSV0728UrqNtP0qmydzITZC6czF",
