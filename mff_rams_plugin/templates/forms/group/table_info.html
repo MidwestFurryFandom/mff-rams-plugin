@@ -73,7 +73,7 @@ power: {{ table_info.power.data|tojson }},
         {{ form_macros.input(table_info.power_usage, required_if="power > 0", **{'x-bind:readonly': "power <= 0"}) }}
     </div>
 </div><div class="row g-sm-3 mb-3">
-    <div class="col-sm">{{ form_macros.input(table_info.location_preference, disabled=not is_prereg_dealer and not admin_area, required_if="is_dealer") }}</div>
+    <div class="col-sm">{{ form_macros.input(table_info.location_preference, required_if="is_dealer") }}</div>
 {% endblock %}
 
 {% block website %}
