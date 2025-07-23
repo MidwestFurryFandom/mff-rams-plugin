@@ -100,18 +100,19 @@ class TableInfo:
     mff_alumni = BooleanField('I have vended at Midwest FurFest before.')
     art_show_intent = BooleanField('I plan to apply to the Midwest FurFest Art Show.')
     adult_content = SelectField('Selling 18+ Content?', coerce=int, choices=[(0, 'Please select an option')] + c.DEALER_ADULT_OPTS)
-    ip_issues = SelectField('IP Policy History', coerce=int, choices=[(0, 'Please select an option')] + c.DEALER_IP_OPTS)
-    other_cons = StringField('Other Events',
-                             description="Please list any events besides Midwest FurFest that you've vended at before.")
-    table_photo = FileField('Table Setup',
-                            description='Please upload a photo of your table setup (up to 5MB).', render_kw={'accept': "image/*"})
+    ip_issues = SelectField('IP Policy History', coerce=int, choices=[(0, 'Please select an option')] + c.DEALER_IP_OPTS,
+                            description="If yes, please tell us how it was handled. We are simply looking for honesty here, \
+                                and this does not count against your application, but rather a chance to display integrity and growth. ")
+    other_cons = StringField(f'Other Conventions in {c.EVENT_YEAR}',
+                             description=f"Please list any events that you've vended at within {c.EVENT_YEAR}.")
+    table_photo = FileField('Table Setup', render_kw={'accept': "image/*"})
     shipping_boxes = BooleanField('I plan on or may be shipping boxes or pallets to the convention center.')
     agreed_to_dealer_policies = BooleanField(Markup(f'I have read and agree to the Midwest FurFest policies for dealers.'))
     agreed_to_ip_policy = BooleanField(Markup(f'<strong>I have read and agree to the Midwest FurFest IP policies for dealers.</strong>'))
     vehicle_access = BooleanField('I will need vehicle access for load-in.')
-    display_height = StringField('Display Height',
-                                 description="Please provide the estimated display height of your table, in inches.")
-    at_con_standby = BooleanField('I will be available on a stand-by basis during the convention.')
+    display_height = StringField('Display Height')
+    at_con_standby = BooleanField('Please add me to the on site stand-by list if my application is waitlisted. \
+                                  I will be available to be contacted if a spot becomes available on short term notice at the convention.')
     at_con_standby_text = TextAreaField('On-site Contact Info',
                                         description="Please provide the quickest way to contact you on-site.")
 
@@ -124,6 +125,17 @@ class TableInfo:
         return Markup(f"""<strong>
                       I have read and agree to the <a href="" target="_blank">Midwest FurFest IP policies</a> for dealers.
                       </strong>""")
+    
+    def display_height_desc(self):
+        return Markup(f"""Estimated height of your entire Dealer Display (including all signage) from floor to top.
+                      <br/>Please be sure to read our new guidelines on display height limitations in the
+                      <a href="" target="_blank">Dealers Agreement</a>.""")
+    
+    def table_photo_desc(self):
+        return Markup(f"""Please upload a photo of what your Dealer Display looks like, from within the past year,
+                      so we can get to know you and what you want to sell.
+                      <br/>*IP items are OK in the photo as long as you tell us you won't be selling them at our event.
+                      Please see the <a href="" target="_blank">Dealers Agreement</a> for more info on our IP policies.""")
 
     def get_non_admin_locked_fields(self, group):
         locked_fields = self.super_get_non_admin_locked_fields(group)
