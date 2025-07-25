@@ -3,8 +3,8 @@
 {% block x_data %}
 {{ super() }}
 requested_accessibility_services: {{ other_info.requested_accessibility_services.data|boolean|tojson }},
-accessibility_requests: {{ other_info.accessibility_requests.data|tojson }},
-get otherRequests() { return this.accessibility_requests.includes(String({{ c.OTHER|tojson }})) },
+accessibility_requests: {{ other_info.accessibility_requests.data|map('string')|list }},
+get otherRequests() { return this.accessibility_requests.includes('{{ c.OTHER }}') },
 {% endblock %}
 
 {% block interests %}
