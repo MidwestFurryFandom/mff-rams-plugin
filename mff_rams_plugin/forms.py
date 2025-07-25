@@ -96,13 +96,14 @@ class TableInfo:
     description = StringField('Merchandise Description',
                               description="This will be used both for dealer selection (if necessary) and in all dealer listings.")
     social_media = TextAreaField("Social Media Details",
-                                 description="Please list any social media accounts you use that should be included in the review process.")
+                                 description="Please list any social media accounts you use that should be included in the review process. Applications without any social media accounts listed are less likely to be considered.")
     mff_alumni = BooleanField('I have vended at Midwest FurFest before.')
     art_show_intent = BooleanField('I plan to apply to the Midwest FurFest Art Show.')
     adult_content = SelectField('Selling 18+ Content?', coerce=int, choices=[(0, 'Please select an option')] + c.DEALER_ADULT_OPTS)
     ip_issues = SelectField('IP Policy History', coerce=int, choices=[(0, 'Please select an option')] + c.DEALER_IP_OPTS,
                             description="If yes, please tell us how it was handled. We are simply looking for honesty here, \
                                 and this does not count against your application, but rather a chance to display integrity and growth. ")
+    ip_issues_text = StringField('How did you handle past IP issues?')
     other_cons = StringField(f'Other Conventions in {c.EVENT_YEAR}',
                              description=f"Please list any events that you've vended at within {c.EVENT_YEAR}.")
     table_photo = FileField('Table Setup', render_kw={'accept': "image/*"})
@@ -129,13 +130,14 @@ class TableInfo:
     def display_height_desc(self):
         return Markup(f"""Estimated height of your entire Dealer Display (including all signage) from floor to top.
                       <br/>Please be sure to read our new guidelines on display height limitations in the
-                      <a href="" target="_blank">Dealers Agreement</a>.""")
+                      <a href="https://www.furfest.org/vendors/dealers/information" target="_blank">Dealers Agreement</a>.""")
     
     def table_photo_desc(self):
         return Markup(f"""Please upload a photo of what your Dealer Display looks like, from within the past year,
                       so we can get to know you and what you want to sell.
                       <br/>*IP items are OK in the photo as long as you tell us you won't be selling them at our event.
-                      Please see the <a href="" target="_blank">Dealers Agreement</a> for more info on our IP policies.""")
+                      Please see the <a href="https://www.furfest.org/vendors/dealers/information" target="_blank">Dealers 
+                      Agreement</a> for more info on our IP policies.""")
 
     def get_non_admin_locked_fields(self, group):
         locked_fields = self.super_get_non_admin_locked_fields(group)

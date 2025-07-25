@@ -100,6 +100,8 @@ TableInfo.field_validation.required_fields.update({
                       lambda x: x.form.model.is_dealer),
     'ip_issues': ("Please tell us if you have had any IP policy issues in the past.", 'ip_issues',
                   lambda x: x.form.model.is_dealer),
+    'ip_issues_text': ("Please tell us how you handled past IP policy issues.", 'ip_issues',
+                       lambda x: x == c.YES_ISSUES),
     'agreed_to_dealer_policies': ("You must agree to Midwest Furfest's dealer policies.", 'agreed_to_dealer_policies',
                                   lambda x: x.form.model.is_dealer),
     'agreed_to_ip_policy': ("You must agree to the IP policies for dealers.", 'agreed_to_ip_policy',

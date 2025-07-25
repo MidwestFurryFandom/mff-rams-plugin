@@ -4,6 +4,8 @@
 {{ super() }}
 at_con_standby: {{ table_info.at_con_standby.data|tojson }},
 power: {{ table_info.power.data|tojson }},
+ip_issues: '{{ table_info.ip_issues.data }}',
+get hadIpIssues() { return this.ip_issues == '{{ c.YES_ISSUES }}' },
 {% endblock %}
 
 {% block badges_js %}
@@ -94,7 +96,11 @@ power: {{ table_info.power.data|tojson }},
 </div>
 <div class="row g-3 mb-3">
     <div class="col-sm">{{ form_macros.input(table_info.adult_content, required_if="is_dealer") }}</div>
-    <div class="col-sm">{{ form_macros.input(table_info.ip_issues, required_if="is_dealer") }}</div>
+    <div class="col-sm">
+        {% call form_macros.input(table_info.ip_issues, required_if="is_dealer", alpine_model="ip_issues") %}
+        <div x-show="hadIpIssues">{{ form_macros.input(table_info.ip_issues_text, required_if="is_dealer && hadIpIssues") }}</div>
+        {% endcall %}
+    </div>
 </div>
 <div class="row g-3 mb-3">
     <div class="col-sm">{{ form_macros.input(table_info.other_cons) }}</div>

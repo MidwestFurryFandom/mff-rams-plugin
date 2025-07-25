@@ -42,6 +42,7 @@ class Group:
     art_show_intent = Column(Boolean, default=False)
     adult_content = Column(Choice(c.DEALER_ADULT_OPTS, allow_unspecified=True), default=0)
     ip_issues = Column(Choice(c.DEALER_IP_OPTS, allow_unspecified=True), default=0)
+    ip_issues_text = Column(UnicodeText)
     other_cons = Column(UnicodeText)
     table_photo_filename = Column(UnicodeText)
     table_photo_content_type = Column(UnicodeText)
