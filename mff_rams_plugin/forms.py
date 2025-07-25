@@ -119,12 +119,12 @@ class TableInfo:
 
     def agreed_to_dealer_policies_label(self):
         return Markup(f"""
-                      I have read and agree to the <strong><a href="" target="_blank">Midwest FurFest dealer policies</a></strong>.
+                      I have read and agree to the <strong><a href="https://www.furfest.org/vendors/dealers/information/#rules" target="_blank">Midwest FurFest dealer policies</a></strong>.
                       """)
 
     def agreed_to_ip_policy_label(self):
         return Markup(f"""<strong>
-                      I have read and agree to the <a href="" target="_blank">Midwest FurFest IP policies</a> for dealers.
+                      I have read and agree to the <a href="https://www.furfest.org/vendors/dealers/information/#rules" target="_blank">Midwest FurFest IP policies</a> for dealers.
                       </strong>""")
     
     def display_height_desc(self):
