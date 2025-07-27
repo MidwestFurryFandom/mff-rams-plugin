@@ -5,6 +5,8 @@
 birthdate: '{{ personal_info.birthdate.data|default('', true) }}',
 consent_form: {{ (attendee.birthdate and attendee.age_group_conf['consent_form'])|boolean|tojson }},
 toggleConsentFormEmail(data) {
+  return false;
+
   if(data.birthdate.match(/\d{2}\/\d{2}\/\d{4}/)) {
     $.ajax({
       method: 'GET',

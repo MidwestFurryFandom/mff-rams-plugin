@@ -1,9 +1,11 @@
 from wtforms import validators
 from wtforms.validators import ValidationError, StopValidation
+from markupsafe import Markup
 
 from .config import c
 from uber.validations import (ignore_unassigned_and_placeholders, TableInfo, PersonalInfo, OtherInfo, PreregOtherInfo,
                               BadgeExtras, CheckInForm, ContactInfo)
+from uber.utils import get_age_conf_from_birthday
 
 
 def country_exclusions(form, field):
@@ -18,7 +20,7 @@ ContactInfo.field_validation.validations['country']['exclude'] = country_exclusi
 PersonalInfo.field_validation.required_fields.update({
     'consent_form_email': ("Please enter an email address for us to send consent forms to.",
                            'consent_form_email',
-                           lambda x: x.form.model.birthdate and x.form.model.age_group_conf['consent_form'])
+                           lambda x: False and x.form.model.birthdate and x.form.model.age_group_conf['consent_form'])
 })
 
 
@@ -27,6 +29,16 @@ PersonalInfo.field_validation.validations['consent_form_email']['optional'] = va
 
 PersonalInfo.field_validation.validations['badge_printed_name']['length'] = validators.Length(
     max=30, message="Your printed badge name is too long. Please use less than 30 characters.")
+
+
+@PersonalInfo.field_validation('birthdate')
+def attendee_age_checks(form, field):
+    age_group_conf = get_age_conf_from_birthday(field.data, c.NOW_OR_AT_CON) \
+        if (hasattr(form, "birthdate") and form.birthdate.data) else field.data
+    if age_group_conf and not age_group_conf['can_register']:
+        raise ValidationError(Markup("At this time Midwest FurFest is not accepting registrations for our Minor attendees \
+                                     while we finalize our policies for this year. Please visit our website at \
+                                     https://www.furfest.org/attend/register for more information."))
 
 
 @PersonalInfo.field_validation('onsite_contact')
