@@ -2,9 +2,18 @@
 
 {% block cost %}
 {{ super() }}
-
-<div class="row g-sm-3">
-    <div class="col-12 col-sm-6">{{ form_macros.form_input(table_info.power_fee) }}</div>
-    <div class="col-12 col-sm-6">{{ form_macros.form_input(table_info.location) }}</div>
 </div>
+<div class="row g-3 mb-3">
+    <div class="col-sm">{{ form_macros.input(table_info.power_fee) }}</div>
+    <div class="col-sm">{{ form_macros.input(table_info.location) }}</div>
+{% endblock %}
+
+{% block group_status %}
+{{ super() }}
+    <div class="col-sm">{{ form_macros.input(table_info.socials_checked) }}</div>
+    <div class="col-sm">{{ form_macros.input(table_info.table_seen) }}</div>
+</div>
+<div class="row g-3 mb-3">
+    <div class="col-sm">{{ form_macros.input(table_info.ip_concerns) }}</div>
+    <div class="col-sm">{{ form_macros.input(table_info.other_concerns) }}</div>
 {% endblock %}

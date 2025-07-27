@@ -1,8 +1,8 @@
 import math
 from datetime import timedelta
-
+from markupsafe import Markup
 from residue import CoerceUTF8 as UnicodeText
-from pockets import cached_classproperty
+from pockets import cached_classproperty, classproperty
 from pockets.autolog import log
 from sqlalchemy import and_, or_, not_
 from sqlalchemy.types import Boolean, Integer, Numeric
@@ -11,10 +11,10 @@ from sqlalchemy.ext.hybrid import hybrid_property
 from uber.models import Session
 from uber.config import c
 from uber.utils import add_opt, localized_now, localize_datetime, remove_opt, normalize_email_legacy
-from uber.models import Attendee as BaseAttendee
 from uber.models.types import Choice, DefaultColumn as Column, MultiChoice
 from uber.decorators import presave_adjustment
 from uber.tasks.registration import update_receipt
+from .tasks import check_pit_badge
 
 
 @Session.model_mixin
@@ -28,21 +28,36 @@ class SessionMixin:
 
 
 @Session.model_mixin
-class LotteryApplication:
-    @property
-    def qualifies_for_staff_lottery(self):
-        return self.attendee.badge_type == c.STAFF_BADGE or c.STAFF_RIBBON in self.attendee.ribbon_ints
-
-
-@Session.model_mixin
 class Group:
     power = Column(Choice(c.DEALER_POWER_OPTS), default=-1)
     power_fee = Column(Integer, default=0)
     power_usage = Column(UnicodeText)
+    location_preference = Column(Choice(c.DEALER_LOCATION_PREFERENCE_OPTS), default=c.NONE)
     location = Column(UnicodeText, default='', admin_only=True)
     table_fee = Column(Integer, default=0)
     tax_number = Column(UnicodeText)
+    social_media = Column(UnicodeText)
     review_notes = Column(UnicodeText)
+    mff_alumni = Column(Boolean, default=False)
+    art_show_intent = Column(Boolean, default=False)
+    adult_content = Column(Choice(c.DEALER_ADULT_OPTS, allow_unspecified=True), default=0)
+    ip_issues = Column(Choice(c.DEALER_IP_OPTS, allow_unspecified=True), default=0)
+    ip_issues_text = Column(UnicodeText)
+    other_cons = Column(UnicodeText)
+    table_photo_filename = Column(UnicodeText)
+    table_photo_content_type = Column(UnicodeText)
+    shipping_boxes = Column(Boolean, default=False)
+    agreed_to_dealer_policies = Column(Boolean, default=False)
+    agreed_to_ip_policy = Column(Boolean, default=False)
+    vehicle_access = Column(Boolean, default=False)
+    display_height = Column(UnicodeText)
+    at_con_standby = Column(Boolean, default=False)
+    at_con_standby_text = Column(UnicodeText)
+    socials_checked = Column(Boolean, default=False)
+    table_seen = Column(Boolean, default=False)
+    ip_concerns = Column(UnicodeText)
+    other_concerns = Column(UnicodeText)
+
 
     @cached_classproperty
     def import_fields(cls):
@@ -113,6 +128,45 @@ class Group:
     def dealer_max_badges(self):
         return c.MAX_DEALERS or min(math.ceil(self.tables) * 3, 12)
 
+    @property
+    def can_add_existing_badges(self):
+        if self.is_dealer:
+            return True
+    
+    @property
+    def table_photo(self):
+        if not self.table_photo_filename:
+            return ''
+        return Markup(f"""
+                      <a href="../mff_reports/view_table_photo?id={self.id}" target="_blank">
+                      {self.table_photo_filename}
+                      </a>""")
+
+    @table_photo.setter
+    def table_photo(self, value):
+        import shutil
+        import cherrypy
+
+        if not isinstance(value, cherrypy._cpreqbody.Part):
+            log.error(f"Tried to set table_photo for group {self.name} with invalid value type: {type(value)}")
+            return
+
+        self.table_photo_filename = value.filename
+        self.table_photo_content_type = value.content_type.value
+
+        with open(self.table_photo_filepath, 'wb') as f:
+            shutil.copyfileobj(value.file, f)
+
+    @property
+    def table_photo_download_filename(self):
+        name = ''.join(s for s in self.name.strip() if s.isalnum() or s == ' ')
+        return ' '.join(name.split()).replace(' ', '_') + '_' + self.table_photo_filename
+
+    @property
+    def table_photo_filepath(self):
+        import os
+        return os.path.join(c.GROUPS_TABLE_PHOTOS_DIR, str(self.id))
+
 
 @Session.model_mixin
 class ArtistMarketplaceApplication:
@@ -126,6 +180,13 @@ class Attendee:
     fursuiting = Column(Boolean, default=False)
     accessibility_requests = Column(MultiChoice(c.ACCESSIBILITY_SERVICE_OPTS))
     other_accessibility_requests = Column(UnicodeText)
+    dietary_restrictions = Column(UnicodeText)
+
+    @classproperty
+    def skip_placeholder_fields(self):
+        return ['birthdate', 'age_group', 'ec_name', 'ec_phone', 'address1', 'city',
+                'region', 'region_us', 'region_canada', 'zip_code', 'country', 'onsite_contact',
+                'badge_printed_name', 'cellphone', 'confirm_email', 'legal_name', 'consent_form_email']
 
     @cached_classproperty
     def import_fields(cls):
@@ -144,6 +205,18 @@ class Attendee:
         self.can_spam = False
 
     @presave_adjustment
+    def check_pit_badge(self):
+        if self.badge_status != self.orig_value_of('badge_status') and not self.is_valid \
+                and self.birthdate and self.age_now_or_at_con < c.ACCOMPANYING_ADULT_AGE:
+            check_pit_badge.delay(self.id)
+
+    @presave_adjustment
+    def kid_in_tow_badge(self):
+        if self.age_now_or_at_con and self.age_now_or_at_con < 7 and (
+                self.badge_type == c.ATTENDEE_BADGE or self.attendance_type == c.SINGLE_DAY):
+            self.badge_type = c.KID_IN_TOW_BADGE
+
+    @presave_adjustment
     def not_attending_need_not_pay(self):
         if self.badge_status == c.NOT_ATTENDING:
             self.paid = c.NEED_NOT_PAY
@@ -153,12 +226,13 @@ class Attendee:
                 update_receipt(self.id, {'paid': c.NEED_NOT_PAY})
 
     @presave_adjustment
-    def pit_need_not_pay(self):
-        if self.badge_type == c.PARENT_IN_TOW_BADGE:
+    def in_tow_need_not_pay(self):
+        if self.badge_type in [c.KID_IN_TOW_BADGE, c.PARENT_IN_TOW_BADGE]:
             self.paid = c.NEED_NOT_PAY
-            self.comped_reason = "Automated: Parent in Tow badge."
 
-            if not self.is_new:
+            if self.is_new and self.badge_status == c.PENDING_STATUS:
+                self.badge_status == c.COMPLETE
+            elif not self.is_new:
                 update_receipt(self.id, {'paid': c.NEED_NOT_PAY})
 
     def calculate_badge_cost(self, use_promo_code=False, include_price_override=True):
@@ -198,11 +272,6 @@ class Attendee:
                                                 ) and self.badge_status == c.IMPORTED_STATUS and self.badge_type != c.STAFF_BADGE:
             self.ribbon = add_opt(self.ribbon_ints, c.STAFF_RIBBON)
 
-    @presave_adjustment
-    def kid_in_tow_badge(self):
-        if self.age_now_or_at_con and self.age_now_or_at_con < 7 and self.badge_type == c.ATTENDEE_BADGE:
-            self.badge_type = c.KID_IN_TOW_BADGE
-
     def cc_emails_for_ident(self, ident=''):
         if ident == 'under_18_parental_consent_reminder' and self.email != self.consent_form_email:
             return self.consent_form_email
@@ -219,6 +288,45 @@ class Attendee:
                 self.badge_type = c.ATTENDEE_BADGE
 
     @property
+    def cannot_abandon_badge_reason(self):
+        from uber.custom_tags import email_only
+        if self.checked_in:
+            return "This badge has already been picked up."
+        if self.badge_type in [c.STAFF_BADGE, c.CONTRACTOR_BADGE]:
+            return f"Please contact {email_only(c.STAFF_EMAIL)} to cancel or defer your badge."
+        if self.badge_type in c.BADGE_TYPE_PRICES and c.AFTER_EPOCH:
+            return f"Please contact {email_only(c.REGDESK_EMAIL)} to cancel your badge."
+
+        if self.art_show_applications and self.art_show_applications[0].is_valid:
+            return f"Please contact {email_only(c.ART_SHOW_EMAIL)} to cancel your art show application first."
+        if self.art_agent_apps and any(app.is_valid for app in self.art_agent_apps):
+            return "Please ask the artist you're agenting for {} first.".format(
+                "assign a new agent" if c.ONE_AGENT_PER_APP else "unassign you as an agent."
+            )
+
+        reason = ""
+        if c.ATTENDEE_ACCOUNTS_ENABLED and self.managers:
+            account = self.managers[0]
+            other_adult_badges = [a for a in account.valid_adults if a.id != self.id]
+            if account.badges_needing_adults and not other_adult_badges:
+                reason = f"You cannot cancel the last adult badge on an account with an attendee under {c.ACCOMPANYING_ADULT_AGE}."
+
+        if not reason:
+            if self.paid == c.NEED_NOT_PAY and not self.promo_code and self.badge_type not in [c.PARENT_IN_TOW_BADGE,
+                                                                                               c.KID_IN_TOW_BADGE]:
+                reason = "You cannot abandon a comped badge."
+            elif self.is_group_leader and self.group.is_valid:
+                reason = f"As a leader of a group, you cannot {'abandon' if not self.group.cost else 'refund'} your badge."
+            elif self.amount_paid:
+                reason = self.cannot_self_service_refund_reason
+
+        if reason:
+            return reason + " Please {} contact us at {}{}.".format(
+                "transfer your badge instead or" if self.is_transferable else "",
+                email_only(c.REGDESK_EMAIL),
+                " to cancel your badge")
+
+    @property
     def ribbon_and_or_badge(self):
         ribbon_labels = self.ribbon_labels
         if self.badge_type == c.STAFF_BADGE and c.STAFF_RIBBON in self.ribbon_ints:
@@ -229,6 +337,40 @@ class Attendee:
             return ' / '.join(ribbon_labels)
         else:
             return self.badge_type_label
+
+    @property
+    def attendance_type(self):
+        if self.badge_type == c.ONE_DAY_BADGE or self.is_presold_oneday:
+            return c.SINGLE_DAY
+        elif self.badge_type == c.PARENT_IN_TOW_BADGE:
+            return c.PARENT_IN_TOW_BADGE
+        return c.WEEKEND
+
+    @property
+    def available_attendance_type_opts(self):
+        if self.is_new or self.is_unpaid:
+            attendance_types = []
+            if self.badge_type == c.PARENT_IN_TOW_BADGE:
+                attendance_types.append({
+                    'name': c.BADGES[c.PARENT_IN_TOW_BADGE],
+                    'desc': "A complimentary badge to accompany a paid attendee under 17.",
+                    'value': c.PARENT_IN_TOW_BADGE,
+                })
+            attendance_types.extend(c.FORMATTED_ATTENDANCE_TYPES)
+            return attendance_types
+
+        attendance_types = [{
+            'name': c.ATTENDANCE_TYPES[c.WEEKEND],
+            'desc': "Allows access to the convention for its duration.",
+            'value': c.WEEKEND,
+        }]
+        if self.attendance_type == c.SINGLE_DAY:
+            attendance_types.append({
+            'name': c.ATTENDANCE_TYPES[c.SINGLE_DAY],
+            'desc': "Allows access to the convention for one day.",
+            'value': c.SINGLE_DAY,
+            })
+        return attendance_types
 
     @property
     def check_in_notes(self):
@@ -313,9 +455,31 @@ class Attendee:
     def has_personalized_badge(self):
         return True
 
+    @property
+    def staff_hotel_lottery_eligible(self):
+        return self.badge_type == c.STAFF_BADGE or c.STAFF_RIBBON in self.ribbon_ints
+
 
 @Session.model_mixin
 class AttendeeAccount:
+    @property
+    def pit_badge(self):
+        for attendee in self.valid_attendees:
+            if attendee.badge_type == c.PARENT_IN_TOW_BADGE:
+                return attendee
+
+    @property
+    def pit_eligible(self):
+        return self.paid_minors and not self.pit_badge
+    
+    @property
+    def paid_minors(self):
+        paid_minors = []
+        for minor in [a for a in self.valid_attendees if a.birthdate and a.age_now_or_at_con < c.ACCOMPANYING_ADULT_AGE]:
+            if minor.badge_cost and minor.is_paid:
+                paid_minors.append(minor)
+        return paid_minors
+
     @property
     def hotel_eligible_dealers(self):
         return [attendee for attendee in self.hotel_eligible_attendees if attendee.is_dealer and attendee.badge_status != c.UNAPPROVED_DEALER_STATUS]

@@ -1,6 +1,7 @@
 from collections import defaultdict
 from datetime import timedelta
 from pockets.autolog import log
+from pockets import listify
 from pathlib import Path
 
 from uber.config import c, Config, dynamic, parse_config, request_cached_property
@@ -108,13 +109,15 @@ class ExtraConfig:
 
     @property
     def PREREG_BADGE_TYPES(self):
-        types = [self.ATTENDEE_BADGE, self.PSEUDO_DEALER_BADGE]
+        types = [self.ATTENDEE_BADGE, self.PSEUDO_DEALER_BADGE, self.PARENT_IN_TOW_BADGE]
         for reg_open, badge_type in [(self.BEFORE_GROUP_PREREG_TAKEDOWN, self.PSEUDO_GROUP_BADGE)]:
             if reg_open:
                 types.append(badge_type)
         for badge_type in self.BADGE_TYPE_PRICES:
             if badge_type not in types:
                 types.append(badge_type)
+        if self.ONE_DAYS_ENABLED and self.PRESELL_ONE_DAYS:
+            types.extend([c.FRIDAY, c.SATURDAY, c.SUNDAY])
         return types
 
     @request_cached_property
@@ -128,38 +131,58 @@ class ExtraConfig:
             opts.append(self.SHINY_BADGE)
 
         return opts
-    
+
+    @request_cached_property
+    @dynamic
+    def OFFER_PIT_BADGE(self):
+        from uber.models import Session
+        from uber.payments import PreregCart
+
+        with Session() as session:
+            account = session.current_attendee_account()
+            cart = PreregCart(listify(PreregCart.unpaid_preregs.values()))
+            pit_in_cart = any([a for a in cart.attendees if a.badge_type == c.PARENT_IN_TOW_BADGE])
+            paid_minors_in_cart = any([a for a in cart.attendees if a.age_now_or_at_con < c.ACCOMPANYING_ADULT_AGE \
+                                    and a.calculate_badge_cost()])
+            return account.pit_eligible and not pit_in_cart or (not account.pit_badge and not pit_in_cart and paid_minors_in_cart)
+
+    @request_cached_property
+    @dynamic
+    def FORMATTED_ATTENDANCE_TYPES(self):
+        attendance_types = []
+
+        if 'preregistration/form' in c.PAGE_PATH and self.OFFER_PIT_BADGE:
+            attendance_types.append({
+                'name': c.BADGES[c.PARENT_IN_TOW_BADGE],
+                'desc': "A complimentary badge to accompany a paid attendee under 18.",
+                'value': c.PARENT_IN_TOW_BADGE,
+            })
+
+        attendance_types.append({
+            'name': c.ATTENDANCE_TYPES[c.WEEKEND],
+            'desc': "Allows access to the convention for its duration.",
+            'value': c.WEEKEND,
+        })
+        if hasattr(self, 'SINGLE_DAY') and c.SINGLE_DAY in c.ATTENDANCE_TYPES:
+            attendance_types.append({
+            'name': c.ATTENDANCE_TYPES[c.SINGLE_DAY],
+            'desc': "Allows access to the convention for one day.",
+            'value': c.SINGLE_DAY,
+            })
+
+        return attendance_types
+
     @request_cached_property
     @dynamic
     def FORMATTED_BADGE_TYPES(self):
         badge_types = []
-        if c.AT_THE_CON and self.ONE_DAYS_ENABLED:
-            if self.PRESELL_ONE_DAYS and localized_now().date() >= self.EPOCH.date() or True:
-                day_name = localized_now().strftime('%A')
-                if day_name in ["Friday", "Saturday", "Sunday"]:
-                    price = self.BADGE_PRICES['single_day'].get(day_name) or self.DEFAULT_SINGLE_DAY
-                    badge = getattr(self, day_name.upper())
-                    if getattr(self, day_name.upper() + '_AVAILABLE', None):
-                        badge_types.append({
-                            'name': day_name,
-                            'desc': "Can be upgraded to an Attendee badge later.",
-                            'value': badge,
-                            'price': price,
-                        })
-            elif self.ONE_DAY_BADGE_AVAILABLE:
-                badge_types.append({
-                    'name': 'Single Day',
-                    'desc': "Can be upgraded to an Attendee badge later.",
-                    'value': c.ONE_DAY_BADGE,
-                    'price': self.DEFAULT_SINGLE_DAY
-                })
         badge_types.append({
             'name': 'Attendee',
             'desc': 'Allows access to the convention for its duration.',
             'value': c.ATTENDEE_BADGE,
             'price': c.get_attendee_price()
             })
-        for badge_type in c.BADGE_TYPE_PRICES:
+        for badge_type in sorted(c.BADGE_TYPE_PRICES, key=c.BADGE_TYPE_PRICES.get):
             if c.PRE_CON or badge_type not in c.SOLD_OUT_BADGE_TYPES:
                 badge_types.append({
                     'name': c.BADGES[badge_type],
@@ -283,6 +306,8 @@ c.STATIC_HASH_LIST = {
     "fullcalendar-5.3.2/lib/main.js": "sha384-1Gk3PslZaZU8EEzESD+jT7CZwmyxB+jDFrxpCWoNURUWe5QVWHF5FH33osXwJP42",
     "fullcalendar-5.3.2/lib/locales-all.min.js": "sha384-9DSjmB5snkwTpF4UkLpUAUXKCCcL3Kq4Q6qunUiHFlwynxem0fBKSB/Pdz+4dDL3",
     "fullcalendar-5.3.2/lib/locales-all.js": "sha384-x4145WV6VZ8HGF2fYYuIUBHxjQyYrj63XpMs5F9Wabt3p8qsSpFb7jZARJtdQTnh",
+    "js/alpine.3.14.8.min.js": "sha384-X9kJyAubVxnP0hcA+AMMs21U445qsnqhnUF8EBlEpP3a42Kh/JwWjlv2ZcvGfphb",
+    "js/alpine-mask.js": "sha384-yVnK/Q4Tlw6JGP/UjGMxacfz1eEovg+4HvyR50ZTjmJ38i2ifp4GrmL+zIpeIG6k",
     "js/common-static.js": "sha384-75eWtizzova4ZxRETusdqkk05zrFfYzYWCmoUYlawGuwv8msiP+MxMKjO5kziAuK",
     "js/moment.js": "sha384-7e6uR49PcQsrLgfr25C6sHp5owxwt+kkiaby+/PMbG4xw0FKp1d49+WllI8AicB/",
     "js/warn-before-logout-dealer.js": "sha384-OXrEL7xAoSb+ANl19Ersw+KAlXTYfY0RsPnCNnSV0728UrqNtP0qmydzITZC6czF",

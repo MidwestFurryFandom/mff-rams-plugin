@@ -1,10 +1,12 @@
+import cherrypy
+from cherrypy.lib.static import serve_file
 from collections import defaultdict
 from pockets.autolog import log
 from sqlalchemy import func
 from sqlalchemy.sql.expression import literal
 
 from uber.config import c
-from uber.decorators import all_renderable, csv_file
+from uber.decorators import all_renderable, csv_file, public
 from uber.models import Attendee, Group
 from uber.utils import localized_now
 
@@ -196,6 +198,17 @@ class Root:
                 ", ".join(attendee.accessibility_requests_labels),
                 attendee.other_accessibility_requests
             ])
+
+    @public
+    def view_table_photo(self, session, id):
+        group = session.group(id)
+        cherrypy.response.headers['Cache-Control'] = 'no-store'
+
+        return serve_file(
+            group.table_photo_filepath,
+            disposition="attachment",
+            name=group.table_photo_download_filename if session.current_admin_account() else group.table_photo_filename,
+            content_type=group.table_photo_content_type)
 
     @csv_file
     def full_dealer_report(self, out, session):

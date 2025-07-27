@@ -5,18 +5,18 @@
 <li>Admissions purchased prior to the event must be picked up in person at event registration. Full information on Registration operating hours can be found on our <a href="https://www.furfest.org/attend/register/" target="_blank">Registration website</a>.</li>
 <li>Midwest Furfest has a one badge per person policy. If you purchase multiple badges (for your family, friend, or as a gift), please ensure that each badge is purchased in the name of the individual who the badge is intended for. You may use the same email address for multiple badges so any surprises aren't ruined. The purchaser retains sole ownership of the badge until the end of preregistration.</li>
 <li>Each badge holder must present and present identification to receive their badge. No person can pick up a badge for someone else, regardless of who paid for the badge.</li>
-<li>Minors (those under 18 years of age at the start of the convention) must be accompanied by a parent or guardian, or have a notarized unattended minor form. Please review our <a href="https://www.furfest.org/support/parents-guide" target="_blank">Parent's Guide</a> for more information.</li>
+{% if False %}<li>Minors (those under 18 years of age at the start of the convention) must be accompanied by a parent or guardian, or have a notarized unattended minor form. Please review our <a href="https://www.furfest.org/support/parents-guide" target="_blank">Parent's Guide</a> for more information.</li>{% endif %}
 <li>Please review our frequently asked questions <a href="https://www.furfest.org/attend/register/faq" target="_blank">on our website</a> prior to purchasing your badge for important information. </li>
-{% if not c.AT_THE_CON %}<li>If you don't pay for your registration, it will be deleted and you will have to pay full price at the door.</li>{% endif %}
+{% if not c.AT_THE_CON %}<li>If you do not complete the checkout of your registration, it will be deleted and you will need to register again. This may incur a price increase if you register after the end of the pre-registration period.</li>{% endif %}
 <li>Refunds for your Midwest FurFest registration can be requested via one of the following methods:
     <ul>
-        <li>Logging into your FurFest Account and selecting the "Cancel Registration" button for the badge you wish to cancel.</li>
+        <li>Logging into your FurFest Account and selecting the refund button for the badge you wish to cancel.</li>
         <li>Sending an email to {{ "registration@furfest.org"|email_to_link }}. Refund requests must be sent from the email address associated with the registration account requesting the refund.</li>
     </ul>
 <br/><strong>All refunds will be sent to the original payment method.</strong>
-<br/><br/>Attendees can request a full refund through 11:59PM Central Standard Time on Saturday, December 14, 2024.
-<br/><br/>Sponsors and Shiny Sponsors can request a full refund through 11:59PM Central Standard Time on Wednesday, December 4, 2024. A partial refund equal to the amount of the pre-registration Attendee registration can be requested until 11:59PM Central Standard Time on Saturday, December 14, 2024.
-<br/><br/>Any badge that is marked as Checked In or Picked Up on Thursday, December 5, 2024 or later is not eligible for a refund.
+<br/><br/>Attendees can request a full refund through 11:59PM Central Standard Time on Saturday, December 13, 2025.
+<br/><br/>Sponsors and Shiny Sponsors can request a full refund through 11:59PM Central Standard Time on Wednesday, December 3, 2025. A partial refund equal to the amount of the pre-registration Attendee registration can be requested until 11:59PM Central Standard Time on Saturday, December 13, 2025.
+<br/><br/>Any badge that is marked as Checked In or Picked Up on Thursday, December 4, 2025 or later is not eligible for a refund.
 </li>
 
     {% if c.CONSENT_FORM_URL and (attendee and attendee.age_now_or_at_con and attendee.age_now_or_at_con < 18) %}
@@ -27,7 +27,6 @@
     <li> Table costs and memberships may be refunded if you need to cancel your dealership. Tables may not be transferred under any circumstances.</li>
     {% endif %}
 </ul>
-<br/>
 
 <script type="text/javascript">
     $(document).ready(function(){

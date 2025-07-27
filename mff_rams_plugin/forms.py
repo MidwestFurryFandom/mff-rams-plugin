@@ -1,101 +1,65 @@
 from markupsafe import Markup
 from wtforms import (BooleanField, DecimalField, EmailField, Form, FormField,
                      HiddenField, SelectField, SelectMultipleField, IntegerField,
-                     StringField, TelField, validators, TextAreaField)
-from wtforms.validators import ValidationError, StopValidation
+                     StringField, FileField, TextAreaField)
 from pockets.autolog import log
 
 from uber.config import c
-from uber.forms import AddressForm, CustomValidation, MultiCheckbox, MagForm, IntSelect, SwitchInput, NumberInputGroup, HiddenIntField
+from uber.forms import TableInfo, CustomValidation, MultiCheckbox, MagForm, IntSelect, SwitchInput, NumberInputGroup, HiddenIntField
 from uber.custom_tags import popup_link, format_currency, pluralize, table_prices
 
 
 @MagForm.form_mixin
 class PersonalInfo:
-    field_validation, new_or_changed_validation = CustomValidation(), CustomValidation()
-    kwarg_overrides = {'badge_printed_name': {'maxlength': 30}}
-    consent_form_email = EmailField('Email for Consent Forms', validators=[
-        validators.DataRequired("Please enter an email address for us to send consent forms to."),
-        validators.Length(max=255, message="Email addresses cannot be longer than 255 characters."),
-        validators.Email(granular_message=True),
-        ],
-        description="We will send consent forms to this email address.",
-        render_kw={'placeholder': 'test@example.com'})
+    consent_form_email = EmailField('Email for Consent Forms', 
+                                    description="We will send consent forms to this email address.",
+                                    render_kw={'placeholder': 'test@example.com'})
 
-    def get_optional_fields(self, attendee, is_admin=False):
-        optional_list = self.super_get_optional_fields(attendee)
-
-        if c.STAFF_RIBBON in attendee.ribbon_ints and 'onsite_contact' not in optional_list:
-            optional_list.append('onsite_contact')
-        
-        if not attendee.birthdate or not attendee.age_group_conf['consent_form']:
-            optional_list.append('consent_form_email')
-
-        return optional_list
-
-    def badge_printed_name_validators(self, field):
-        # TODO: Add an upgrade to load_forms later that does this find and replace for you
-        return [validator for validator in (field.validators or []) if not isinstance(validator, validators.Length)] + [
-            validators.DataRequired("Please enter a name for your custom-printed badge."),
-            validators.Length(max=30, message="Your printed badge name is too long. \
-                              Please use less than 30 characters.")]
-    
     def badge_printed_name_desc(self):
         return "Badge names have a maximum of 30 characters and must not include emoji."
-    
-    @field_validation.cellphone
-    def not_same_cellphone_ec(form, field):
-        return
+
 
 @MagForm.form_mixin
 class OtherInfo:
     promo_code = StringField('Registration Code', description="A discount code or an art show agent code.")
-    accessibility_requests = SelectMultipleField('Accommodations Desired', validators=[
-        validators.DataRequired("Please select one or more accessbility accommodations.")
-    ], choices=c.ACCESSIBILITY_SERVICE_OPTS, coerce=int, widget=MultiCheckbox())
+    accessibility_requests = SelectMultipleField('Accommodations Desired',
+                                                 choices=c.ACCESSIBILITY_SERVICE_OPTS, coerce=int, widget=MultiCheckbox())
     other_accessibility_requests = StringField('What other accommodations do you need?')
     fursuiting = BooleanField('I plan on fursuiting at the event.', widget=SwitchInput(), description="This is just to help us prepare; it's okay if your plans change!")
 
-    def get_optional_fields(self, attendee, is_admin=False):
-        optional_list = self.super_get_optional_fields(attendee)
-        if not self.requested_accessibility_services.data:
-            optional_list.append('accessibility_requests')
-
-        return optional_list
-    
     def staffing_desc(self):
-        return 
+        return ""
 
     def requested_accessibility_services_label(self):
         return "I have an accessibility request."
-    
-    def validate_accessibility_requests(form, field):
-        if field.data and c.OTHER in field.data and not form.other_accessibility_requests.data:
-            raise ValidationError("Please describe what other accommodations you need.")
+
+
+@MagForm.form_mixin
+class PreregOtherInfo:
+    group_name = TableInfo.name
+
+    def group_name_label(self):
+        return "Table Name"
+
+
+@MagForm.form_mixin
+class StaffingInfo:
+    def staffing_desc(self):
+        return ""
 
 
 @MagForm.form_mixin
 class BadgeExtras:
-    new_or_changed_validation = CustomValidation()
-
-    @new_or_changed_validation.badge_type
-    def badge_upgrade_sold_out(form, field):
-        if field.data == c.SPONSOR_BADGE and not c.SPONSOR_BADGE_AVAILABLE:
-            raise ValidationError("Sponsor badges have sold out.")
-        elif field.data == c.SHINY_BADGE and not c.SHINY_BADGE_AVAILABLE:
-            raise ValidationError("Shiny Sponsor badges have sold out.")
+    field_aliases = {'badge_type': ['badge_type_single']}
+    field_validation, new_or_changed_validation = CustomValidation(), CustomValidation()
+    has_restrictions = BooleanField("I have a dietary restriction that needs accommodating for convention-sponsored meals.")
+    dietary_restrictions = StringField("Dietary Restriction(s)")
 
     def badge_type_desc(self):
         return Markup('<span class="popup"><a href="https://www.furfest.org/registration" target="_blank"><i class="fa fa-question-circle" aria-hidden="true"></i> Badge details, pickup information, and refund policy</a></span>')
-
-
-@MagForm.form_mixin
-class AdminBadgeExtras:
-    new_or_changed_validation = CustomValidation()
-
-    @new_or_changed_validation.badge_type
-    def badge_upgrade_sold_out(form, field):
-        pass # Let admins 'oversell' badges
+    
+    def badge_type_single_desc(self):
+        return Markup('<span class="popup"><a href="https://www.furfest.org/registration" target="_blank"><i class="fa fa-question-circle" aria-hidden="true"></i> Badge details, pickup information, and refund policy</a></span>')
 
 
 @MagForm.form_mixin
@@ -115,43 +79,65 @@ class Consents:
 
 
 @MagForm.form_mixin
-class CheckInForm:
-    kwarg_overrides = {'badge_printed_name': {'maxlength': 30}}
-
-    # TODO: Overrides should also apply when a form uses another form's field
-    def badge_printed_name_validators(self, field):
-        return [validator for validator in (field.validators or []) if not isinstance(validator, validators.Length)] + [
-            validators.DataRequired("Please enter a name for your custom-printed badge."),
-            validators.Length(max=30, message="Your printed badge name is too long. \
-                              Please use less than 30 characters.")]
-
-
-@MagForm.form_mixin
 class TableInfo:
-    power = IntegerField('Power Level', validators=[
-        validators.InputRequired("Please select what power level you want, or no power."),
-        validators.NumberRange(min=0, message="Please select what power level you want, or no power."),
-        validators.NumberRange(max=max(c.DEALER_POWERS.keys()), message="Please select a valid power level.")
-        ], widget=IntSelect())
+    power = IntegerField('Power Level', widget=IntSelect(), description="Final cost for power is subject to change.")
     power_usage = TextAreaField('Power Usage', description="Please provide a listing of what devices you will be using.")
-    tax_number = StringField('Illinois Business Tax Number', validators=[
-        validators.Regexp("^[0-9-]*$", message="Please use only numbers and hyphens for your IBT number.")
-        ], description="""
-                    If you have an Illinois Business license please provide the number here. Note that this 
-                    number is in the format 1234-5678; it is not your Federal Tax ID or any other Tax ID number 
-                    you may have.""", render_kw={'pattern': "[0-9]{4}-[0-9]{4}", 'title': "1234-5678"})
-    review_notes = TextAreaField('Review Notes', validators=[
-        validators.Length(max=1000, message="Review notes cannot be longer than 1000 characters.")
-    ], description="""
-                Please provide any additional information which you feel could assist in our selection process. 
-                This could include additional links other than your website or more detailed merchandise 
-                descriptions. If your website includes merchandise which may be in violation of our 
-                Intellectual Property rules, please confirm that you will not be bringing this merchandise 
-                for sale at MFF.""")
-    description = StringField('Merchandise Description', validators=[
-        validators.DataRequired("Please provide a description for us to evaluate your submission and use in listings.")
-        ], description="This will be used both for dealer selection (if necessary) and in all dealer listings.")
-    wares = HiddenField('Wares', validators=[validators.Optional()])
+    location_preference = SelectField('Location Preference', default=0, coerce=int,
+                                      choices=[(0, 'Please select an option')] + c.DEALER_LOCATION_PREFERENCE_OPTS,
+                                      description="If you are selected for an endcap, you will be charged an additional $150 fee.")
+    tax_number = StringField('Illinois Business Tax Number', description="""
+                             If you have an Illinois Business license please provide the number here. Note that this 
+                             number is in the format 1234-5678; it is not your Federal Tax ID or any other Tax ID number 
+                             you may have.""", render_kw={'pattern': "[0-9]{4}-[0-9]{4}", 'title': "1234-5678"})
+    review_notes = TextAreaField('Review Notes', description="""
+                                 Please provide any additional information which you feel could assist in our selection process. 
+                                 This could include additional links other than your website or more detailed merchandise 
+                                 descriptions.""")
+    description = StringField('Merchandise Description',
+                              description="This will be used both for dealer selection (if necessary) and in all dealer listings.")
+    social_media = TextAreaField("Social Media Details",
+                                 description="Please list any social media accounts you use that should be included in the review process. Applications without any social media accounts listed are less likely to be considered.")
+    mff_alumni = BooleanField('I have vended at Midwest FurFest before.')
+    art_show_intent = BooleanField('I plan to apply to the Midwest FurFest Art Show.')
+    adult_content = SelectField('Selling 18+ Content?', coerce=int, choices=[(0, 'Please select an option')] + c.DEALER_ADULT_OPTS)
+    ip_issues = SelectField('IP Policy History', coerce=int, choices=[(0, 'Please select an option')] + c.DEALER_IP_OPTS,
+                            description="If yes, please tell us how it was handled. We are simply looking for honesty here, \
+                                and this does not count against your application, but rather a chance to display integrity and growth. ")
+    ip_issues_text = StringField('How did you handle past IP issues?')
+    other_cons = StringField(f'Other Conventions in {c.EVENT_YEAR}',
+                             description=f"Please list any events that you've vended at within {c.EVENT_YEAR}.")
+    table_photo = FileField('Table Setup', render_kw={'accept': "image/*"})
+    shipping_boxes = BooleanField('I plan on or may be shipping boxes or pallets to the convention center.')
+    agreed_to_dealer_policies = BooleanField(Markup(f'I have read and agree to the Midwest FurFest policies for dealers.'))
+    agreed_to_ip_policy = BooleanField(Markup(f'<strong>I have read and agree to the Midwest FurFest IP policies for dealers.</strong>'))
+    vehicle_access = BooleanField('I will need vehicle access for load-in.')
+    display_height = StringField('Display Height')
+    at_con_standby = BooleanField('Please add me to the on site stand-by list if my application is waitlisted. \
+                                  I will be available to be contacted if a spot becomes available on short term notice at the convention.')
+    at_con_standby_text = TextAreaField('On-site Contact Info',
+                                        description="Please provide the quickest way to contact you on-site.")
+
+    def agreed_to_dealer_policies_label(self):
+        return Markup(f"""
+                      I have read and agree to the <strong><a href="https://www.furfest.org/vendors/dealers/information/#rules" target="_blank">Midwest FurFest dealer policies</a></strong>.
+                      """)
+
+    def agreed_to_ip_policy_label(self):
+        return Markup(f"""<strong>
+                      I have read and agree to the <a href="https://www.furfest.org/vendors/dealers/information/#rules" target="_blank">Midwest FurFest IP policies</a> for dealers.
+                      </strong>""")
+    
+    def display_height_desc(self):
+        return Markup(f"""Estimated height of your entire Dealer Display (including all signage) from floor to top.
+                      <br/>Please be sure to read our new guidelines on display height limitations in the
+                      <a href="https://www.furfest.org/vendors/dealers/information" target="_blank">Dealers Agreement</a>.""")
+    
+    def table_photo_desc(self):
+        return Markup(f"""Please upload a photo of what your Dealer Display looks like, from within the past year,
+                      so we can get to know you and what you want to sell.
+                      <br/>*IP items are OK in the photo as long as you tell us you won't be selling them at our event.
+                      Please see the <a href="https://www.furfest.org/vendors/dealers/information" target="_blank">Dealers 
+                      Agreement</a> for more info on our IP policies.""")
 
     def get_non_admin_locked_fields(self, group):
         locked_fields = self.super_get_non_admin_locked_fields(group)
@@ -164,21 +150,19 @@ class TableInfo:
         
         return locked_fields
 
-    def special_needs_validators(self, field):
-        return (field.validators or []) + [
-            validators.Length(max=1000, message="Special requests cannot be longer than 1000 characters.")]
-
     def tables_desc(self):
         return ""
-    
-    def validate_power_usage(form, field):
-        if form.power.data > 0 and not field.data:
-            raise ValidationError("Please provide a list of what powered devices you expect to use.")
+
 
 @MagForm.form_mixin
 class AdminTableInfo:
     location = StringField('Table Assignment', render_kw={'placeholder': "Dealer's table location"})
     power_fee = IntegerField('Power Fee', widget=NumberInputGroup())
+    socials_checked = BooleanField('Socials Checked')
+    table_seen = BooleanField('Table Setup Seen')
+    ip_concerns = TextAreaField('IP Concerns')
+    other_concerns = TextAreaField('Other Concerns')
+
 
 @MagForm.form_mixin
 class ArtistMarketplaceForm:

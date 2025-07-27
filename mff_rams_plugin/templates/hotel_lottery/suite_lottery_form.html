@@ -9,7 +9,7 @@
 {% endblock %}
 
 {% block suite_ranking_form %}
-{{ form_macros.form_input(suite_lottery.suite_type_preference,
+{{ form_macros.input(suite_lottery.suite_type_preference,
     help_text="" if not c.STAFF_HOTEL_LOTTERY_OPEN else "The staff (less expensive) Regency suite rate is not available after the staff room lottery closes.",
     readonly=read_only, show_staff_rates=c.STAFF_HOTEL_LOTTERY_OPEN and application.qualifies_for_staff_lottery) }}
 {% if not read_only and application.current_step <= steps.counter %}
