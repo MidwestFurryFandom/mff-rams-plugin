@@ -144,7 +144,7 @@ class Group:
 
     @table_photo.setter
     def table_photo(self, value):
-        if not value:
+        if not value or not getattr(value, 'filename'):
             return
 
         import shutil
