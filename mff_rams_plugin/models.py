@@ -272,6 +272,20 @@ class Attendee:
                                                 ) and self.badge_status == c.IMPORTED_STATUS and self.badge_type != c.STAFF_BADGE:
             self.ribbon = add_opt(self.ribbon_ints, c.STAFF_RIBBON)
 
+    @presave_adjustment
+    def badge_adjustments(self):
+        from uber.badge_funcs import needs_badge_num
+
+        if self.badge_type == c.PSEUDO_DEALER_BADGE:
+            self.ribbon = add_opt(self.ribbon_ints, c.DEALER_RIBBON)
+
+        self.badge_type = self.badge_type_real
+
+        old_type = self.orig_value_of('badge_type')
+
+        if (old_type != self.badge_type and c.STAFF_RIBBON not in self.ribbon_ints) or needs_badge_num(self) and not self.badge_num:
+            self.session.update_badge(self)
+
     def cc_emails_for_ident(self, ident=''):
         if ident == 'under_18_parental_consent_reminder' and self.email != self.consent_form_email:
             return self.consent_form_email
