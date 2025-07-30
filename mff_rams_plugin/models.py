@@ -272,13 +272,28 @@ class Attendee:
                                                 ) and self.badge_status == c.IMPORTED_STATUS and self.badge_type != c.STAFF_BADGE:
             self.ribbon = add_opt(self.ribbon_ints, c.STAFF_RIBBON)
 
+    @presave_adjustment
+    def badge_adjustments(self):
+        from uber.badge_funcs import needs_badge_num
+
+        if self.badge_type == c.PSEUDO_DEALER_BADGE:
+            self.ribbon = add_opt(self.ribbon_ints, c.DEALER_RIBBON)
+
+        self.badge_type = self.badge_type_real
+
+        old_type = self.orig_value_of('badge_type')
+
+        if (old_type != self.badge_type and c.STAFF_RIBBON not in self.ribbon_ints) or needs_badge_num(self) and not self.badge_num:
+            self.session.update_badge(self)
+
     def cc_emails_for_ident(self, ident=''):
         if ident == 'under_18_parental_consent_reminder' and self.email != self.consent_form_email:
             return self.consent_form_email
 
     def undo_extras(self):
-        if self.active_receipt:
-            return "Could not undo extras, this attendee has an open receipt!"
+        receipt = self.active_receipt
+        if receipt and receipt.payment_total and receipt.payment_total != receipt.pending_total:
+            return "Could not undo extras, this attendee has payments recorded!"
         self.amount_extra = 0
         self.extra_donation = 0
         if self.badge_type in c.BADGE_TYPE_PRICES:
