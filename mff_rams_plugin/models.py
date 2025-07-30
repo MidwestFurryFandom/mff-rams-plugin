@@ -144,6 +144,9 @@ class Group:
 
     @table_photo.setter
     def table_photo(self, value):
+        if not value:
+            return
+
         import shutil
         import cherrypy
 
@@ -165,7 +168,7 @@ class Group:
     @property
     def table_photo_filepath(self):
         import os
-        return os.path.join(c.GROUPS_TABLE_PHOTOS_DIR, str(self.id))
+        return os.path.join(c.UPLOADED_FILES_DIR, c.GROUPS_TABLE_PHOTOS_DIR, str(self.id))
 
 
 @Session.model_mixin
