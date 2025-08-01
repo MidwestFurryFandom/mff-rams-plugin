@@ -1,6 +1,6 @@
-{% extends "uber/templates/hotel_lottery/room_lottery_form.html" %}
+{% extends "uber/templates/forms/hotel/room_lottery.html" %}
 {% set show_staff_rates = c.STAFF_HOTEL_LOTTERY_OPEN and application.qualifies_for_staff_lottery %}
-{% set show_dealer_info = application.attendee.is_dealer and application.attendee.badge_status != c.UNAPPROVED_DEALER_STATUS %}
+{% set show_dealer_info = application.attendee.is_dealer and application.attendee.group.is_valid and application.attendee.group.status != c.WAITLISTED %}
 
 {% block hotel_and_room_type_ranking_desc %}
 <style>
@@ -28,7 +28,8 @@
     <p>If your dealer application is pending at the time you enter, that is okay. We will check all dealer applications before announcing room results.</p>
 
     <p>
-        Room groups <strong>must</strong> have a dealer as the group leader to be eligible for the dealer block.
+        Room groups <strong>must</strong> have a dealer or dealer assistant as the group leader to be eligible for the dealer block.
+        You may have one room in the dealer block for every three <strong>assigned and completed</strong> dealer or dealer assistant badges on your application.
     </p>
 
     <p>We encourage people from the same dealer group to room together to help accommodate as many people as possible.</p>

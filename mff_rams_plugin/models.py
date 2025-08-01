@@ -134,6 +134,10 @@ class Group:
             return True
 
     @property
+    def completed_badges(self):
+        return [a for a in self.attendees if not a.is_unassigned and not a.placeholder]
+
+    @property
     def table_photo(self):
         if not self.table_photo_filename:
             return ''
