@@ -132,7 +132,11 @@ class Group:
     def can_add_existing_badges(self):
         if self.is_dealer:
             return True
-    
+
+    @property
+    def completed_badges(self):
+        return [a for a in self.attendees if not a.is_unassigned and not a.placeholder]
+
     @property
     def table_photo(self):
         if not self.table_photo_filename:
@@ -144,7 +148,7 @@ class Group:
 
     @table_photo.setter
     def table_photo(self, value):
-        if not value or not getattr(value, 'filename'):
+        if not value or not getattr(value, 'filename', None):
             return
 
         import shutil

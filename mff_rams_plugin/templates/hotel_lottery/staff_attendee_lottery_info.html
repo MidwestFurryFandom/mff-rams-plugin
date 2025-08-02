@@ -1,0 +1,31 @@
+<strong>Please read the following before entering the attendee lottery</strong>:
+<ul>
+    <li>
+        <em>If you received a room in the Hyatt Regency O'Hare in the staff lottery</em>,
+        you may ONLY enter for a suite in the attendee room lottery, not a standard room.
+
+        {% if application.entry_type == c.ROOM_ENTRY %}
+        <ul>
+            <li>
+                If this applies to you, please make sure to switch your entry type to a suite entry
+                by pressing the "<strong>Change to Suite Entry</strong>" button above your application
+                information after entering the attendee lottery.
+            </li>
+        </ul>
+        {% endif %}
+    </li>
+    <li>
+        If you are awarded a room in the attendee lottery, the room you were awarded in the staff lottery
+        will be <strong>automatically cancelled</strong>.
+        {% if application.room_group_name and application.group_members %}
+        <strong><span class="text-danger">This will also cancel the room for all your room group members!</span></strong>
+        {% endif %}
+        <ul>
+            <li>
+                To be very clear, <em>entering</em> the attendee lottery will not cancel your room from the staff lottery,
+                but you will NOT be able to choose between an attendee lottery room and your staff lottery room.
+                Please make sure to only select preferences that will be better than your staff room award!
+            </li>
+        </ul>
+    </li>
+</ul>
