@@ -315,7 +315,7 @@ class Attendee:
         if self.checked_in:
             return "This badge has already been picked up."
         if self.badge_type in [c.STAFF_BADGE, c.CONTRACTOR_BADGE]:
-            return f"Please contact {email_only(c.STAFF_EMAIL)} to cancel or defer your badge."
+            return f"Please contact hr@furfest.org to cancel or defer your badge."
         if self.badge_type in c.BADGE_TYPE_PRICES and c.AFTER_EPOCH:
             return f"Please contact {email_only(c.REGDESK_EMAIL)} to cancel your badge."
 
