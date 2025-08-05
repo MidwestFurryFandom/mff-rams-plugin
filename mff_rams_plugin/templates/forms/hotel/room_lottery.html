@@ -12,10 +12,12 @@
     <p>
         Rank your choice of hotel and standard room type below by clicking and dragging options from "Available" to "Selected" in order of preference.
         At least one selection is required. Not all hotels/room types need be selected. Accordingly, <em>please do not select hotels or room types you do not wish to stay at</em>.
-        For additional room and amenity information, please see <a href="{{ c.HOTEL_LOTTERY_URL }}" target="_blank">our website</a>.
+        For information about hotels, room types, and amenities, please see <a href="{{ c.HOTEL_LOTTERY_URL }}" target="_blank">our website  <i class="fa fa-external-link"></i></a>.
     </p>
 
     <p>A limited number of small junior suites ("King Parlor Suites") are available at select hotels. They are awarded along with standard rooms, and are separate from the suite options at the Hyatt Regency O'Hare.</p>
+
+    <p><strong>We STRONGLY recommended selecting at least three hotels.</strong> Selecting just one or two hotels, especially only the Hyatt Regency O’Hare, will dramatically increase the chance that you <strong>will not get a room{% if c.STAFF_HOTEL_LOTTERY_OPEN and application.qualifies_for_staff_lottery %}, even in the staff lottery{% endif %}</strong>.</p>
 
     {% if show_dealer_info %}
     <h4>Dealer Room Block Information</h4>
@@ -65,88 +67,47 @@
             <th scope="col"></th>
             <th scope="col">King</th>
             <th scope="col">Double</th>
-            <th scope="col">King Parlor Suite</th>
+            <th scope="col">Queen/Queen</th>
         </thead>
         <tbody>
             <tr>
                 <th scope="row">Hyatt Regency O'Hare</th>
-                <td>$168</td>
-                <td>$183{% if show_staff_rates %}/<strong>$168</strong>{% endif %}</td>
+                <td>$170</td>
+                <td>$185{% if show_staff_rates %}/<strong>$170</strong>{% endif %}</td>
                 <td></td>
             </tr>
             <tr>
                 <th scope="row">Aloft</th>
-                <td>$182</td>
-                <td>$182</td>
-                <td></td>
-            </tr>
-            <tr>
-                <th scope="row">Comfort Inn</th>
-                <td>$119</td>
-                <td>$119<span class="text-muted">*</span></td>
-                <td></td>
-            </tr>
-            <tr>
-                <th scope="row">Comfort Suites</th>
-                <td>$150</td>
-                <td>$150</td>
+                <td>$185</td>
+                <td>$185</td>
                 <td></td>
             </tr>
             <tr>
                 <th scope="row">Courtyard</th>
-                <td>$149</td>
-                <td>$169</td>
+                <td>$154</td>
+                <td>$174</td>
                 <td></td>
             </tr>
             <tr>
                 <th scope="row">Crowne Plaza</th>
-                <td>$169{% if show_staff_rates %}/<strong>$159</strong>{% endif %}</td>
-                <td>$169{% if show_staff_rates %}/<strong>$159</strong>{% endif %}</td>
+                <td>$174{% if show_staff_rates %}/<strong>$164</strong>{% endif %}</td>
+                <td>$174{% if show_staff_rates %}/<strong>$164</strong>{% endif %}</td>
                 <td></td>
             </tr>
             <tr>
                 <th scope="row">Hilton Garden Inn</th>
-                <td>$159</td>
-                <td>$159</td>
+                <td>$167</td>
+                <td>$167</td>
                 <td></td>
             </tr>
             <tr>
-                <th scope="row">Holiday Inn</th>
-                <td>$139<span class="text-muted">**</span></td>
-                <td>$149<span class="text-muted">**</span></td>
-                <td></td>
-            </tr>
-            <tr>
-                <th scope="row">Hyatt Place</th>
-                <td>$159</td>
-                <td>$159</td>
-                <td></td>
-            </tr>
-            <tr>
-                <th scope="row">La Quinta</th>
-                <td>$159</td>
-                <td>$159</td>
-                <td></td>
-            </tr>
-            <tr>
-                <th scope="row">Marriott Suites</th>
-                <td>$199</td>
-                <td></td>
-                <td>$229</td>
-            </tr>
-            <tr>
-                <th scope="row">Staybridge Suites</th>
-                <td></td>
-                <td></td>
-                <td>$169<span class="text-muted">**</span></td>
+                <th scope="row">Spark by Hilton</th>
+                <td>$129</td>
+                <td>$149</td>
+                <td>$169</td>
             </tr>
         </tbody>
     </table>
-    <div class="form-text mb-4">
-        <p>*The Comfort Inn offers double rooms with two queens and two doubles. We will fill two queen rooms first, followed by two doubles.</p>
-        <p>**Rates do not include a $1.75/night "Green Engage" fee assessed by the hotel.</p>
-        <p>***Staybridge King rooms are suites with a parlor. IF YOU WANT THIS ROOM TYPE, include "King Parlor Suite" in your room selection.</p>
-    </div>
 </div>
 {% endblock %}
 
