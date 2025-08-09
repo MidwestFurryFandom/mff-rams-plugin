@@ -58,7 +58,6 @@ class Group:
     ip_concerns = Column(UnicodeText)
     other_concerns = Column(UnicodeText)
 
-
     @cached_classproperty
     def import_fields(cls):
         return ['power', 'power_fee', 'power_usage', 'tax_number', 'review_notes']

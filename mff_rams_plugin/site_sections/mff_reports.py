@@ -229,7 +229,26 @@ class Root:
             'Admin Notes',
             'Power Requested',
             'Power Request Info',
-            'Location'
+            'Location Preference',
+            'Location',
+            'Social Media Info',
+            'Review Notes',
+            'MFF Alumni?',
+            'Art Show?',
+            'Adult Content?',
+            'IP Issues?',
+            'IP Issues Desc',
+            'Other 2025 Events',
+            'Table Setup Photo',
+            'Shipping Boxes?',
+            'Vehicle Access?',
+            'Display Height',
+            'At Con Standby?',
+            'At-Con Contact Info',
+            'Socials Checked?',
+            'Table Seen?',
+            'IP Concerns',
+            'Other Concerns'
         ])
         dealer_groups = session.query(Group).filter(Group.is_dealer == True).all()
         for group in dealer_groups:
@@ -252,7 +271,26 @@ class Root:
                     group.admin_notes,
                     group.power,
                     group.power_usage,
-                    group.location
+                    group.location_preference_label,
+                    group.location,
+                    group.social_media,
+                    group.review_notes,
+                    group.mff_alumni,
+                    group.art_show_intent,
+                    group.adult_content_label,
+                    group.ip_issues_label,
+                    group.ip_issues_text,
+                    group.other_cons,
+                    f"{c.URL_BASE}/mff_reports/view_table_photo?id={group.id}" if group.table_photo_filename else '',
+                    group.shipping_boxes,
+                    group.vehicle_access,
+                    group.display_height,
+                    group.at_con_standby,
+                    group.at_con_standby_text,
+                    group.socials_checked,
+                    group.table_seen,
+                    group.ip_concerns,
+                    group.other_concerns,
                 ])
 
     @csv_file
@@ -414,27 +452,6 @@ class Root:
             'now': localized_now(),
         }
 
-        custom_fee_groups = paid_groups.filter(Group.auto_recalc == False)
-        auto_recalc_groups = paid_groups.filter(Group.auto_recalc == True)
-        table_cost_list = defaultdict(int)
-        for num, desc in c.TABLE_OPTS:
-            table_cost_list[desc] = auto_recalc_groups.filter(Group.tables == num).count() * c.TABLE_PRICES.get(num)
-
-        return {
-            'now': localized_now(),
-            'message': message,
-            'num_custom_groups': custom_fee_groups.count(),
-            'num_auto_groups': auto_recalc_groups.count(),
-            'table_breakdown': table_cost_list.items(),
-            'table_sum': sum(table_cost_list.values()),
-            'badge_sum': session.query(Attendee).join(Attendee.group).filter(Attendee.paid == c.PAID_BY_GROUP,
-                                                                            Attendee.is_dealer == True,
-                                                                            Group.amount_paid > 0,
-                                                                            Group.auto_recalc == True).count() * c.DEALER_BADGE_PRICE,
-            'custom_fee_sum': sum([group.cost for group in custom_fee_groups]),
-            'power_fee_sum': sum([group.power_fee for group in auto_recalc_groups]),
-        }
-
     @csv_file
     def dealers_application_review_report(self, out, session):
         out.writerow([
@@ -450,7 +467,21 @@ class Root:
             'Review Notes',
             'Admin Notes',
             'Power Requested',
-            'Power Request Info'
+            'Power Request Info',
+            'Location Preference',
+            'Social Media Info',
+            'Review Notes',
+            'MFF Alumni?',
+            'Art Show?',
+            'Adult Content?',
+            'IP Issues?',
+            'IP Issues Desc',
+            'Other 2025 Events',
+            'Table Setup Photo',
+            'Socials Checked?',
+            'Table Seen?',
+            'IP Concerns',
+            'Other Concerns'
         ])
         dealer_groups = session.query(Group).filter(Group.is_dealer == True).all()
         for group in dealer_groups:
@@ -469,6 +500,20 @@ class Root:
                     group.review_notes,
                     group.admin_notes,
                     group.power,
-                    group.power_usage
+                    group.power_usage,
+                    group.location_preference_label,
+                    group.social_media,
+                    group.review_notes,
+                    group.mff_alumni,
+                    group.art_show_intent,
+                    group.adult_content_label,
+                    group.ip_issues_label,
+                    group.ip_issues_text,
+                    group.other_cons,
+                    f"{c.URL_BASE}/mff_reports/view_table_photo?id={group.id}" if group.table_photo_filename else '',
+                    group.socials_checked,
+                    group.table_seen,
+                    group.ip_concerns,
+                    group.other_concerns,
                 ])
 

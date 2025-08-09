@@ -2,7 +2,7 @@
 
 {% block staffing %}
 {% set staffing_message = "" %}
-{% set label = "I would like to be emailed a link to the volunteer application." %}
+{% set label = "I would like to be emailed a link to the volunteer application once it is open." %}
 {% if not admin_area %}
     {% if attendee.badge_type in [c.CONTRACTOR_BADGE, c.STAFF_BADGE] or c.STAFF_RIBBON in attendee.ribbon_ints %}
     {% set staffing_message = "This checkbox is required for staff. Please contact Furfest HR if you wish to change your status." %}
@@ -11,8 +11,16 @@
     {% set staffing_message = "Please " ~ 'go to the Gophers desk to change your volunteer status.' if c.AT_THE_CON else 'unassign yourself from shifts before changing your volunteer status.' %}
     {% endif %}
 {% endif %}
+
 {% if staffing_message != '' %}<input type="hidden" name="{{ staffing_info.staffing.name }}" value="1">{% endif %}
-    <div class="col-12">{{ form_macros.input(staffing_info.staffing, label_text=label, help_text=staffing_message, disabled=staffing_message != '', **{'x-model.boolean':'staffing'}) }}</div>
+<div class="col-12">
+{% if staffing_message == '' and c.VOLUNTEER_APP_URL %}
+    <div class="form-text">Volunteer Application</div>
+    Interested in volunteering for {{ c.EVENT_NAME }}? Fill out our <a href="{{ c.VOLUNTEER_APP_URL }}" target="_blank">volunteer application</a>!
+{% else %}
+    {{ form_macros.input(staffing_info.staffing, label_text=label, help_text=staffing_message, disabled=staffing_message != '', **{'x-model.boolean':'staffing'}) }}
+{% endif %}
+</div>
 
 {% if c.PUBLIC_DEPARTMENT_OPTS_WITH_DESC|length > 1 %}
 </div>
