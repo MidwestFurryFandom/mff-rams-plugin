@@ -34,7 +34,12 @@
         You may have one room in the dealer block for every three <strong>assigned and completed</strong> dealer or dealer assistant badges on your application.
     </p>
 
-    <p>We encourage people from the same dealer group to room together to help accommodate as many people as possible.</p>
+    <p>
+        We encourage people from the same dealer group to room together to help accommodate as many people as possible.
+        {% if application.attendee.group.same_email_badges or True %}
+        If you can, please also <strong>update your dealer assistants's information</strong> to use unique email addresses -- this helps us a lot when processing room awards!
+        {% endif %}
+    </p>
     {% endif %}
 
     {% if show_staff_rates %}

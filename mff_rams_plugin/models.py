@@ -133,8 +133,9 @@ class Group:
             return True
 
     @property
-    def completed_badges(self):
-        return [a for a in self.attendees if not a.is_unassigned and not a.placeholder]
+    def same_email_badges(self):
+        emails = [a.email for a in self.attendees if not a.is_unassigned and not a.placeholder]
+        return len(emails) != len(set(emails))
 
     @property
     def table_photo(self):
