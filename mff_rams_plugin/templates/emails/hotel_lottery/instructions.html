@@ -5,7 +5,7 @@
 <p>Greetings!</p>
 
 <p>
-    The {{ c.EVENT_NAME }} hotel lottery is NOW OPEN! We have <strong>new, extra streamlined process</strong> so please take the time to read about it below.
+    The {{ c.EVENT_NAME }} hotel lottery is NOW OPEN! Please take the time to read about how to enter the lottery below.
 </p>
 
 <p>
@@ -34,7 +34,7 @@
     {% endif %}
     <li>If you're joining a room group, you will be shown the policies for room groups. Read them carefully, then click "Continue". Look up the group using its confirmation number and the group leader's email address, then confirm that you want to join that group.</li>
     <li>Once you have completed your entry, you will get an entry confirmation to your email address with all the information you submitted, along with your lottery confirmation number. If you completed a room or suite entry, you will also be able to create a room group.</li>
-    {% if account.hotel_eligible_attendees|length > 1 %}<li>You can return to your homepage to enter on behalf of the other people under your account. Registrations on your account will NOT be automatically added to your room group.</li>{% endif %}
+    {% if account.hotel_eligible_attendees|length > 1 %}<li>If you create a room group, other registrations on your account will NOT be automatically added to your room group. You can use the room group management page to add them, or return to your homepage to enter on their behalf.</li>{% endif %}
 </ol>
 
 <p>Once you have finished registering, you can now relax and we'll let you know if you were selected soon after the lottery closes!</p>
