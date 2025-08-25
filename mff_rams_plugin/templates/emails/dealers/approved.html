@@ -2,9 +2,15 @@
 <head></head>
 <body>
 {{ group.name }} has been approved as a {{ c.EVENT_NAME }} Dealer for this coming {{ event_dates() }}!
+{% if group.dealer_payment_due %}
 You can pay the {{ group.cost|format_currency }} you owe using the credit card button
 <a href="{{ c.URL_BASE }}/preregistration/group_members?id={{ group.id }}">on this page</a>.
 Payment is expected by: {{ group.dealer_payment_due|datetime_local }} or your application may be removed and your tables filled by another applicant.
+{% elif c.SIGNNOW_DEALER_FOLDER_ID %}
+Please look out for an email to sign our terms and conditions for vending at {{ c.EVENT_NAME }} in the near future.
+After signing them, you will be able to pay the {{ group.cost|format_currency }} you owe using the credit card button
+<a href="{{ c.URL_BASE }}/preregistration/group_members?id={{ group.id }}">on this page</a>.
+{% endif %}
 
 {% if group.unassigned %}
     <br/> <br/>

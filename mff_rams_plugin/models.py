@@ -106,11 +106,16 @@ class Group:
     @property
     def dealer_payment_due(self):
         if self.approved:
-            return self.approved + timedelta(c.DEALER_PAYMENT_DAYS)
+            if c.SIGNNOW_DEALER_FOLDER_ID or self.terms_conditions_doc:
+                if not self.terms_conditions_doc:
+                    return
+                return self.terms_conditions_doc.created + timedelta(c.DEALER_PAYMENT_DAYS)
+            else:
+                return self.approved + timedelta(c.DEALER_PAYMENT_DAYS)
 
     @property
     def dealer_payment_is_late(self):
-        if self.approved:
+        if self.dealer_payment_due:
             return localized_now() > localize_datetime(self.dealer_payment_due)
 
     @presave_adjustment
