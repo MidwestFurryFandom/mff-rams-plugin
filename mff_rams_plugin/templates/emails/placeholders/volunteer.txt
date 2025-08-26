@@ -4,4 +4,4 @@ Thanks for volunteering to help the staff of {{ c.EVENT_NAME }}!  You've been ad
 
 If you have any questions, please email us at registration@furfest.org
 
-{{ c.STOPS_EMAIL_SIGNATURE }}
+{{ email_signature }}

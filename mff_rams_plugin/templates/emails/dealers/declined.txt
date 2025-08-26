@@ -8,4 +8,4 @@ Please create an account if you do not already have one and include your 10 digi
 
 Alternatively, you can also email hotel@furfest.org.
 
-{{ c.MARKETPLACE_EMAIL_SIGNATURE }}
+{{ email_signature }}
