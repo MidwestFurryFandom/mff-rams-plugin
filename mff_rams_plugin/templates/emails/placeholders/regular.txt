@@ -6,4 +6,4 @@ You may also choose to upgrade your membership at this time, for an additional f
 
 If you have any questions, please email us at registration@furfest.org
 
-{{ c.REGDESK_EMAIL_SIGNATURE }}
+{{ email_signature }}

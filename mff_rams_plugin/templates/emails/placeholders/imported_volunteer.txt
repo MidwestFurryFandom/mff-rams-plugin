@@ -10,4 +10,4 @@ If you want to return to {{ c.EVENT_NAME }} but don't want to volunteer again, j
 
 Please let us know if you have any questions.
 
-{{ c.STOPS_EMAIL_SIGNATURE }}
+{{ email_signature }}

@@ -4,4 +4,4 @@ Thanks again for registering as a Dealer for this year's {{ c.EVENT_NAME }}.  Ou
 
 You can use the credit card button on your group's page to pay the {{ group.amount_unpaid|format_currency }} that you owe: {{ c.URL_BASE }}/preregistration/group_members?id={{ group.id }}
 
-{{ c.MARKETPLACE_EMAIL_SIGNATURE }}
+{{ email_signature }}

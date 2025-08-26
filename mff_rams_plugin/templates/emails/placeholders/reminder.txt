@@ -6,4 +6,4 @@ We need to know whether you're coming, so please let us know by accepting your r
 
 You won't be able to check-in at the event until your registration is complete!
 
-{{ c.REGDESK_EMAIL_SIGNATURE }}
+{{ email_signature }}

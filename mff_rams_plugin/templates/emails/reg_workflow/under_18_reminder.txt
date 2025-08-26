@@ -14,4 +14,4 @@ If you have any questions please email registration@furfest.org
 
 We look forward to seeing you at {{ c.EVENT_NAME_AND_YEAR }}!
 
-{{ c.REGDESK_EMAIL_SIGNATURE }}
+{{ email_signature }}
