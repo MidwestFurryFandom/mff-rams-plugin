@@ -213,9 +213,11 @@ class Attendee:
 
     @presave_adjustment
     def check_pit_badge(self):
-        if self.badge_status != self.orig_value_of('badge_status') and not self.is_valid \
-                and self.birthdate and self.age_now_or_at_con < c.ACCOMPANYING_ADULT_AGE:
-            check_pit_badge.delay(self.id)
+        if self.birthdate and self.age_now_or_at_con < c.ACCOMPANYING_ADULT_AGE and self.managers and (
+                self.badge_status != self.orig_value_of('badge_status') or self.managers[0].pit_badge and 
+                self.managers[0].pit_badge.badge_status == c.PENDING_STATUS):
+            log.error(bool(self.badge_status == c.COMPLETED_STATUS and self.badge_cost and self.is_paid))
+            check_pit_badge.delay(self.id, bool(self.badge_status == c.COMPLETED_STATUS and self.badge_cost and self.is_paid))
 
     @presave_adjustment
     def kid_in_tow_badge(self):
@@ -486,7 +488,7 @@ class Attendee:
 class AttendeeAccount:
     @property
     def pit_badge(self):
-        for attendee in self.valid_attendees:
+        for attendee in self.valid_attendees + self.pending_attendees:
             if attendee.badge_type == c.PARENT_IN_TOW_BADGE:
                 return attendee
 
@@ -498,7 +500,7 @@ class AttendeeAccount:
     def paid_minors(self):
         paid_minors = []
         for minor in [a for a in self.valid_attendees if a.birthdate and a.age_now_or_at_con < c.ACCOMPANYING_ADULT_AGE]:
-            if minor.badge_cost and minor.is_paid:
+            if minor.badge_cost and minor.is_paid and minor.badge_status != c.NOT_ATTENDING:
                 paid_minors.append(minor)
         return paid_minors
 
