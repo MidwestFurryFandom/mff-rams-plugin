@@ -23,7 +23,7 @@ from uber.payments import ReceiptManager, TransactionRequest
 
 
 @celery.task
-def check_pit_badge(badge_id, mark_complete):
+def check_pit_badge(badge_id):
     with Session() as session:
         try:
             badge = session.attendee(badge_id)
@@ -33,13 +33,9 @@ def check_pit_badge(badge_id, mark_complete):
         if badge.managers:
             account = badge.managers[0]
             pit_badge = account.pit_badge
-            if pit_badge:
-                if (account.paid_minors or mark_complete) and pit_badge.badge_status == c.PENDING_STATUS:
-                    pit_badge.badge_status = c.COMPLETED_STATUS
-                elif not account.paid_minors:
-                    pending_minors = [a for a in account.attendees if a.badge_status == c.PENDING_STATUS and 
-                                      a.birthdate and a.age_now_or_at_con < c.ACCOMPANYING_ADULT_AGE]
-                    if not pending_minors:
-                        pit_badge.badge_status = c.INVALID_STATUS
-                session.add(pit_badge)
+            pending_minors = [a for a in account.attendees if a.badge_status == c.PENDING_STATUS and 
+                              a.birthdate and a.age_now_or_at_con < c.ACCOMPANYING_ADULT_AGE]
+            if pit_badge and not account.paid_minors and not pending_minors:
+                pit_badge.badge_status = c.INVALID_STATUS
+            session.add(pit_badge)
             session.commit()

@@ -142,8 +142,8 @@ class ExtraConfig:
             account = session.current_attendee_account()
             cart = PreregCart(listify(PreregCart.unpaid_preregs.values()))
             pit_in_cart = any([a for a in cart.attendees if a.badge_type == c.PARENT_IN_TOW_BADGE])
-            paid_minors_in_cart = any([a for a in cart.attendees if a.age_now_or_at_con < c.ACCOMPANYING_ADULT_AGE \
-                                    and a.calculate_badge_cost()])
+            paid_minors_in_cart = any([a for a in cart.attendees if a.birthdate and a.age_now_or_at_con < c.ACCOMPANYING_ADULT_AGE \
+                                       and a.total_cost_if_valid])
             return account.pit_eligible and not pit_in_cart or (not account.pit_badge and not pit_in_cart and paid_minors_in_cart)
 
     @request_cached_property

@@ -213,11 +213,9 @@ class Attendee:
 
     @presave_adjustment
     def check_pit_badge(self):
-        if self.birthdate and self.age_now_or_at_con < c.ACCOMPANYING_ADULT_AGE and self.managers and (
-                self.badge_status != self.orig_value_of('badge_status') or self.managers[0].pit_badge and 
-                self.managers[0].pit_badge.badge_status == c.PENDING_STATUS):
-            log.error(bool(self.badge_status == c.COMPLETED_STATUS and self.badge_cost and self.is_paid))
-            check_pit_badge.delay(self.id, bool(self.badge_status == c.COMPLETED_STATUS and self.badge_cost and self.is_paid))
+        if self.birthdate and self.age_now_or_at_con < c.ACCOMPANYING_ADULT_AGE and self.managers and \
+                self.badge_status != self.orig_value_of('badge_status'):
+            check_pit_badge.delay(self.id)
 
     @presave_adjustment
     def kid_in_tow_badge(self):
@@ -246,7 +244,8 @@ class Attendee:
 
     def calculate_badge_cost(self, use_promo_code=False, include_price_override=True):
         # Adds overrides for a couple special cases where a badge should be free
-        if self.paid == c.NEED_NOT_PAY or self.badge_status == c.NOT_ATTENDING or self.badge_type == c.PARENT_IN_TOW_BADGE:
+        if self.paid == c.NEED_NOT_PAY or self.badge_status == c.NOT_ATTENDING or \
+                self.badge_type in [c.PARENT_IN_TOW_BADGE, c.KID_IN_TOW_BADGE]:
             return 0
         elif self.overridden_price is not None and include_price_override:
             return self.overridden_price
