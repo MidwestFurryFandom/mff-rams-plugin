@@ -312,6 +312,9 @@ class Attendee:
 
     @property
     def cannot_abandon_badge_reason(self):
+        return self.cannot_abandon_badge_check()
+    
+    def cannot_abandon_badge_check(self, including_last_adult=True):
         from uber.custom_tags import email_only
         if self.checked_in:
             return "This badge has already been picked up."
@@ -328,7 +331,7 @@ class Attendee:
             )
 
         reason = ""
-        if c.ATTENDEE_ACCOUNTS_ENABLED and self.managers:
+        if c.ATTENDEE_ACCOUNTS_ENABLED and self.managers and including_last_adult:
             account = self.managers[0]
             other_adult_badges = [a for a in account.valid_adults if a.id != self.id]
             if account.badges_needing_adults and not other_adult_badges:
@@ -505,7 +508,8 @@ class AttendeeAccount:
 
     @property
     def hotel_eligible_dealers(self):
-        return [attendee for attendee in self.hotel_eligible_attendees if attendee.is_dealer and attendee.badge_status != c.UNAPPROVED_DEALER_STATUS]
+        return [attendee for attendee in self.hotel_eligible_attendees if attendee.is_dealer and
+                attendee.badge_status != c.UNAPPROVED_DEALER_STATUS]
 
     @property
     def hotel_eligible_staff(self):
