@@ -213,7 +213,7 @@ class Attendee:
 
     @presave_adjustment
     def check_pit_badge(self):
-        if self.birthdate and self.age_now_or_at_con < c.ACCOMPANYING_ADULT_AGE and self.managers and \
+        if self.birthdate and self.age_now_or_at_con < 18 and self.managers and \
                 self.badge_status != self.orig_value_of('badge_status'):
             check_pit_badge.delay(self.id)
 
@@ -501,7 +501,7 @@ class AttendeeAccount:
     @property
     def paid_minors(self):
         paid_minors = []
-        for minor in [a for a in self.valid_attendees if a.birthdate and a.age_now_or_at_con < c.ACCOMPANYING_ADULT_AGE]:
+        for minor in [a for a in self.valid_attendees if a.birthdate and a.age_now_or_at_con < 18]:
             if minor.badge_cost and minor.is_paid and minor.badge_status != c.NOT_ATTENDING:
                 paid_minors.append(minor)
         return paid_minors
