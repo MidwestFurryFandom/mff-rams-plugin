@@ -218,8 +218,8 @@ class Attendee:
 
     @presave_adjustment
     def check_pit_badge(self):
-        if self.badge_status != self.orig_value_of('badge_status') and not self.is_valid \
-                and self.birthdate and self.age_now_or_at_con < c.ACCOMPANYING_ADULT_AGE:
+        if self.birthdate and self.age_now_or_at_con < 18 and self.managers and \
+                self.badge_status != self.orig_value_of('badge_status'):
             check_pit_badge.delay(self.id)
 
     @presave_adjustment
@@ -249,7 +249,8 @@ class Attendee:
 
     def calculate_badge_cost(self, use_promo_code=False, include_price_override=True):
         # Adds overrides for a couple special cases where a badge should be free
-        if self.paid == c.NEED_NOT_PAY or self.badge_status == c.NOT_ATTENDING or self.badge_type == c.PARENT_IN_TOW_BADGE:
+        if self.paid == c.NEED_NOT_PAY or self.badge_status == c.NOT_ATTENDING or \
+                self.badge_type in [c.PARENT_IN_TOW_BADGE, c.KID_IN_TOW_BADGE]:
             return 0
         elif self.overridden_price is not None and include_price_override:
             return self.overridden_price
@@ -316,6 +317,9 @@ class Attendee:
 
     @property
     def cannot_abandon_badge_reason(self):
+        return self.cannot_abandon_badge_check()
+    
+    def cannot_abandon_badge_check(self, including_last_adult=True):
         from uber.custom_tags import email_only
         if self.checked_in:
             return "This badge has already been picked up."
@@ -332,7 +336,7 @@ class Attendee:
             )
 
         reason = ""
-        if c.ATTENDEE_ACCOUNTS_ENABLED and self.managers:
+        if c.ATTENDEE_ACCOUNTS_ENABLED and self.managers and including_last_adult:
             account = self.managers[0]
             other_adult_badges = [a for a in account.valid_adults if a.id != self.id]
             if account.badges_needing_adults and not other_adult_badges:
@@ -491,7 +495,7 @@ class Attendee:
 class AttendeeAccount:
     @property
     def pit_badge(self):
-        for attendee in self.valid_attendees:
+        for attendee in self.valid_attendees + self.pending_attendees:
             if attendee.badge_type == c.PARENT_IN_TOW_BADGE:
                 return attendee
 
@@ -502,14 +506,15 @@ class AttendeeAccount:
     @property
     def paid_minors(self):
         paid_minors = []
-        for minor in [a for a in self.valid_attendees if a.birthdate and a.age_now_or_at_con < c.ACCOMPANYING_ADULT_AGE]:
-            if minor.badge_cost and minor.is_paid:
+        for minor in [a for a in self.valid_attendees if a.birthdate and a.age_now_or_at_con < 18]:
+            if minor.badge_cost and minor.is_paid and minor.badge_status != c.NOT_ATTENDING:
                 paid_minors.append(minor)
         return paid_minors
 
     @property
     def hotel_eligible_dealers(self):
-        return [attendee for attendee in self.hotel_eligible_attendees if attendee.is_dealer and attendee.badge_status != c.UNAPPROVED_DEALER_STATUS]
+        return [attendee for attendee in self.hotel_eligible_attendees if attendee.is_dealer and
+                attendee.badge_status != c.UNAPPROVED_DEALER_STATUS]
 
     @property
     def hotel_eligible_staff(self):

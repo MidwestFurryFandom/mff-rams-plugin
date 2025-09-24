@@ -3,7 +3,6 @@
 {% if warn_free_badge %}
 <script type="text/javascript">
     var warnFreeBadge = function() {
-        console.log("Whee")
         bootbox.confirm({
         title: "Wait! You qualify for a free badge!",
         message: `<p>Any account with at least one paid registration under 17 years old can add an "accompanying adult" badge for free.</p> 
@@ -18,7 +17,7 @@
                 className: 'btn-primary'
             },
             cancel: {
-                label: 'Oops, let me redeem my free badge!',
+                label: 'Let me redeem my free badge!',
                 className: 'btn-success'
             }
         },
