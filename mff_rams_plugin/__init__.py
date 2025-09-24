@@ -29,8 +29,8 @@ def prereg_cart_checks(self, session):
     account = session.current_attendee_account()
     for attendee in self.attendees:
         if attendee.badge_type == c.PARENT_IN_TOW_BADGE:
-            paid_minors_in_cart = any([a for a in self.attendees if a.age_now_or_at_con < c.ACCOMPANYING_ADULT_AGE \
-                                    and a.calculate_badge_cost()])
+            paid_minors_in_cart = any([a for a in self.attendees if a.birthdate and a.age_now_or_at_con < 18 \
+                                       and a.total_cost_if_valid])
             if not account.pit_eligible and not paid_minors_in_cart:
                 return "You cannot register an Accompanying Adult badge when you have no paid badges under 18 years old."
 
