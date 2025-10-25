@@ -1,0 +1,7 @@
+Thank you for registering as a Dealer ({{ group.name }}) for this year's Midwest Furfest! You are now able to review and submit your group payment and dealer agreement digital signature form. You should have already received an email with your dealer agreement. After signing the agreement, you can use the credit card button on your group page to review and pay your balance: {{ c.URL_BASE }}/preregistration/group_members?id={{ group.id }}
+
+Please post payment ASAP to confirm your space. If for any reason you are unable to deal at Midwest FurFest, please notify us promptly. Full refunds can be made if we receive your cancellation prior to October 31, 2025. After that date, refunds are possible only if we are able to resell your space.
+
+Any questions regarding Dealers Den operations should be directed to Midwest FurFest Dealers Room <dealers@furfest.org>
+
+{{ email_signature }}

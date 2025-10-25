@@ -167,6 +167,11 @@ class AdminTableInfo:
 @MagForm.form_mixin
 class ArtistMarketplaceForm:
     def terms_accepted_label(self):
-        return Markup("I have read both the <a href='https://www.furfest.org/vendors/menagerie/rules' target='_blank'>general rules</a> "
-                      " for the artist alley and marketplace and the <a href='https://www.furfest.org/vendors/menagerie/marketplace' target='_blank'>"
-                      f"specific rules</a> for the artist marketplace and understand the requirements, including the ${c.ARTIST_MARKETPLACE_FEE} fee.")
+        return Markup(
+            "I have read both the <a href='https://www.furfest.org/vendors/menagerie/rules' target='_blank'>General Rules for the Artist Alley</a> "
+            "and the <a href='https://www.furfest.org/vendors/menagerie/marketplace' target='_blank'>Specific Rules for the Artist Marketplace</a>, "
+            "and by submitting this form, I agree to be bound by the terms and conditions of the Rules. I understand that, if I am selected to "
+            f"receive a space in the Artist Marketplace, a non-refundable fee of ${c.ARTIST_MARKETPLACE_FEE} is required to secure my space. "
+            "Further, I agree to defend, indemnify, and hold harmless Midwest Furry Fandom, Inc., including its officers, employees, and agents, "
+            "from any third-party claims arising from or related to my breach of the Rule, including without limitation, intellectual property claims."
+        )
