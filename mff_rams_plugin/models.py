@@ -9,6 +9,7 @@ from sqlalchemy.types import Boolean, Integer, Numeric
 from sqlalchemy.ext.hybrid import hybrid_property
 
 from uber.models import Session
+from uber.badge_funcs import get_real_badge_type
 from uber.config import c
 from uber.utils import add_opt, localized_now, localize_datetime, remove_opt, normalize_email_legacy
 from uber.models.types import Choice, DefaultColumn as Column, MultiChoice
@@ -25,6 +26,30 @@ class SessionMixin:
             Attendee.ribbon == c.STAFF_RIBBON,
             Attendee.badge_type == c.GUEST_BADGE))\
             .order_by(Attendee.full_name).all()
+
+    def update_badge(self, attendee):
+        from uber.badge_funcs import needs_badge_num
+
+        if attendee.checked_in:
+            return
+
+        badge_type = c.STAFF_BADGE if c.STAFF_RIBBON in attendee.ribbon_ints else get_real_badge_type(attendee.badge_type)
+        lower_bound, upper_bound = c.BADGE_RANGES[badge_type]
+
+        if attendee.active_badge and attendee.active_badge.attendee_id:
+            if lower_bound <= attendee.badge_num <= upper_bound:
+                return
+            attendee.active_badge.unassign()
+            self.add(attendee.active_badge)
+        
+        if needs_badge_num(attendee):
+            new_badge = self.get_next_badge_num(badge_type)
+
+            if not new_badge:
+                return
+
+            new_badge.assign(attendee.id)
+            self.add(new_badge)
 
 
 @Session.model_mixin

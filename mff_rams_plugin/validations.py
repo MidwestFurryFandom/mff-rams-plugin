@@ -3,8 +3,9 @@ from wtforms.validators import ValidationError, StopValidation
 from markupsafe import Markup
 
 from .config import c
+from uber.badge_funcs import get_real_badge_type
 from uber.validations import (ignore_unassigned_and_placeholders, TableInfo, PersonalInfo, OtherInfo, PreregOtherInfo,
-                              BadgeExtras, CheckInForm, ContactInfo)
+                              BadgeExtras, AdminBadgeFlags, CheckInForm, ContactInfo)
 from uber.utils import get_age_conf_from_birthday
 
 
@@ -96,6 +97,18 @@ def badge_upgrade_sold_out(form, field):
         raise ValidationError("Sponsor badges have sold out.")
     elif field.data == c.SHINY_BADGE and not c.SHINY_BADGE_AVAILABLE:
         raise ValidationError("Shiny Sponsor badges have sold out.")
+
+
+@AdminBadgeFlags.field_validation('badge_num')
+def not_in_range(form, field):
+    if not field.data or form.no_badge_num and form.no_badge_num.data:
+        return
+
+    badge_type = c.STAFF_BADGE if c.STAFF_RIBBON in form.model.ribbon_ints else get_real_badge_type(form.model.badge_type)
+    lower_bound, upper_bound = c.BADGE_RANGES[badge_type]
+    if not (lower_bound <= int(field.data) <= upper_bound):
+        raise ValidationError(f'Badge number {field.data} is out of range for badge type \
+                              {c.BADGES[badge_type]} ({lower_bound} - {upper_bound})')
 
 
 CheckInForm.field_validation.validations['badge_printed_name'].update(PersonalInfo.field_validation.validations['badge_printed_name'])
