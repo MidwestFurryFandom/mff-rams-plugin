@@ -20,7 +20,6 @@ AutomatedEmailFixture(
     '{EVENT_NAME} registration confirmed',
     'reg_workflow/attendee_confirmation.html',
     lambda a: not a.placeholder and a.badge_type in [c.PARENT_IN_TOW_BADGE, c.KID_IN_TOW_BADGE],
-    needs_approval=False,
     allow_at_the_con=True,
     ident='kitpit_badge_confirmed')
 
