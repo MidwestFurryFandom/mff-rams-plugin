@@ -1,6 +1,6 @@
 {{ group.leader.first_name }},
 
-Thanks again for registering as a Dealer for this year's {{ c.EVENT_NAME }}. Your Dealer group ({{ group.name }}) is still unpaid - please post payment to confirm your group no later than {{ group.dealer_payment_due|datetime_local }}.
+Thanks again for registering as a Dealer for this year's {{ c.EVENT_NAME }}. Our records indicate that your Dealer group ({{ group.name }}) is still unpaid, and if we do not receive payment by {{ group.dealer_payment_due|datetime_local }}, your Dealer group will be declined.
 
 Use the credit card button on your group's page to pay the {{ group.amount_unpaid|format_currency }} that you owe: {{ c.URL_BASE }}/preregistration/group_members?id={{ group.id }}
 

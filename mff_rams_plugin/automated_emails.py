@@ -1,7 +1,7 @@
 from uber.automated_emails import ArtShowAppEmailFixture, AutomatedEmailFixture, MarketplaceEmailFixture, StopsEmailFixture
 from uber.config import c
 from uber.models import Attendee, AttendeeAccount, AutomatedEmail, LotteryApplication
-from uber.utils import before, days_before
+from uber.utils import before, days_before, days_after
 
 
 AutomatedEmailFixture(
@@ -15,31 +15,50 @@ AutomatedEmailFixture(
 )
 
 
+AutomatedEmailFixture(
+    Attendee,
+    '{EVENT_NAME} registration confirmed',
+    'reg_workflow/attendee_confirmation.html',
+    lambda a: not a.placeholder and a.badge_type in [c.PARENT_IN_TOW_BADGE, c.KID_IN_TOW_BADGE],
+    allow_at_the_con=True,
+    ident='kitpit_badge_confirmed')
+
+
+MarketplaceEmailFixture(
+        'Payment Now Due for your Midwest FurFest Dealer Group and Registrations',
+        'dealers/payment_ready.txt',
+        lambda g: g.status in c.DEALER_ACCEPTED_STATUSES and days_after(30, g.approved)() and g.is_unpaid,
+        # query=and_(
+        #     Group.status == c.APPROVED,
+        #     Group.approved < (func.now() - timedelta(days=30)),
+        #     Group.is_unpaid == True),
+        needs_approval=True,
+        ident='dealer_reg_payment_reminder')
+
+
 MarketplaceEmailFixture(
     'Your {EVENT_NAME} ({EVENT_DATE}) Dealer registration is due in one week',
     'dealers/payment_reminder.txt',
     lambda g: g.status in [c.APPROVED, c.SHARED] and days_before(7, g.dealer_payment_due, 2)() and g.is_unpaid,
-    needs_approval=False,
-    ident='dealer_reg_payment_reminder_due_soon_mff')
+    ident='dealer_reg_payment_reminder_due_soon')
 
 MarketplaceEmailFixture(
     'Last chance to pay for your {EVENT_NAME} ({EVENT_DATE}) Dealer registration',
-    'dealers/payment_reminder.txt',
+    'dealers/payment_reminder_final.txt',
     lambda g: g.status in [c.APPROVED, c.SHARED] and days_before(2, g.dealer_payment_due)() and g.is_unpaid,
-    needs_approval=False,
-    ident='dealer_reg_payment_reminder_last_chance_mff')
+    ident='dealer_reg_payment_reminder_last_chance')
 
 MarketplaceEmailFixture(
     'Your {EVENT_NAME} ({EVENT_DATE}) dealer application has been waitlisted',
     'dealers/pending_waitlisted.txt',
     lambda g: g.status == c.WAITLISTED and (not c.DEALER_REG_DEADLINE or g.registered < c.DEALER_REG_DEADLINE),
-    ident='dealer_pending_now_waitlisted_mff')
+    ident='dealer_pending_now_waitlisted')
 
 MarketplaceEmailFixture(
     'Your {EVENT_NAME} ({EVENT_DATE}) dealer application has been declined',
     'dealers/declined.txt',
     lambda g: g.status == c.DECLINED,
-    ident='dealer_pending_declined_mff')
+    ident='dealer_pending_declined')
 
 ArtShowAppEmailFixture(
     '{EVENT_NAME} Charity Donations needed',
