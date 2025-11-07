@@ -318,7 +318,7 @@ c.STATIC_HASH_LIST = {
     "js/bootstrap.min.js": "sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa",
     "js/resend-email-form.js": "sha384-sjHVXMIXb0Tk+zIRl25hLv0+6o8VfA+Pc/GHyAg6BkiafRFOp1EDVXTTLH7+mmfL",
     "js/jquery-3.1.1.min.js": "sha384-3ceskX3iaEnIogmQchP8opvBy3Mi7Ce34nWjpBIwVTHfGYWQS9jwHDVRnpKKHJg7",
-    "js/badge_num_barcode.js": "sha384-/SnNKSIYNqoKfPQPzjlVzOGhKprpwnfULI10YIO53t3TL2ESShXD8zqgos8XsCkz",
+    "js/badge_num_barcode.js": "sha384-B0f2KJPTNNN8QUSNx152KNdiool8H6pVyr2v96/1Brh07++M/kxERQcPtocpIVLe",
     "js/servertimecheck.js": "sha384-Y5HavH5aTQVEYJlpWLWAwJ+k2ojugn6r533PoMGcznySyW9Uzq5PAZxyjsAKrqrT",
     "js/load-attendee-modal.js": "sha384-8lGUJFplMQ3ervQ4EZBhl6Zxf+PGlCCwQFXj3mqcysEEFzgvVdTNiTza+/KgKOFh",
     "js/check-duplicate-email.js": "sha384-/APjfl/cVRBfLU8+wA5ZSegLaUtMkZcNur2c+SBowl4buJZp6hv3ngGt6iT9Vqna",
