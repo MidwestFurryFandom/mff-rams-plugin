@@ -39,7 +39,7 @@
         {% if cart.total_cost > 0 %}
             {% if c.AT_THE_CON and c.SPIN_TERMINAL_AUTH_KEY %}
                 <a {% if warn_free_badge %}onClick="warnFreeBadge()"{% else %}href="at_door_confirmation"{% endif %} class="btn btn-success">Confirm Registrations and Get Check-in Barcode</a>
-            {% else %}
+            {% elif c.ONLINE_PAYMENT_AVAILABLE %}
                 {% if warn_free_badge %}
                 <div class="d-none">{{ stripe_form('prereg_payment', text="Pay with Card Now", stripe_button_id="prereg-payment") }}</div>
                 <button type="button" class="btn btn-info" onClick="warnFreeBadge()">Pay with Card Now</button>
