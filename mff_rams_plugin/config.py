@@ -327,7 +327,7 @@ c.STATIC_HASH_LIST = {
     "styles/login.css": "sha384-tKT6+xUzjqdQAhN/87ZGyqhXpazxNuXTF24z2CxXdCPs7XJDCUgj5WIynPxWGOsf",
     "theme/prereg.css": "sha384-D+G/Wl80zewz1Mx9jsjqQB5sJO9TjJXC/yWfMQSSfYOB9RAGbW2WPWLcH32G7jnY",
     "theme/prereg_extra.css": "sha384-1Y2O5xB/ObfxLxE/FH0iH6/XdsbKdTIHvDGSDP7coXZEH+RhmaDXBPCAYva0yube",
-    "deps/jquery/jquery-migrate-3.4.1.js": "sha384-aofvYCRoEEBAS73AgmofcfsuajpnnQR42KM5H/3ZdlcNLu035OIi/ny1Lp5MLrbR",
+    "deps/jquery/jquery-migrate-3.4.1.js": "sha384-cG5RCHYtwmrSoNV1o0el92fuszs0g3Q7LmgwVE5f6u2Yn/LWDcUeEsDdmAhV0D3e",
     "deps/selectToAutocomplete/jquery-1.11.1.min.js": "sha384-UM1JrZIpBwVf5jj9dTKVvGiiZPZTLVoq4sfdvIe9SBumsvCuv6AHDNtEiIb5h1kU",
     "deps/selectToAutocomplete/jquery-ui.min.js": "sha384-TkwOpfRia7iUdElqSOlUgVT6+cZb8lR/wsXT91RPkrUYQAoCyG3SlfVX8c0Ey5IR",
     "deps/selectToAutocomplete/jquery.select-to-autocomplete.js": "sha384-qUnRY5v9UDiLpcdltjLZlygKiMN2Atj4Ayqp+/YJKRIs/GW1mdEvDuFLohZ9VtIe",
