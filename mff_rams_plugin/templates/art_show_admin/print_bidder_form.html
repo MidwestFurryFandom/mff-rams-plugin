@@ -1,0 +1,83 @@
+{% extends 'static_views/static_base.html' %}
+
+{% include 'art_show_common/print.html' with context %}
+
+{% block page %}
+{% set printable = True %}
+{% include 'forms/art_show/admin_bidder_signup.html' with context %}
+
+<span class="text-center pagebreak">
+<p>
+    By signing this form, the undersigned ("you"or "your") acknowledges the receipt and review of these terms and conditions and 
+    the Art Show Rules (https://files.furfest.org/artshow/MFF-art-show-rules.pdf) and such terms constitute a legal, valid, binding, and enforceable 
+    contract between Midwest Furry Fandom("Auctioneer"),and you. Theseterms and conditions will control over any conflicting or inconsistent terms 
+    contained inthe Art Show Rules, or other documentation regarding the Art show.Your participation in the auction to be held during the 2025 
+    Midwest FurFest, December 4-7, 2025 ("Auction"), though any means, is further evidence of your agreement to be bound by these terms.
+</p>
+<p>
+    The Auctioneer shall sell by auction works of art and other items ("Lot") consigned to be sold at theAuction held by the Auctioneer. 
+    The highest price at the completion of the Auction, the "Auction Price,"and the person who has placed a bid at the highest price shall be 
+    the "Successful Bidder."
+</p>
+<p>
+    By registering to bid, you represent that you are at least eighteen (18) years of age and that you are otherwise legally able to enter into 
+    a contract in the state of Illinois. These terms and conditions shall be governed by the laws of the State of Illinois, without regard to 
+    its conflict of laws principles.
+</p>
+<p>
+    You hereby assume all risks in connection with your participation, or attempted participation,in the Auction,and waive any and all claims or 
+    causes of action against the Auctioneer arising from, without limitation, all risks associated with: (i) your presence at the Auction site; 
+    (ii) removal, transport, or use of any Lot(s);(iii) your breach of any representations or warranties madeto the Auctioneerand/or (iii) any harm, 
+    injury, or damage to you or your property resulting from acts other than those caused exclusively by Auctioneer’s gross negligence or intentional 
+    misconduct. Further, you agree to indemnify the Auctioneer from any third-party claims related to therisksdescribed in the preceding sentence.
+</p>
+<p>
+    ALL ITEMS OFFERED FOR SALE AT THE AUCTION ARE ON AN "AS IS"BASISAND THE AUCTIONEER HEREBY DISCLAIMS ANY WARRANTIES OF ANY KIND EITHER EXPRESSED 
+    OR IMPLIED, INCLUDING BUT NOT LIMITED TO WARRANTIES OF TITLE OR IMPLIED WARRANTIES OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+</p>
+<p>
+    You acknowledge that you may not retract any bids once submitted or acknowledged by the Auctioneer. You acknowledge and agree that Auctioneer 
+    is acting in reliance on tendered bids in the conduct of the Auction, and that bid retraction is disruptive and interferes with the Auction, 
+    and that, as an inducement for Auctioneerto accept your registration and for you to bid at the Auction, you agree not to withdraw or to attempt 
+    to withdraw any bid tendered by you or on your behalf.
+</p>
+<p>
+    Auctioneer will regulate all matters relating to the conduct of the Auction at Auctioneer’s soleand complete discretionand will resolve any and 
+    all disputes related to the Auction. The final determination of any winning bid will be made by the Auctioneer.
+</p>
+<p>
+    ALL SALES ARE FINAL. NO REFUNDS OR RETURNS.
+</p>
+<p>
+    If you are certified as the winning bid on a Lot(the Successful Bidder), you will be contractually obligated to pay the Auction Priceand any 
+    applicable sales tax(the "Purchase Price").However, title and ownership of the Lot will not pass from the seller to you until payment is made 
+    and clears.
+</p>
+<p>
+    All Lots are to be picked up between 10:00amand 4:00pm onthe Sunday immediately following the Actionat the location designated by the Auctioneer.
+</p>
+<p>
+    If you fail to pay for your Lot within the time provided, you will be deemed to have abandoned any interestin the Lot but you will remain liable 
+    for the Purchase Price. Unpaid Lots may be retained by the seller, resold, or otherwise disposed of. Failuretopick-upandpayforany Lots that you 
+    have the winning bid on could resultin you being unable to attend Midwest FurFest in the future.
+</p>
+</span>
+<br/>
+<div class="row g-3">
+  <div class="col-12 col-sm-6">
+    <label class="form-text">Signature</label>
+    <div class="mb-3">
+        ____________________________________________________________
+    </div>
+  </div>
+</div>
+
+<div class="row g-3">
+  <div class="col-12 col-sm-6">
+    <label class="form-text">Date</label>
+    <div class="mb-3">
+      ______________________________
+    </div>
+  </div>
+</div>
+{% endblock %}
