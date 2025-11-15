@@ -111,6 +111,19 @@ def not_in_range(form, field):
                               {c.BADGES[badge_type]} ({lower_bound} - {upper_bound})')
 
 
+@CheckInForm.field_validation('instructions_followed')
+def instructions_were_followed(form, field):
+    if form.model.age_group_conf['consent_form'] and not field.data:
+        if form.model.age_now_or_at_con < c.ACCOMPANYING_ADULT_AGE:
+            action_needed = "this attendee has an accompanying adult with them"
+        else:
+            action_needed = "you have collected the signed consent form for this attendee"
+
+        raise ValidationError(f"Please confirm that {action_needed}.")
+    elif form.model.check_in_notes and not field.data:
+        raise ValidationError(f"Please confirm that you've reviewed and followed the check-in instructions for this attendee.")
+
+
 CheckInForm.field_validation.validations['badge_printed_name'].update(PersonalInfo.field_validation.validations['badge_printed_name'])
 
 

@@ -1,0 +1,19 @@
+{% extends "uber/templates/forms/attendee/check_in_form.html" %}
+
+{% block check_in_notes %}
+{% if attendee.age_group_conf['consent_form'] %}
+    {% set consent_check_label %}
+        {% if attendee.age_now_or_at_con < c.ACCOMPANYING_ADULT_AGE %}
+        {{ attendee.full_name }} is checking in with their guardian, or their guardian has a badge already and is present.
+        {% else %}
+        I have collected the signed consent form for {{ attendee.full_name }}, which has been notarized or signed in front of me.
+        {% endif %}
+    {% endset %}
+    <div class="alert alert-info mt-3">
+        {{ attendee.check_in_notes }}
+    </div>
+    {{ form_macros.input(check_in_form.instructions_followed, label_text=consent_check_label) }}
+{% else %}
+    {{ super() }}
+{% endif %}
+{% endblock %}

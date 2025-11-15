@@ -431,10 +431,13 @@ class Attendee:
     @property
     def check_in_notes(self):
         notes = []
-        if self.age_group_conf['consent_form']:
-            notes.append("Before checking this attendee in, please collect a signed parental consent form, \
-                         which must be notarized if the guardian is not there. If the guardian is there, and \
-                         they have not already completed one, have them sign one in front of you.")
+        if self.age_now_or_at_con < c.ACCOMPANYING_ADULT_AGE:
+            notes.append(f"All attendees under {c.ACCOMPANYING_ADULT_AGE} MUST check in with an accompanying adult. "
+                         f"Please confirm below that {self.full_name} has an accompanying adult checking in with them.")
+        elif self.age_group_conf['consent_form']:
+            notes.append(f"Before checking {self.full_name} in, if they are attending unaccompanied, \
+                         please collect a signed parental consent form, which must be notarized. \
+                         Otherwise, please ensure they are checking in with an accompanying adult.")
 
         if self.regdesk_info:
             notes.append(self.regdesk_info)
