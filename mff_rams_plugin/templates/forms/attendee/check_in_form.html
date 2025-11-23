@@ -6,7 +6,7 @@
         {% if attendee.age_now_or_at_con < c.ACCOMPANYING_ADULT_AGE %}
         {{ attendee.full_name }} is checking in with their guardian, or their guardian has a badge already and is present.
         {% else %}
-        I have collected the signed consent form for {{ attendee.full_name }}, which has been notarized or signed in front of me.
+        I have collected the signed and notarized consent form for {{ attendee.full_name }}, or have confirmed that they are checking in with an accompanying adult.
         {% endif %}
     {% endset %}
     <div class="alert alert-info mt-3">
