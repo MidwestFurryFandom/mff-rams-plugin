@@ -351,7 +351,8 @@ class Attendee:
         if self.badge_type in [c.STAFF_BADGE, c.CONTRACTOR_BADGE]:
             return f"Please contact hr@furfest.org to cancel or defer your badge."
         if self.badge_type in c.BADGE_TYPE_PRICES and c.AFTER_EPOCH:
-            return f"Please contact {email_only(c.REGDESK_EMAIL)} to cancel your badge."
+            return f"Upgraded badges cannot be cancelled after the event starts. \
+                Please contact {email_only(c.REGDESK_EMAIL)} for a partial refund."
 
         if self.art_show_applications and self.art_show_applications[0].is_valid:
             return f"Please contact {email_only(c.ART_SHOW_EMAIL)} to cancel your art show application first."
