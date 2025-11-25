@@ -3,9 +3,9 @@
 <body>
 
 You ({{ attendee.full_name }}) have preregistered for {{ c.EVENT_NAME }} at the {{ attendee.badge_type_label }} level
-{% if attendee.group %}
-    by claiming one of the badges in the {{ attendee.group.name }} group.
-{% elif attendee.badge_type in [c.KID_IN_TOW_BADGE, c.PARENT_IN_TOW_BADGE] %}.
+{%- if attendee.group %}
+ by claiming one of the badges in the {{ attendee.group.name }} group.
+{%- elif attendee.badge_type in [c.KID_IN_TOW_BADGE, c.PARENT_IN_TOW_BADGE] -%}.
 {% else %}
     and your payment of {{ (attendee.amount_paid / 100)|format_currency }} has been received.  
 {% endif %}
