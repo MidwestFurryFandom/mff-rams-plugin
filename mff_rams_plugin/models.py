@@ -384,6 +384,17 @@ class Attendee:
                 " to cancel your badge")
 
     @property
+    def ribbon_labels(self):
+        ints = self.ribbon_ints
+        labels = dict(self.get_field('ribbon').type.choices)
+        if len(ints) > 0 and isinstance(labels[ints[0]], dict):
+            return_labels = [labels[i].get('name', '') for i in ints]
+        else:
+            return_labels = sorted(labels[i] for i in ints)
+
+        return [label for label in return_labels if label != c.RIBBONS[c.VOLUNTEER_RIBBON]]
+
+    @property
     def ribbon_and_or_badge(self):
         ribbon_labels = self.ribbon_labels
         if self.badge_type == c.STAFF_BADGE and c.STAFF_RIBBON in self.ribbon_ints:
