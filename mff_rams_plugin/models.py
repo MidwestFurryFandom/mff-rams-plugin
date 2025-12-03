@@ -351,7 +351,8 @@ class Attendee:
         if self.badge_type in [c.STAFF_BADGE, c.CONTRACTOR_BADGE]:
             return f"Please contact hr@furfest.org to cancel or defer your badge."
         if self.badge_type in c.BADGE_TYPE_PRICES and c.AFTER_EPOCH:
-            return f"Please contact {email_only(c.REGDESK_EMAIL)} to cancel your badge."
+            return f"Upgraded badges cannot be cancelled after the event starts. \
+                Please contact {email_only(c.REGDESK_EMAIL)} for a partial refund."
 
         if self.art_show_applications and self.art_show_applications[0].is_valid:
             return f"Please contact {email_only(c.ART_SHOW_EMAIL)} to cancel your art show application first."
@@ -381,6 +382,17 @@ class Attendee:
                 "transfer your badge instead or" if self.is_transferable else "",
                 email_only(c.REGDESK_EMAIL),
                 " to cancel your badge")
+
+    @property
+    def ribbon_labels(self):
+        ints = self.ribbon_ints
+        labels = dict(self.get_field('ribbon').type.choices)
+        if len(ints) > 0 and isinstance(labels[ints[0]], dict):
+            return_labels = [labels[i].get('name', '') for i in ints]
+        else:
+            return_labels = sorted(labels[i] for i in ints)
+
+        return [label for label in return_labels if label != c.RIBBONS[c.VOLUNTEER_RIBBON]]
 
     @property
     def ribbon_and_or_badge(self):
@@ -431,10 +443,13 @@ class Attendee:
     @property
     def check_in_notes(self):
         notes = []
-        if self.age_group_conf['consent_form']:
-            notes.append("Before checking this attendee in, please collect a signed parental consent form, \
-                         which must be notarized if the guardian is not there. If the guardian is there, and \
-                         they have not already completed one, have them sign one in front of you.")
+        if self.age_now_or_at_con < c.ACCOMPANYING_ADULT_AGE:
+            notes.append(f"All attendees under {c.ACCOMPANYING_ADULT_AGE} MUST check in with an accompanying adult. "
+                         f"Please confirm below that {self.full_name} has an accompanying adult checking in with them.")
+        elif self.age_group_conf['consent_form']:
+            notes.append(f"Before checking {self.full_name} in, if they are attending unaccompanied, \
+                         please collect a signed parental consent form, which must be notarized. \
+                         Otherwise, please ensure they are checking in with an accompanying adult.")
 
         if self.regdesk_info:
             notes.append(self.regdesk_info)
