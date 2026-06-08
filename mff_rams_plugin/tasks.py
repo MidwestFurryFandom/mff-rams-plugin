@@ -1,12 +1,11 @@
 from collections import defaultdict
 from datetime import datetime, timedelta
-from pockets import groupify
 
 import stripe
 import time
 import pytz
+import logging
 from celery.schedules import crontab
-from pockets.autolog import log
 from sqlalchemy import not_, or_, insert
 from sqlalchemy.orm import joinedload
 from sqlalchemy.orm.exc import NoResultFound
@@ -20,6 +19,8 @@ from uber.tasks.email import send_email
 from uber.tasks import celery
 from uber.utils import localized_now, TaskUtils
 from uber.payments import ReceiptManager, TransactionRequest
+
+log = logging.getLogger(__name__)
 
 
 @celery.task

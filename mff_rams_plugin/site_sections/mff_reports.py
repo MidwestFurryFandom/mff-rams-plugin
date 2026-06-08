@@ -1,7 +1,7 @@
 import cherrypy
+import logging
 from cherrypy.lib.static import serve_file
 from collections import defaultdict
-from pockets.autolog import log
 from sqlalchemy import func
 from sqlalchemy.sql.expression import literal
 
@@ -9,6 +9,8 @@ from uber.config import c
 from uber.decorators import all_renderable, csv_file, public
 from uber.models import Attendee, Group
 from uber.utils import localized_now
+
+log = logging.getLogger(__name__)
 
 
 def get_dict_sum(dict_to_sum):

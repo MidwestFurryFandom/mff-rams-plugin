@@ -1,13 +1,14 @@
+import logging
 from markupsafe import Markup
 from wtforms import (BooleanField, DecimalField, EmailField, Form, FormField,
                      HiddenField, SelectField, SelectMultipleField, IntegerField,
                      StringField, FileField, TextAreaField)
-from pockets.autolog import log
 
 from uber.config import c
 from uber.forms import TableInfo, CustomValidation, MultiCheckbox, MagForm, IntSelect, SwitchInput, NumberInputGroup, HiddenIntField
 from uber.custom_tags import popup_link, format_currency, pluralize, table_prices
 
+log = logging.getLogger(__name__)
 
 @MagForm.form_mixin
 class PersonalInfo:

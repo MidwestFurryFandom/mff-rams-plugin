@@ -1,9 +1,8 @@
+import logging
 import math
+
 from datetime import timedelta
 from markupsafe import Markup
-from residue import CoerceUTF8 as UnicodeText
-from pockets import cached_classproperty, classproperty
-from pockets.autolog import log
 from sqlalchemy import and_, or_, not_
 from sqlalchemy.types import Boolean, Integer, Numeric
 from sqlalchemy.ext.hybrid import hybrid_property
@@ -12,11 +11,13 @@ from uber.models import Session
 from uber.badge_funcs import get_real_badge_type
 from uber.config import c
 from uber.utils import add_opt, localized_now, localize_datetime, remove_opt, normalize_email_legacy
-from uber.models.types import Choice, DefaultColumn as Column, MultiChoice
-from uber.decorators import presave_adjustment
+from uber.models.types import (Choice, MultiChoice, DefaultColumn as Column, default_relationship as relationship,
+                               DefaultField as Field, DefaultRelationship as Relationship)
+from uber.decorators import cached_classproperty, classproperty, presave_adjustment
 from uber.tasks.registration import update_receipt
 from .tasks import check_pit_badge
 
+log = logging.getLogger(__name__)
 
 @Session.model_mixin
 class SessionMixin:
@@ -54,34 +55,34 @@ class SessionMixin:
 
 @Session.model_mixin
 class Group:
-    power = Column(Choice(c.DEALER_POWER_OPTS), default=-1)
-    power_fee = Column(Integer, default=0)
-    power_usage = Column(UnicodeText)
-    location_preference = Column(Choice(c.DEALER_LOCATION_PREFERENCE_OPTS), default=c.NONE)
-    location = Column(UnicodeText, default='', admin_only=True)
+    power: int = Field(sa_column=Column(Choice(c.DEALER_POWER_OPTS)), default=-1)
+    power_fee: int = 0
+    power_usage: str = ''
+    location_preference: int = Field(sa_column=Column(Choice(c.DEALER_LOCATION_PREFERENCE_OPTS)), default=c.NONE)
+    location: str = ''
     table_fee = Column(Integer, default=0)
-    tax_number = Column(UnicodeText)
-    social_media = Column(UnicodeText)
-    review_notes = Column(UnicodeText)
-    mff_alumni = Column(Boolean, default=False)
-    art_show_intent = Column(Boolean, default=False)
-    adult_content = Column(Choice(c.DEALER_ADULT_OPTS, allow_unspecified=True), default=0)
-    ip_issues = Column(Choice(c.DEALER_IP_OPTS, allow_unspecified=True), default=0)
-    ip_issues_text = Column(UnicodeText)
-    other_cons = Column(UnicodeText)
-    table_photo_filename = Column(UnicodeText)
-    table_photo_content_type = Column(UnicodeText)
-    shipping_boxes = Column(Boolean, default=False)
-    agreed_to_dealer_policies = Column(Boolean, default=False)
-    agreed_to_ip_policy = Column(Boolean, default=False)
-    vehicle_access = Column(Boolean, default=False)
-    display_height = Column(UnicodeText)
-    at_con_standby = Column(Boolean, default=False)
-    at_con_standby_text = Column(UnicodeText)
-    socials_checked = Column(Boolean, default=False)
-    table_seen = Column(Boolean, default=False)
-    ip_concerns = Column(UnicodeText)
-    other_concerns = Column(UnicodeText)
+    tax_number: str = ''
+    social_media: str = ''
+    review_notes: str = ''
+    mff_alumni: bool = False
+    art_show_intent: bool = False
+    adult_content: int = Field(sa_column=Column(Choice(c.DEALER_ADULT_OPTS, allow_unspecified=True)), default=0)
+    ip_issues: int = Field(sa_column=Column(Choice(c.DEALER_IP_OPTS, allow_unspecified=True)), default=0)
+    ip_issues_text: str = ''
+    other_cons: str = ''
+    table_photo_filename: str = ''
+    table_photo_content_type: str = ''
+    shipping_boxes: bool = False
+    agreed_to_dealer_policies: bool = False
+    agreed_to_ip_policy: bool = False
+    vehicle_access: bool = False
+    display_height: str = ''
+    at_con_standby: bool = False
+    at_con_standby_text: str = ''
+    socials_checked: bool = False
+    table_seen: bool = False
+    ip_concerns: str = ''
+    other_concerns: str = ''
 
     @cached_classproperty
     def import_fields(cls):
@@ -212,12 +213,12 @@ class ArtistMarketplaceApplication:
 
 @Session.model_mixin
 class Attendee:
-    consent_form_email = Column(UnicodeText)
-    comped_reason = Column(UnicodeText, default='', admin_only=True)
-    fursuiting = Column(Boolean, default=False)
-    accessibility_requests = Column(MultiChoice(c.ACCESSIBILITY_SERVICE_OPTS))
-    other_accessibility_requests = Column(UnicodeText)
-    dietary_restrictions = Column(UnicodeText)
+    consent_form_email: str = ''
+    comped_reason: str = ''
+    fursuiting: bool = False
+    accessibility_requests: str = Field(sa_type=MultiChoice(c.ACCESSIBILITY_SERVICE_OPTS), default='')
+    other_accessibility_requests: str = ''
+    dietary_restrictions: str = ''
 
     @classproperty
     def skip_placeholder_fields(self):

@@ -15,7 +15,6 @@ depends_on = None
 
 from alembic import op
 import sqlalchemy as sa
-import residue
 
 
 try:
@@ -52,11 +51,11 @@ sqlite_reflect_kwargs = {
 
 
 def upgrade():
-    op.add_column('attendee', sa.Column('comped_reason', residue.CoerceUTF8(), server_default='', nullable=False))
-    op.add_column('group', sa.Column('location', residue.CoerceUTF8(), server_default='', nullable=False))
+    op.add_column('attendee', sa.Column('comped_reason', sa.Unicode(), server_default='', nullable=False))
+    op.add_column('group', sa.Column('location', sa.Unicode(), server_default='', nullable=False))
     op.add_column('group', sa.Column('power', sa.Integer(), server_default='0', nullable=False))
     op.add_column('group', sa.Column('power_fee', sa.Integer(), server_default='0', nullable=False))
-    op.add_column('group', sa.Column('power_usage', residue.CoerceUTF8(), nullable=False))
+    op.add_column('group', sa.Column('power_usage', sa.Unicode(), nullable=False))
     op.add_column('group', sa.Column('table_fee', sa.Integer(), server_default='0', nullable=False))
 
 

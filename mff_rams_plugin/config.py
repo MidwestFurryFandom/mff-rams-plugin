@@ -1,12 +1,14 @@
+import logging
+
 from collections import defaultdict
 from datetime import timedelta
-from pockets.autolog import log
-from pockets import listify
 from pathlib import Path
 
 from uber.config import c, Config, dynamic, parse_config, request_cached_property
 from uber.menu import MenuItem
-from uber.utils import localized_now
+from uber.utils import localized_now, listify
+
+log = logging.getLogger(__name__)
 
 config = parse_config("mff_rams_plugin", Path(__file__).parents[0])
 c.include_plugin_config(config)

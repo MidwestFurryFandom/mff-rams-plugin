@@ -1,7 +1,6 @@
 import re
 
 from datetime import date
-from pockets import classproperty
 from wtforms import validators
 from wtforms.validators import ValidationError, StopValidation
 

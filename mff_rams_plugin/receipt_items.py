@@ -1,8 +1,10 @@
-from pockets.autolog import log
+import logging
 
 from uber.config import c
 from uber.decorators import receipt_calculation
 from uber.models import Group
+
+log = logging.getLogger(__name__)
 
 
 @receipt_calculation.Group
