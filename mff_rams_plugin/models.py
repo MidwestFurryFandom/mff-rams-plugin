@@ -3,9 +3,10 @@ import math
 
 from datetime import timedelta
 from markupsafe import Markup
-from sqlalchemy import and_, or_, not_
+from sqlalchemy import and_, or_, not_, String
 from sqlalchemy.types import Boolean, Integer, Numeric
 from sqlalchemy.ext.hybrid import hybrid_property
+from typing import ClassVar
 
 from uber.models import Session
 from uber.badge_funcs import get_real_badge_type
@@ -56,33 +57,33 @@ class SessionMixin:
 @Session.model_mixin
 class Group:
     power: int = Field(sa_column=Column(Choice(c.DEALER_POWER_OPTS)), default=-1)
-    power_fee: int = 0
-    power_usage: str = ''
+    power_fee: int = Field(sa_type=Integer, default=0)
+    power_usage: str = Field(sa_type=String, default='')
     location_preference: int = Field(sa_column=Column(Choice(c.DEALER_LOCATION_PREFERENCE_OPTS)), default=c.NONE)
-    location: str = ''
-    table_fee = Column(Integer, default=0)
-    tax_number: str = ''
-    social_media: str = ''
-    review_notes: str = ''
-    mff_alumni: bool = False
-    art_show_intent: bool = False
+    location: str = Field(sa_type=String, default='')
+    table_fee: int = Field(sa_type=Integer, default=0)
+    tax_number: str = Field(sa_type=String, default='')
+    social_media: str = Field(sa_type=String, default='')
+    review_notes: str = Field(sa_type=String, default='')
+    mff_alumni: bool = Field(sa_type=Boolean, default=False)
+    art_show_intent: bool = Field(sa_type=Boolean, default=False)
     adult_content: int = Field(sa_column=Column(Choice(c.DEALER_ADULT_OPTS, allow_unspecified=True)), default=0)
     ip_issues: int = Field(sa_column=Column(Choice(c.DEALER_IP_OPTS, allow_unspecified=True)), default=0)
-    ip_issues_text: str = ''
-    other_cons: str = ''
-    table_photo_filename: str = ''
-    table_photo_content_type: str = ''
-    shipping_boxes: bool = False
-    agreed_to_dealer_policies: bool = False
-    agreed_to_ip_policy: bool = False
-    vehicle_access: bool = False
-    display_height: str = ''
-    at_con_standby: bool = False
-    at_con_standby_text: str = ''
-    socials_checked: bool = False
-    table_seen: bool = False
-    ip_concerns: str = ''
-    other_concerns: str = ''
+    ip_issues_text: str = Field(sa_type=String, default='')
+    other_cons: str = Field(sa_type=String, default='')
+    table_photo_filename: str = Field(sa_type=String, default='')
+    table_photo_content_type: str = Field(sa_type=String, default='')
+    shipping_boxes: bool = Field(sa_type=Boolean, default=False)
+    agreed_to_dealer_policies: bool = Field(sa_type=Boolean, default=False)
+    agreed_to_ip_policy: bool = Field(sa_type=Boolean, default=False)
+    vehicle_access: bool = Field(sa_type=Boolean, default=False)
+    display_height: str = Field(sa_type=String, default='')
+    at_con_standby: bool = Field(sa_type=Boolean, default=False)
+    at_con_standby_text: str = Field(sa_type=String, default='')
+    socials_checked: bool = Field(sa_type=Boolean, default=False)
+    table_seen: bool = Field(sa_type=Boolean, default=False)
+    ip_concerns: str = Field(sa_type=String, default='')
+    other_concerns: str = Field(sa_type=String, default='')
 
     @cached_classproperty
     def import_fields(cls):
@@ -115,7 +116,7 @@ class Group:
 
     @property
     def default_power_fee(self):
-        return c.POWER_PRICES.get(int(self.power), None)
+        return c.POWER_PRICES.get(int(self.power or -1), None)
     
     def convert_to_shared(self, session):
         self.tables = 0
@@ -208,17 +209,17 @@ class Group:
 
 @Session.model_mixin
 class ArtistMarketplaceApplication:
-    MATCHING_DEALER_FIELDS = ['email_address', 'website', 'name', 'tax_number']
+    MATCHING_DEALER_FIELDS: ClassVar = ['email_address', 'website', 'name', 'tax_number']
 
 
 @Session.model_mixin
 class Attendee:
-    consent_form_email: str = ''
-    comped_reason: str = ''
-    fursuiting: bool = False
+    consent_form_email: str = Field(sa_type=String, default='')
+    comped_reason: str = Field(sa_type=String, default='')
+    fursuiting: bool = Field(sa_type=Boolean, default=False)
     accessibility_requests: str = Field(sa_type=MultiChoice(c.ACCESSIBILITY_SERVICE_OPTS), default='')
-    other_accessibility_requests: str = ''
-    dietary_restrictions: str = ''
+    other_accessibility_requests: str = Field(sa_type=String, default='')
+    dietary_restrictions: str = Field(sa_type=String, default='')
 
     @classproperty
     def skip_placeholder_fields(self):
@@ -340,6 +341,14 @@ class Attendee:
                 self.badge_type = c.STAFF_BADGE
             else:
                 self.badge_type = c.ATTENDEE_BADGE
+
+    @property
+    def needs_comped_reason(self):
+        return self.paid == c.NEED_NOT_PAY and not self.comped_reason and self.badge_type not in [
+        c.KID_IN_TOW_BADGE, c.PARENT_IN_TOW_BADGE, c.STAFF_BADGE] and (
+            self.age_discount == 1 or abs(self.age_discount) < self.new_badge_cost) and (
+            c.STAFF_RIBBON not in self.ribbon_ints) and (
+            not self.promo_code and not self.promo_code_code)
 
     @property
     def cannot_abandon_badge_reason(self):

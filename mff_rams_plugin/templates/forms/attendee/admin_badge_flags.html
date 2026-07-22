@@ -2,7 +2,8 @@
 
 {% block x_data %}
 {{ super() }}
-get compedReason() { return this.paid == {{ c.NEED_NOT_PAY|tojson }} && this.badge_type != {{ c.STAFF_BADGE|tojson }} && !this.badge_ribbons.includes({{ c.STAFF_RIBBON|tojson }}) }
+needs_comped_reason: {{ attendee.needs_comped_reason|tojson }},
+get compedReason() { return this.paid == {{ c.NEED_NOT_PAY|tojson }} && this.needs_comped_reason && this.badge_type != {{ c.STAFF_BADGE|tojson }} && !this.badge_ribbons.includes({{ c.STAFF_RIBBON|tojson }}) }
 {% endblock %}
 
 {% block paid_status %}
