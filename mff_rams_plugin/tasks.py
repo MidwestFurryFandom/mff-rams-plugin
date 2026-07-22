@@ -15,7 +15,6 @@ from uber.custom_tags import readable_join
 from uber.decorators import render
 from uber.models import (ApiJob, Attendee, AttendeeAccount, BadgeInfo, BadgePickupGroup, Email, Group, ModelReceipt,
                          ReceiptInfo, ReceiptItem, ReceiptTransaction, Session, TerminalSettlement)
-from uber.tasks.email import send_email
 from uber.tasks import celery
 from uber.utils import localized_now, TaskUtils
 from uber.payments import ReceiptManager, TransactionRequest
