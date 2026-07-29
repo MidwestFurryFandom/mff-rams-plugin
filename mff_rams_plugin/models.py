@@ -115,8 +115,11 @@ class Group:
 
     @presave_adjustment
     def blank_platform(self):
+        if not self.social_media:
+            return
+
         for num in ['1', '2', '3']:
-            if not self.social_media['platform_' + num]:
+            if not self.social_media.get('platform_' + num, None):
                 self.social_media['username_' + num] = ''
 
     def get_social_media_url(self, num):
