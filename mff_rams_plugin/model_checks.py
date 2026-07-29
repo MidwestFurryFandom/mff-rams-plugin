@@ -49,6 +49,24 @@ def no_approval_without_power_fee(group):
         return "Please set a power fee. To provide free power, turn off automatic recalculation."
 
 
+@validation.Group
+def social_media_1(group):
+    if group.social_media['platform_1'] and not group.social_media['username_1']:
+        return ('social_media-username_1', 'Please enter your username for social media platform 1, or select None.')
+
+
+@validation.Group
+def social_media_2(group):
+    if group.social_media['platform_2'] and not group.social_media['username_2']:
+        return ('social_media-username_2', 'Please enter your username for social media platform 2, or select None.')
+
+
+@validation.Group
+def social_media_3(group):
+    if group.social_media['platform_3'] and not group.social_media['username_3']:
+        return ('social_media-username_3', 'Please enter your username for social media platform 3, or select None.')
+
+
 @validation.Attendee
 def need_comped_reason(attendee):
     if attendee.needs_comped_reason:

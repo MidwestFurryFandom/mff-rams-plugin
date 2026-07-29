@@ -201,17 +201,6 @@ class Root:
                 attendee.other_accessibility_requests
             ])
 
-    @public
-    def view_table_photo(self, session, id):
-        group = session.group(id)
-        cherrypy.response.headers['Cache-Control'] = 'no-store'
-
-        return serve_file(
-            group.table_photo_filepath,
-            disposition="attachment",
-            name=group.table_photo_download_filename if session.current_admin_account() else group.table_photo_filename,
-            content_type=group.table_photo_content_type)
-
     @csv_file
     def full_dealer_report(self, out, session):
         out.writerow([
@@ -233,7 +222,9 @@ class Root:
             'Power Request Info',
             'Location Preference',
             'Location',
-            'Social Media Info',
+            'Social Media URL 1',
+            'Social Media URL 2',
+            'Social Media URL 3',
             'Review Notes',
             'MFF Alumni?',
             'Art Show?',
@@ -275,7 +266,9 @@ class Root:
                     group.power_usage,
                     group.location_preference_label,
                     group.location,
-                    group.social_media,
+                    group.get_social_media_url(1),
+                    group.get_social_media_url(2),
+                    group.get_social_media_url(3),
                     group.review_notes,
                     group.mff_alumni,
                     group.art_show_intent,
@@ -471,7 +464,9 @@ class Root:
             'Power Requested',
             'Power Request Info',
             'Location Preference',
-            'Social Media Info',
+            'Social Media URL 1',
+            'Social Media URL 2',
+            'Social Media URL 3',
             'Review Notes',
             'MFF Alumni?',
             'Art Show?',
@@ -504,7 +499,9 @@ class Root:
                     group.power,
                     group.power_usage,
                     group.location_preference_label,
-                    group.social_media,
+                    group.get_social_media_url(1),
+                    group.get_social_media_url(2),
+                    group.get_social_media_url(3),
                     group.review_notes,
                     group.mff_alumni,
                     group.art_show_intent,

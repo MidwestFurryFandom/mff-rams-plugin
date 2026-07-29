@@ -5,7 +5,8 @@ from datetime import timedelta
 from markupsafe import Markup
 from sqlalchemy import and_, or_, not_, String
 from sqlalchemy.types import Boolean, Integer, Numeric
-from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy.dialects.postgresql.json import JSONB
+from sqlalchemy.ext.mutable import MutableDict
 from typing import ClassVar
 
 from uber.models import Session
@@ -63,7 +64,7 @@ class Group:
     location: str = Field(sa_type=String, default='')
     table_fee: int = Field(sa_type=Integer, default=0)
     tax_number: str = Field(sa_type=String, default='')
-    social_media: str = Field(sa_type=String, default='')
+    social_media: str = Field(sa_type=MutableDict.as_mutable(JSONB), default_factory=dict)
     review_notes: str = Field(sa_type=String, default='')
     mff_alumni: bool = Field(sa_type=Boolean, default=False)
     art_show_intent: bool = Field(sa_type=Boolean, default=False)
@@ -71,8 +72,6 @@ class Group:
     ip_issues: int = Field(sa_column=Column(Choice(c.DEALER_IP_OPTS, allow_unspecified=True)), default=0)
     ip_issues_text: str = Field(sa_type=String, default='')
     other_cons: str = Field(sa_type=String, default='')
-    table_photo_filename: str = Field(sa_type=String, default='')
-    table_photo_content_type: str = Field(sa_type=String, default='')
     shipping_boxes: bool = Field(sa_type=Boolean, default=False)
     agreed_to_dealer_policies: bool = Field(sa_type=Boolean, default=False)
     agreed_to_ip_policy: bool = Field(sa_type=Boolean, default=False)
@@ -113,6 +112,17 @@ class Group:
     def float_table_to_int(self):
         # Fix some data weirdness with prior year groups
         self.tables = int(self.tables)
+
+    @presave_adjustment
+    def blank_platform(self):
+        for num in ['1', '2', '3']:
+            if not self.social_media['platform_' + num]:
+                self.social_media['username_' + num] = ''
+
+    def get_social_media_url(self, num):
+        num = str(num)
+        platform = self.social_media['platform_' + num]
+        return c.DEALER_SOCIAL_MEDIA_URLS[platform] + self.social_media['username_' + num]
 
     @property
     def default_power_fee(self):
@@ -171,40 +181,23 @@ class Group:
 
     @property
     def table_photo(self):
-        if not self.table_photo_filename:
+        from uber.files import FileService
+
+        if not self.session:
             return ''
-        return Markup(f"""
-                      <a href="../mff_reports/view_table_photo?id={self.id}" target="_blank">
-                      {self.table_photo_filename}
-                      </a>""")
+
+        table_photo = FileService.get_existing_files(self.session, self, and_flags=['table_photo'])
+        return table_photo.html_link if table_photo else ''
 
     @table_photo.setter
     def table_photo(self, value):
-        if not value or not getattr(value, 'filename', None):
+        from uber.files import FileService
+
+        if not value or not getattr(value, 'filename', None) or not self.session:
             return
 
-        import shutil
-        import cherrypy
-
-        if not isinstance(value, cherrypy._cpreqbody.Part):
-            log.error(f"Tried to set table_photo for group {self.name} with invalid value type: {type(value)}")
-            return
-
-        self.table_photo_filename = value.filename
-        self.table_photo_content_type = value.content_type.value
-
-        with open(self.table_photo_filepath, 'wb') as f:
-            shutil.copyfileobj(value.file, f)
-
-    @property
-    def table_photo_download_filename(self):
-        name = ''.join(s for s in self.name.strip() if s.isalnum() or s == ' ')
-        return ' '.join(name.split()).replace(' ', '_') + '_' + self.table_photo_filename
-
-    @property
-    def table_photo_filepath(self):
-        import os
-        return os.path.join(c.UPLOADED_FILES_DIR, c.GROUPS_TABLE_PHOTOS_DIR, str(self.id))
+        file_handler = FileService.file_handler(self.session, self, flags={'table_photo': True})
+        file_handler.process_file_upload(value, update_model=self)
 
 
 @Session.model_mixin

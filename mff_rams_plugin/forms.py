@@ -79,6 +79,18 @@ class Consents:
         return ""
 
 
+class DealerSocialMedia(MagForm):
+    platform_1 = SelectField('Platform 1', default=0,
+                             coerce=int, choices=[(0, 'None')] + c.DEALER_SOCIAL_MEDIA_OPTS)
+    username_1 = StringField('Username')
+    platform_2 = SelectField('Platform 2', default=0,
+                             coerce=int, choices=[(0, 'None')] + c.DEALER_SOCIAL_MEDIA_OPTS)
+    username_2 = StringField('Username')
+    platform_3 = SelectField('Platform 3', default=0,
+                             coerce=int, choices=[(0, 'None')] + c.DEALER_SOCIAL_MEDIA_OPTS)
+    username_3 = StringField('Username')
+
+
 @MagForm.form_mixin
 class TableInfo:
     power = IntegerField('Power Level', widget=IntSelect(), description="Final cost for power is subject to change.")
@@ -96,8 +108,8 @@ class TableInfo:
                                  descriptions.""")
     description = StringField('Merchandise Description',
                               description="This will be used both for dealer selection (if necessary) and in all dealer listings.")
-    social_media = TextAreaField("Social Media Details",
-                                 description="Please list any social media accounts you use that should be included in the review process. Applications without any social media accounts listed are less likely to be considered.")
+    social_media = FormField(DealerSocialMedia, "Social Media",
+                             description="Please list up to three social media accounts you use that should be included in the review process. Applications without any social media accounts listed are less likely to be considered.")
     mff_alumni = BooleanField('I have vended at Midwest FurFest before.')
     art_show_intent = BooleanField('I plan to apply to the Midwest FurFest Art Show.')
     adult_content = SelectField('Selling 18+ Content?', coerce=int, choices=[(0, 'Please select an option')] + c.DEALER_ADULT_OPTS)

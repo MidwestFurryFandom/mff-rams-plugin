@@ -5,6 +5,16 @@
 at_con_standby: {{ table_info.at_con_standby.data|tojson }},
 power: {{ table_info.power.data|tojson }},
 ip_issues: '{{ table_info.ip_issues.data }}',
+social_media_platform_1: '{{ table_info.social_media.platform_1.data }}',
+social_media_username_1: '{{ table_info.social_media.username_1.data or '' }}',
+social_media_platform_2: '{{ table_info.social_media.platform_2.data }}',
+social_media_username_2: '{{ table_info.social_media.username_2.data or '' }}',
+social_media_platform_3: '{{ table_info.social_media.platform_3.data }}',
+social_media_username_3: '{{ table_info.social_media.username_3.data or '' }}',
+socialMediaURL(platform, username) { 
+    var url = socialMediaURL(platform);
+    if (url) { return 'URL: ' + url + username };
+    return ''; },
 get hadIpIssues() { return this.ip_issues == '{{ c.YES_ISSUES }}' },
 {% endblock %}
 
@@ -84,10 +94,60 @@ get hadIpIssues() { return this.ip_issues == '{{ c.YES_ISSUES }}' },
 {% endblock %}
 
 {% block textareas %}
-    <div class="col-12">{{ form_macros.input(table_info.special_needs) }}</div>
+    <div class="col-sm">
+        <div class="form-text">{{ table_info.social_media.label.text }}</div>
+        <div class="card card-body">
+            <p>{{ table_info.social_media.description }}</p>
+            {% if admin_area %}
+            {% set social_media_tuples = [
+                (group.social_media.platform_1, group.social_media.username_1),
+                (group.social_media.platform_2, group.social_media.username_2),
+                (group.social_media.platform_3, group.social_media.username_3)
+                ]
+              %}
+            {% for platform, username in social_media_tuples|rejectattr(0, 'equalto', 0) %}
+            {% if loop.first %}<div class="d-flex gap-2 mb-3">{% endif %}
+            <a href="{{ c.DEALER_SOCIAL_MEDIA_URLS[platform] }}{{ username }}" target="_blank">View {{ c.DEALER_SOCIAL_MEDIAS[platform] }} <i class="fa fa-external-link"></i></a>
+            {% if loop.last %}</div>{% endif %}
+            {% endfor %}
+            {% endif %}
+            <div class="row g-3 mb-3">
+                <div class="col-sm">{{ form_macros.input(table_info.social_media.platform_1, alpine_model="social_media_platform_1") }}</div>
+                <div class="col-sm">
+                    {% call form_macros.input(table_info.social_media.username_1, alpine_model="social_media_username_1") %}
+                    <div class="form-text" x-text="socialMediaURL(social_media_platform_1, social_media_username_1)"></div>
+                    {% endcall %}
+                </div>
+            </div>
+            <div class="row g-3 mb-3">
+                <div class="col-sm">{{ form_macros.input(table_info.social_media.platform_2, alpine_model="social_media_platform_2") }}</div>
+                <div class="col-sm">
+                    {% call form_macros.input(table_info.social_media.username_2, alpine_model="social_media_username_2") %}
+                    <div class="form-text" x-text="socialMediaURL(social_media_platform_2, social_media_username_2)"></div>
+                    {% endcall %}
+                </div>
+            </div>
+            <div class="row g-3 mb-3">
+                <div class="col-sm">{{ form_macros.input(table_info.social_media.platform_3, alpine_model="social_media_platform_3") }}</div>
+                <div class="col-sm">
+                    {% call form_macros.input(table_info.social_media.username_3, alpine_model="social_media_username_3") %}
+                    <div class="form-text" x-text="socialMediaURL(social_media_platform_3, social_media_username_3)"></div>
+                    {% endcall %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    var socialMediaURL = function(val) {
+        var url_dict = {{ c.DEALER_SOCIAL_MEDIA_URLS|tojson }};
+        return url_dict[val];
+    }
+</script>
+<div class="row g-3 mb-3">
+    <div class="col-sm">{{ form_macros.input(table_info.special_needs) }}</div>
 </div>
 <div class="row g-3 mb-3">
-    <div class="col-sm">{{ form_macros.input(table_info.social_media) }}</div>
     <div class="col-sm">{{ form_macros.input(table_info.review_notes) }}</div>
 </div>
 <div class="row g-3 mb-3">

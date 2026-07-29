@@ -3,6 +3,7 @@ from wtforms.validators import ValidationError, StopValidation
 from markupsafe import Markup
 
 from .config import c
+from .forms import DealerSocialMedia
 from uber.badge_funcs import get_real_badge_type
 from uber.validations import (ignore_unassigned_and_placeholders, TableInfo, PersonalInfo, OtherInfo, PreregOtherInfo,
                               BadgeExtras, AdminBadgeFlags, CheckInForm, ContactInfo)
@@ -144,8 +145,13 @@ TableInfo.field_validation.required_fields.update({
                                   lambda x: x.form.model.is_dealer),
     'agreed_to_ip_policy': ("You must agree to the IP policies for dealers.", 'agreed_to_ip_policy',
                             lambda x: x.form.model.is_dealer),
-    'at_con_standby_text': ("Please provide on-site contact info.", 'at_con_standby')
+    'at_con_standby_text': ("Please provide on-site contact info.", 'at_con_standby'),
 })
+
+
+DealerSocialMedia.field_validation.required_fields = {
+    'username_3': ("Please enter your username.", 'platform_3'),
+}
 
 
 TableInfo.field_validation.required_fields.pop('wares', None)
