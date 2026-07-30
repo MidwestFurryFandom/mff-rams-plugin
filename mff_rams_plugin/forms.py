@@ -5,7 +5,7 @@ from wtforms import (BooleanField, DecimalField, EmailField, Form, FormField,
                      StringField, FileField, TextAreaField)
 
 from uber.config import c
-from uber.forms import TableInfo, CustomValidation, MultiCheckbox, MagForm, IntSelect, SwitchInput, NumberInputGroup, HiddenIntField
+from uber.forms import TableInfo, CustomValidation, MultiCheckbox, MagForm, IntSelect, SwitchInput, NumberInputGroup, FileUploadField
 from uber.custom_tags import popup_link, format_currency, pluralize, table_prices
 
 log = logging.getLogger(__name__)
@@ -119,7 +119,7 @@ class TableInfo:
     ip_issues_text = StringField('How did you handle past IP issues?')
     other_cons = StringField(f'Other Conventions in {c.EVENT_YEAR}',
                              description=f"Please list any events that you've vended at within {c.EVENT_YEAR}.")
-    table_photo = FileField('Table Setup', render_kw={'accept': "image/*"})
+    table_photo = FileUploadField('Table Setup (max 5MB)', delete_existing=True, render_kw={'accept': "image/*"})
     shipping_boxes = BooleanField('I plan on or may be shipping boxes or pallets to the convention center.')
     agreed_to_dealer_policies = BooleanField(Markup(f'I have read and agree to the Midwest FurFest policies for dealers.'))
     agreed_to_ip_policy = BooleanField(Markup(f'<strong>I have read and agree to the Midwest FurFest IP policies for dealers.</strong>'))

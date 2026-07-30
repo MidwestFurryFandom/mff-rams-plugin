@@ -182,26 +182,6 @@ class Group:
         emails = [a.email for a in self.attendees if not a.is_unassigned and not a.placeholder]
         return len(emails) != len(set(emails))
 
-    @property
-    def table_photo(self):
-        from uber.files import FileService
-
-        if not self.session:
-            return ''
-
-        table_photo = FileService.get_existing_files(self.session, self, and_flags=['table_photo'])
-        return table_photo.html_link if table_photo else ''
-
-    @table_photo.setter
-    def table_photo(self, value):
-        from uber.files import FileService
-
-        if not value or not getattr(value, 'filename', None) or not self.session:
-            return
-
-        file_handler = FileService.file_handler(self.session, self, flags={'table_photo': True})
-        file_handler.process_file_upload(value, update_model=self)
-
 
 @Session.model_mixin
 class ArtistMarketplaceApplication:
