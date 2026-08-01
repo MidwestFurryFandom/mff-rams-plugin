@@ -12,7 +12,7 @@ from typing import ClassVar
 from uber.models import Session
 from uber.badge_funcs import get_real_badge_type
 from uber.config import c
-from uber.utils import add_opt, localized_now, localize_datetime, remove_opt, normalize_email_legacy
+from uber.utils import add_opt, localized_now, localize_datetime, remove_opt, normalize_email
 from uber.models.types import (Choice, MultiChoice, DefaultColumn as Column, default_relationship as relationship,
                                DefaultField as Field, DefaultRelationship as Relationship)
 from uber.decorators import cached_classproperty, classproperty, presave_adjustment
@@ -57,11 +57,14 @@ class SessionMixin:
 
 @Session.model_mixin
 class Group:
+    flexible_tables: bool = Field(sa_type=Boolean, default=False)
+    suite_tables: int = Field(sa_type=Integer, default=0)
     power: int = Field(sa_column=Column(Choice(c.DEALER_POWER_OPTS)), default=-1)
     power_fee: int = Field(sa_type=Integer, default=0)
     power_usage: str = Field(sa_type=String, default='')
     location_preference: int = Field(sa_column=Column(Choice(c.DEALER_LOCATION_PREFERENCE_OPTS)), default=c.NONE)
     location: str = Field(sa_type=String, default='')
+    additional_website: str = Field(sa_type=String, default='')
     table_fee: int = Field(sa_type=Integer, default=0)
     tax_number: str = Field(sa_type=String, default='')
     social_media: str = Field(sa_type=MutableDict.as_mutable(JSONB), default_factory=dict)
@@ -77,8 +80,6 @@ class Group:
     agreed_to_ip_policy: bool = Field(sa_type=Boolean, default=False)
     vehicle_access: bool = Field(sa_type=Boolean, default=False)
     display_height: str = Field(sa_type=String, default='')
-    at_con_standby: bool = Field(sa_type=Boolean, default=False)
-    at_con_standby_text: str = Field(sa_type=String, default='')
     socials_checked: bool = Field(sa_type=Boolean, default=False)
     table_seen: bool = Field(sa_type=Boolean, default=False)
     ip_concerns: str = Field(sa_type=String, default='')
@@ -114,6 +115,11 @@ class Group:
         self.tables = int(self.tables)
 
     @presave_adjustment
+    def no_suite_no_suite_tables(self):
+        if self.tables < 6:
+            self.suite_tables = 0
+
+    @presave_adjustment
     def blank_platform(self):
         if not self.social_media:
             return
@@ -121,6 +127,7 @@ class Group:
         for num in ['1', '2', '3']:
             if not self.social_media.get('platform_' + num, None):
                 self.social_media['username_' + num] = ''
+                
 
     def get_social_media_url(self, num):
         num = str(num)
@@ -519,6 +526,13 @@ class Attendee:
 
 @Session.model_mixin
 class AttendeeAccount:
+    @property
+    def default_group_email(self):
+        local, domain = normalize_email(self.email, split_address=True)
+        if domain not in c.SSO_EMAIL_DOMAINS:
+            return self.email
+        return ''
+    
     @property
     def pit_badge(self):
         for attendee in self.valid_attendees + self.pending_attendees:

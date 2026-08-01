@@ -1,0 +1,39 @@
+{% extends 'uber/templates/forms/group/admin_shared.html' %}
+
+{% block x_data %}
+{{ super() }}
+tables: {{ group_or_table_info.tables.data|jsonize }},
+{% endblock %}
+
+{% block badges_tables %}
+    <div class="col-sm">
+        {% call form_macros.input(group_or_table_info.tables, choices=c.ADMIN_TABLE_OPTS) %}
+            <div x-show="tables >= 6">{{ form_macros.input(group_or_table_info.suite_tables) }}</div>
+            {{ form_macros.input(group_or_table_info.is_dealer,
+                admin_text=c.DEALER_TERM|title ~ "s are prevented from paying until they are approved, but may assign and purchase add-ons for badges.",
+                alpine_model="is_dealer") }}
+        {% endcall %}
+    </div>
+    <div class="col-sm">
+        {% call form_macros.input(group_or_table_info.badges,
+                                    choices=int_choices(0, c.MAX_GROUP_SIZE),
+                                    admin_text="[" ~ group.badges_purchased ~ " badge" ~ group.badges_purchased|pluralize ~ " purchased]" if not group.is_new else "",
+                                    required=True,
+                                    **{'x-model.number': "badges"}) %}
+            {{ form_macros.input(group_or_table_info.can_add) }}
+        {% endcall %}
+    </div>
+</div>
+<div class="mb-3" x-show="showNewBadgeFields">
+    <div class="form-text">New Badges Settings</div>
+    <div class="card card-body bg-light">
+    <div class="row g-3">
+        <div class="col-sm">
+            {{ form_macros.input(group_or_table_info.new_badge_type) }}
+        </div>
+        <div class="col-sm">
+            {{ form_macros.input(group_or_table_info.new_ribbons) }}
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -135,6 +135,7 @@ TableInfo.field_validation.required_fields.update({
                     lambda x: x > 0),
     'location_preference': ("Please select if you would like to be considered for a specific kind of location.",
                             'location_preference', lambda x: x.form.model.is_dealer),
+    'display_height': "Please tell us the estimated height of your display, including signage and banners.",
     'adult_content': ("Please tell us if you are selling 18+ content.", 'adult_content',
                       lambda x: x.form.model.is_dealer),
     'ip_issues': ("Please tell us if you have had any IP policy issues in the past.", 'ip_issues',
@@ -145,7 +146,6 @@ TableInfo.field_validation.required_fields.update({
                                   lambda x: x.form.model.is_dealer),
     'agreed_to_ip_policy': ("You must agree to the IP policies for dealers.", 'agreed_to_ip_policy',
                             lambda x: x.form.model.is_dealer),
-    'at_con_standby_text': ("Please provide on-site contact info.", 'at_con_standby'),
 })
 
 

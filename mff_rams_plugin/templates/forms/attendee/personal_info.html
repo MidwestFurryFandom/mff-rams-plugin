@@ -52,6 +52,7 @@ get mffCellphoneRequired() { return (this.dealer || this.badge_type == {{ c.STAF
   <div class="col-sm">
     {% call form_macros.input(personal_info.email, value=attendee_email, required_if="emailRequired", **{':disabled':'copy_email'}) %}
       {% if is_prereg_dealer %}
+        <div class="form-text">Do not use Furfest Staff email addresses.</div>
         {{ form_macros.input(personal_info.copy_email, **{'x-model.boolean':'copy_email'}) }}
       {% endif %}
     {% endcall %}
