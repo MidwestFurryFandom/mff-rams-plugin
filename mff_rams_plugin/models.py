@@ -127,12 +127,13 @@ class Group:
         for num in ['1', '2', '3']:
             if not self.social_media.get('platform_' + num, None):
                 self.social_media['username_' + num] = ''
-                
 
     def get_social_media_url(self, num):
         num = str(num)
-        platform = self.social_media['platform_' + num]
-        return c.DEALER_SOCIAL_MEDIA_URLS[platform] + self.social_media['username_' + num]
+        platform = self.social_media.get('platform_' + num, None)
+        if platform:
+            return c.DEALER_SOCIAL_MEDIA_URLS[platform] + self.social_media['username_' + num]
+        return ''
 
     @property
     def default_power_fee(self):
@@ -244,18 +245,8 @@ class Attendee:
             self.paid = c.NEED_NOT_PAY
             self.comped_reason = "Automated: Not Attending badge status."
 
-            if not self.is_new:
-                update_receipt(self.id, {'paid': c.NEED_NOT_PAY})
-
-    @presave_adjustment
-    def in_tow_need_not_pay(self):
-        if self.badge_type in [c.KID_IN_TOW_BADGE, c.PARENT_IN_TOW_BADGE]:
-            self.paid = c.NEED_NOT_PAY
-
-            if self.is_new and self.badge_status == c.PENDING_STATUS:
-                self.badge_status == c.COMPLETE
-            elif not self.is_new:
-                update_receipt(self.id, {'paid': c.NEED_NOT_PAY})
+            if not self.is_new and self.session:
+                update_receipt(self.id, {'paid': c.NEED_NOT_PAY}, session=self.session)
 
     def calculate_badge_cost(self, use_promo_code=False, include_price_override=True):
         # Adds overrides for a couple special cases where a badge should be free
@@ -347,13 +338,6 @@ class Attendee:
             return f"Upgraded badges cannot be cancelled after the event starts. \
                 Please contact {email_only(c.REGDESK_EMAIL)} for a partial refund."
 
-        if self.art_show_applications and self.art_show_applications[0].is_valid:
-            return f"Please contact {email_only(c.ART_SHOW_EMAIL)} to cancel your art show application first."
-        if self.art_agent_apps and any(app.is_valid for app in self.art_agent_apps):
-            return "Please ask the artist you're agenting for {} first.".format(
-                "assign a new agent" if c.ONE_AGENT_PER_APP else "unassign you as an agent."
-            )
-
         reason = ""
         if c.ATTENDEE_ACCOUNTS_ENABLED and self.managers and including_last_adult:
             account = self.managers[0]
@@ -369,12 +353,21 @@ class Attendee:
                 reason = f"As a leader of a group, you cannot {'abandon' if not self.group.cost else 'refund'} your badge."
             elif self.amount_paid:
                 reason = self.cannot_self_service_refund_reason
+                if reason and ("Refunds will open" in reason or "Refunds are no longer" in reason):
+                    return reason
 
         if reason:
             return reason + " Please {} contact us at {}{}.".format(
                 "transfer your badge instead or" if self.is_transferable else "",
                 email_only(c.REGDESK_EMAIL),
                 " to cancel your badge")
+        
+        if self.art_show_application and self.art_show_application.is_valid:
+            return f"Please contact {email_only(c.ART_SHOW_EMAIL)} to cancel your art show application first."
+        if self.art_agent_apps and any(app.is_valid for app in self.art_agent_apps):
+            return "Please ask the artist you're agenting for to {} first.".format(
+                "assign a new agent" if c.ONE_AGENT_PER_APP else "unassign you as an agent."
+            )
 
     @property
     def ribbon_labels(self):

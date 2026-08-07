@@ -2,7 +2,7 @@
 
 {% block x_data %}
 {{ super() }}
-tables: {{ table_info.tables.data|jsonize }},
+tables: {{ 1 if is_prereg_dealer else table_info.tables.data|jsonize }},
 power: {{ table_info.power.data|tojson }},
 ip_issues: '{{ table_info.ip_issues.data }}',
 social_media_platform_1: '{{ table_info.social_media.platform_1.data }}',
@@ -15,6 +15,7 @@ socialMediaURL(platform, username) {
     var url = socialMediaURL(platform);
     if (url) { return 'URL: ' + url + username };
     return ''; },
+get locationPreference() { return parseInt(this.tables) == 1 || parseInt(this.tables) == 4  },
 get hadIpIssues() { return this.ip_issues == '{{ c.YES_ISSUES }}' },
 {% endblock %}
 
@@ -66,7 +67,7 @@ get hadIpIssues() { return this.ip_issues == '{{ c.YES_ISSUES }}' },
         <div class="form-text">Flexible Table Option</div>
         {{ form_macros.input(table_info.flexible_tables) }}
     </div>
-    <div class="col-sm">{{ form_macros.input(table_info.location_preference, required_if="is_dealer") }}</div>
+    <div class="col-sm" x-show="locationPreference">{{ form_macros.input(table_info.location_preference, required_if="is_dealer && locationPreference") }}</div>
 </div><div class="row g-3 mb-3">
     <div class="col-sm">
         {{ form_macros.input(table_info.power, choices=c.DEALER_POWER_OPTS if admin_area else c.PREREG_DEALER_POWER_OPTS, disabled=not is_prereg_dealer and not admin_area, alpine_model="power", required_if="is_dealer") }}

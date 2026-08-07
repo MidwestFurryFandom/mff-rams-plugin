@@ -1,3 +1,4 @@
+import re
 from wtforms import validators
 from wtforms.validators import ValidationError, StopValidation
 from markupsafe import Markup
@@ -7,12 +8,23 @@ from .forms import DealerSocialMedia
 from uber.badge_funcs import get_real_badge_type
 from uber.validations import (ignore_unassigned_and_placeholders, TableInfo, PersonalInfo, OtherInfo, PreregOtherInfo,
                               BadgeExtras, AdminBadgeFlags, CheckInForm, ContactInfo)
-from uber.utils import get_age_conf_from_birthday
+from uber.utils import get_age_conf_from_birthday, get_age_from_birthday
 
 
 def country_exclusions(form, field):
     if field.data and field.data in c.EXCLUDED_COUNTRIES:
         raise ValidationError("Midwest FurFest membership, registration, and other MFF-related services are unavailable for your region.")
+
+
+def validate_url(url):
+    url_regex = re.compile(
+        r"(\w+://)?"                # protocol                      (optional)
+        r"(\w+\.)?"                 # host                          (optional)
+        r"(([\w-]+)\.(\w+))"        # domain
+        r"(\.\w+)*"                 # top-level domain              (optional, can have > 1)
+        r"([\w\-\._\~/]*)*(?<!\.)"  # path, params, anchors, etc.   (optional)
+    )
+    return url_regex.match(url)
 
 
 PersonalInfo.field_validation.validations['country']['exclude'] = country_exclusions
@@ -41,6 +53,12 @@ def attendee_age_checks(form, field):
         raise ValidationError(Markup("At this time Midwest FurFest is not accepting registrations for our Minor attendees \
                                      while we finalize our policies for this year. Please visit our website at \
                                      https://www.furfest.org/attend/register for more information."))
+
+
+@PersonalInfo.field_validation('birthdate')
+def no_dealers_under_18(form, field):
+    if form.model.is_dealer and get_age_from_birthday(field.data, c.NOW_OR_AT_CON) < 18:
+        raise ValidationError("You cannot apply as a dealer if you are under 18.")
 
 
 @PersonalInfo.field_validation('onsite_contact')
@@ -132,7 +150,7 @@ TableInfo.field_validation.required_fields.update({
     'power_usage': ("Please provide a list of what powered devices you expect to use.", 'power',
                     lambda x: x > 0),
     'location_preference': ("Please select if you would like to be considered for a specific kind of location.",
-                            'location_preference', lambda x: x.form.model.is_dealer),
+                            'location_preference', lambda x: x.form.model.is_dealer and x.form.tables.data and int(x.form.tables.data) in [1, 4]),
     'display_height': "Please tell us the estimated height of your display, including signage and banners.",
     'adult_content': ("Please tell us if you are selling 18+ content.", 'adult_content',
                       lambda x: x.form.model.is_dealer),
@@ -174,8 +192,20 @@ TableInfo.field_validation.validations['special_needs']['length'] = validators.L
     max=1000, message="Special requests cannot be longer than 1000 characters.")
 
 
+@TableInfo.new_or_changed('website')
+def website_valid(form, field):
+    if field.data and not validate_url(field.data):
+        raise ValidationError("Your website must be a valid URL.")
+    
+
+@TableInfo.new_or_changed('additional_website')
+def additional_website_valid(form, field):
+    if field.data and not validate_url(field.data):
+        raise ValidationError("Your additional website must be a valid URL.")
+
+
 @TableInfo.new_or_changed('power')
-def power_level_required(self, field):
+def power_level_required(form, field):
     if not field.form.model.is_dealer:
         return
 
@@ -184,7 +214,7 @@ def power_level_required(self, field):
 
 
 @TableInfo.new_or_changed('table_photo')
-def table_photo_is_image(self, field):
+def table_photo_is_image(form, field):
     if field.data and field.data.file:
         content_type = field.data.content_type.value
         if not content_type.startswith('image'):
@@ -192,7 +222,7 @@ def table_photo_is_image(self, field):
 
 
 @TableInfo.new_or_changed('table_photo')
-def table_photo_size(self, field):
+def table_photo_size(form, field):
     if field.data and field.data.file:
         field.data.file.seek(0)
         file_size = len(field.data.file.read()) / (1024 * 1024)

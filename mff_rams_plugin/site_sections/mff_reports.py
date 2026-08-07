@@ -7,6 +7,7 @@ from sqlalchemy.sql.expression import literal
 
 from uber.config import c
 from uber.decorators import all_renderable, csv_file, public
+from uber.files import FileService
 from uber.models import Attendee, Group
 from uber.utils import localized_now
 
@@ -186,8 +187,7 @@ class Root:
             'Badge Name',
             'Badge Number',
             'Email',
-            'Desired Accommodations',
-            'Other Desired Accommodations'
+            'Desired Accommodations'
         ])
 
         accessibility_request_attendees = session.query(Attendee).filter(Attendee.accessibility_requests != '').all()
@@ -197,8 +197,7 @@ class Root:
                 attendee.badge_printed_name,
                 attendee.badge_num,
                 attendee.email,
-                ", ".join(attendee.accessibility_requests_labels),
-                attendee.other_accessibility_requests
+                ", ".join(attendee.accessibility_requests_labels)
             ])
 
     @csv_file
@@ -247,6 +246,7 @@ class Root:
         dealer_groups = session.query(Group).filter(Group.is_dealer == True).all()
         for group in dealer_groups:
             if group.is_dealer:
+                table_photo = FileService.get_existing_files(session, group, and_flags=['table_photo'])
                 full_name = group.leader.full_name if group.leader else ''
                 out.writerow([
                     group.name,
@@ -280,7 +280,7 @@ class Root:
                     group.ip_issues_label,
                     group.ip_issues_text,
                     group.other_cons,
-                    f"{c.URL_BASE}/mff_reports/view_table_photo?id={group.id}" if group.table_photo_filename else '',
+                    f"{c.URL_BASE}/services/download_file?id={table_photo.id}" if table_photo else '',
                     group.shipping_boxes,
                     group.vehicle_access,
                     group.display_height,
@@ -488,6 +488,7 @@ class Root:
         dealer_groups = session.query(Group).filter(Group.is_dealer == True).all()
         for group in dealer_groups:
             if group.is_dealer and group.status_label == 'Pending Approval':
+                table_photo = FileService.get_existing_files(session, group, and_flags=['table_photo'])
                 full_name = group.leader.full_name if group.leader else ''
                 out.writerow([
                     group.name,
@@ -517,7 +518,7 @@ class Root:
                     group.ip_issues_label,
                     group.ip_issues_text,
                     group.other_cons,
-                    f"{c.URL_BASE}/mff_reports/view_table_photo?id={group.id}" if group.table_photo_filename else '',
+                    f"{c.URL_BASE}/services/download_file?id={table_photo.id}" if table_photo else '',
                     group.socials_checked,
                     group.table_seen,
                     group.ip_concerns,
