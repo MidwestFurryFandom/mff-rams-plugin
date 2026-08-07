@@ -142,7 +142,7 @@ class ExtraConfig:
 
         with Session() as session:
             account = session.current_attendee_account()
-            cart = PreregCart(listify(PreregCart.unpaid_preregs.values()))
+            cart = PreregCart(list(PreregCart.unpaid_preregs.values()))
             pit_in_cart = any([a for a in cart.attendees if a.badge_type == c.PARENT_IN_TOW_BADGE])
             paid_minors_in_cart = any([a for a in cart.attendees if a.birthdate and a.age_now_or_at_con < 18 \
                                        and a.total_cost_if_valid])

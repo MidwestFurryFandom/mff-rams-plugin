@@ -34,7 +34,7 @@ ContactInfo.field_validation.validations['country']['exclude'] = country_exclusi
 PersonalInfo.field_validation.required_fields.update({
     'consent_form_email': ("Please enter an email address for us to send consent forms to.",
                            'consent_form_email',
-                           lambda x: False and x.form.model.birthdate and x.form.model.age_group_conf['consent_form'])
+                           lambda x: x.form.model.birthdate and x.form.model.age_group_conf['consent_form'])
 })
 
 
@@ -150,7 +150,7 @@ TableInfo.field_validation.required_fields.update({
     'power_usage': ("Please provide a list of what powered devices you expect to use.", 'power',
                     lambda x: x > 0),
     'location_preference': ("Please select if you would like to be considered for a specific kind of location.",
-                            'location_preference', lambda x: x.form.model.is_dealer and x.form.tables.data and int(x.form.tables.data) in [1, 4]),
+                            'location_preference', lambda x: x.form.model.is_dealer and x.form.tables.data and int(x.form.tables.data) < 3),
     'display_height': "Please tell us the estimated height of your display, including signage and banners.",
     'adult_content': ("Please tell us if you are selling 18+ content.", 'adult_content',
                       lambda x: x.form.model.is_dealer),
