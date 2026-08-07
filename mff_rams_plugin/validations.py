@@ -68,9 +68,7 @@ def not_same_cellphone_ec(form, field):
 
 OtherInfo.field_validation.required_fields.update({
     'accessibility_requests': ("Please select one or more accessbility accommodations.",
-                               'requested_accessibility_services'),
-    'other_accessibility_requests': ("Please describe what other accommodations you need.",
-                                     'accessibility_requests', lambda x: c.OTHER in x.data),
+                               'requested_accessibility_services')
 })
 
 

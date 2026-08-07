@@ -23,16 +23,22 @@ class PersonalInfo:
 @MagForm.form_mixin
 class OtherInfo:
     promo_code = StringField('Registration Code', description="A discount code or an art show agent code.")
-    accessibility_requests = SelectMultipleField('Accommodations Desired',
+    accessibility_requests = SelectMultipleField('To help us coordinate services that require advance planning, please indicate if you will need any of the following:',
                                                  choices=c.ACCESSIBILITY_SERVICE_OPTS, coerce=int, widget=MultiCheckbox())
-    other_accessibility_requests = StringField('What other accommodations do you need?')
     fursuiting = BooleanField('I plan on fursuiting at the event.', widget=SwitchInput(), description="This is just to help us prepare; it's okay if your plans change!")
 
     def staffing_desc(self):
         return ""
 
     def requested_accessibility_services_label(self):
-        return "I have an accessibility request."
+        return "I plan to use Accessibility Services."
+    
+    def accessibility_requests_desc(self):
+        return Markup("""Note: Responses are for planning purposes only. Availability may be limited.
+                      <br/><br/>We offer a wide range of Accessibility Services designed to support different needs during the convention.
+                      Most services do not require advance notice. Please visit our
+                      <a href="https://www.furfest.org/attend/accessibility" target="_blank">webpage</a> and
+                      <a href="https://www.furfest.org/attend/accessibility/faq" target="_blank">FAQ</a> for more information.""")
 
 
 @MagForm.form_mixin
@@ -51,7 +57,6 @@ class StaffingInfo:
 
 @MagForm.form_mixin
 class BadgeExtras:
-    field_aliases = {'badge_type': ['badge_type_single']}
     field_validation, new_or_changed_validation = CustomValidation(), CustomValidation()
     has_restrictions = BooleanField("I have a dietary restriction that needs accommodating for convention-sponsored meals.")
     dietary_restrictions = StringField("Dietary Restriction(s)")

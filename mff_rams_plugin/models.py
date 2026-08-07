@@ -201,7 +201,7 @@ class Attendee:
     comped_reason: str = Field(sa_type=String, default='')
     fursuiting: bool = Field(sa_type=Boolean, default=False)
     accessibility_requests: str = Field(sa_type=MultiChoice(c.ACCESSIBILITY_SERVICE_OPTS), default='')
-    other_accessibility_requests: str = Field(sa_type=String, default='')
+    other_accessibility_requests: str = Field(sa_type=String, default='') # Not currently used
     dietary_restrictions: str = Field(sa_type=String, default='')
 
     @classproperty
