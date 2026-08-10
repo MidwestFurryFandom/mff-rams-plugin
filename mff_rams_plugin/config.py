@@ -102,12 +102,12 @@ class ExtraConfig:
     @request_cached_property
     @dynamic
     def SPONSOR_BADGE_COUNT(self):
-        return self.get_badge_count_by_type(c.SPONSOR_BADGE)
+        return self.get_badge_count_by_type(c.SPONSOR_BADGE) + self.get_comped_promo_codes(self.SPONSOR_BADGE)
 
     @request_cached_property
     @dynamic
     def SHINY_BADGE_COUNT(self):
-        return self.get_badge_count_by_type(c.SHINY_BADGE)
+        return self.get_badge_count_by_type(c.SHINY_BADGE) + self.get_comped_promo_codes(self.SHINY_BADGE)
 
     @property
     def PREREG_BADGE_TYPES(self):
