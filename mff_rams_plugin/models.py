@@ -1,22 +1,25 @@
+import logging
 import math
+
 from datetime import timedelta
 from markupsafe import Markup
-from residue import CoerceUTF8 as UnicodeText
-from pockets import cached_classproperty, classproperty
-from pockets.autolog import log
-from sqlalchemy import and_, or_, not_
+from sqlalchemy import and_, or_, not_, String
 from sqlalchemy.types import Boolean, Integer, Numeric
-from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy.dialects.postgresql.json import JSONB
+from sqlalchemy.ext.mutable import MutableDict
+from typing import ClassVar
 
 from uber.models import Session
 from uber.badge_funcs import get_real_badge_type
 from uber.config import c
-from uber.utils import add_opt, localized_now, localize_datetime, remove_opt, normalize_email_legacy
-from uber.models.types import Choice, DefaultColumn as Column, MultiChoice
-from uber.decorators import presave_adjustment
+from uber.utils import add_opt, localized_now, localize_datetime, remove_opt, normalize_email
+from uber.models.types import (Choice, MultiChoice, DefaultColumn as Column, default_relationship as relationship,
+                               DefaultField as Field, DefaultRelationship as Relationship)
+from uber.decorators import cached_classproperty, classproperty, presave_adjustment
 from uber.tasks.registration import update_receipt
 from .tasks import check_pit_badge
 
+log = logging.getLogger(__name__)
 
 @Session.model_mixin
 class SessionMixin:
@@ -54,34 +57,33 @@ class SessionMixin:
 
 @Session.model_mixin
 class Group:
-    power = Column(Choice(c.DEALER_POWER_OPTS), default=-1)
-    power_fee = Column(Integer, default=0)
-    power_usage = Column(UnicodeText)
-    location_preference = Column(Choice(c.DEALER_LOCATION_PREFERENCE_OPTS), default=c.NONE)
-    location = Column(UnicodeText, default='', admin_only=True)
-    table_fee = Column(Integer, default=0)
-    tax_number = Column(UnicodeText)
-    social_media = Column(UnicodeText)
-    review_notes = Column(UnicodeText)
-    mff_alumni = Column(Boolean, default=False)
-    art_show_intent = Column(Boolean, default=False)
-    adult_content = Column(Choice(c.DEALER_ADULT_OPTS, allow_unspecified=True), default=0)
-    ip_issues = Column(Choice(c.DEALER_IP_OPTS, allow_unspecified=True), default=0)
-    ip_issues_text = Column(UnicodeText)
-    other_cons = Column(UnicodeText)
-    table_photo_filename = Column(UnicodeText)
-    table_photo_content_type = Column(UnicodeText)
-    shipping_boxes = Column(Boolean, default=False)
-    agreed_to_dealer_policies = Column(Boolean, default=False)
-    agreed_to_ip_policy = Column(Boolean, default=False)
-    vehicle_access = Column(Boolean, default=False)
-    display_height = Column(UnicodeText)
-    at_con_standby = Column(Boolean, default=False)
-    at_con_standby_text = Column(UnicodeText)
-    socials_checked = Column(Boolean, default=False)
-    table_seen = Column(Boolean, default=False)
-    ip_concerns = Column(UnicodeText)
-    other_concerns = Column(UnicodeText)
+    flexible_tables: bool = Field(sa_type=Boolean, default=False)
+    suite_tables: int = Field(sa_type=Integer, default=0)
+    power: int = Field(sa_column=Column(Choice(c.DEALER_POWER_OPTS)), default=-1)
+    power_fee: int = Field(sa_type=Integer, default=0)
+    power_usage: str = Field(sa_type=String, default='')
+    location_preference: int = Field(sa_column=Column(Choice(c.DEALER_LOCATION_PREFERENCE_OPTS)), default=c.NONE)
+    location: str = Field(sa_type=String, default='')
+    additional_website: str = Field(sa_type=String, default='')
+    table_fee: int = Field(sa_type=Integer, default=0)
+    tax_number: str = Field(sa_type=String, default='')
+    social_media: str = Field(sa_type=MutableDict.as_mutable(JSONB), default_factory=dict)
+    review_notes: str = Field(sa_type=String, default='')
+    mff_alumni: bool = Field(sa_type=Boolean, default=False)
+    art_show_intent: bool = Field(sa_type=Boolean, default=False)
+    adult_content: int = Field(sa_column=Column(Choice(c.DEALER_ADULT_OPTS, allow_unspecified=True)), default=0)
+    ip_issues: int = Field(sa_column=Column(Choice(c.DEALER_IP_OPTS, allow_unspecified=True)), default=0)
+    ip_issues_text: str = Field(sa_type=String, default='')
+    other_cons: str = Field(sa_type=String, default='')
+    shipping_boxes: bool = Field(sa_type=Boolean, default=False)
+    agreed_to_dealer_policies: bool = Field(sa_type=Boolean, default=False)
+    agreed_to_ip_policy: bool = Field(sa_type=Boolean, default=False)
+    vehicle_access: bool = Field(sa_type=Boolean, default=False)
+    display_height: str = Field(sa_type=String, default='')
+    socials_checked: bool = Field(sa_type=Boolean, default=False)
+    table_seen: bool = Field(sa_type=Boolean, default=False)
+    ip_concerns: str = Field(sa_type=String, default='')
+    other_concerns: str = Field(sa_type=String, default='')
 
     @cached_classproperty
     def import_fields(cls):
@@ -112,9 +114,30 @@ class Group:
         # Fix some data weirdness with prior year groups
         self.tables = int(self.tables)
 
+    @presave_adjustment
+    def no_suite_no_suite_tables(self):
+        if self.tables < 6:
+            self.suite_tables = 0
+
+    @presave_adjustment
+    def blank_platform(self):
+        if not self.social_media:
+            return
+
+        for num in ['1', '2', '3']:
+            if not self.social_media.get('platform_' + num, None):
+                self.social_media['username_' + num] = ''
+
+    def get_social_media_url(self, num):
+        num = str(num)
+        platform = self.social_media.get('platform_' + num, None)
+        if platform:
+            return c.DEALER_SOCIAL_MEDIA_URLS[platform] + self.social_media['username_' + num]
+        return ''
+
     @property
     def default_power_fee(self):
-        return c.POWER_PRICES.get(int(self.power), None)
+        return c.POWER_PRICES.get(int(self.power or -1), None)
     
     def convert_to_shared(self, session):
         self.tables = 0
@@ -167,57 +190,20 @@ class Group:
         emails = [a.email for a in self.attendees if not a.is_unassigned and not a.placeholder]
         return len(emails) != len(set(emails))
 
-    @property
-    def table_photo(self):
-        if not self.table_photo_filename:
-            return ''
-        return Markup(f"""
-                      <a href="../mff_reports/view_table_photo?id={self.id}" target="_blank">
-                      {self.table_photo_filename}
-                      </a>""")
-
-    @table_photo.setter
-    def table_photo(self, value):
-        if not value or not getattr(value, 'filename', None):
-            return
-
-        import shutil
-        import cherrypy
-
-        if not isinstance(value, cherrypy._cpreqbody.Part):
-            log.error(f"Tried to set table_photo for group {self.name} with invalid value type: {type(value)}")
-            return
-
-        self.table_photo_filename = value.filename
-        self.table_photo_content_type = value.content_type.value
-
-        with open(self.table_photo_filepath, 'wb') as f:
-            shutil.copyfileobj(value.file, f)
-
-    @property
-    def table_photo_download_filename(self):
-        name = ''.join(s for s in self.name.strip() if s.isalnum() or s == ' ')
-        return ' '.join(name.split()).replace(' ', '_') + '_' + self.table_photo_filename
-
-    @property
-    def table_photo_filepath(self):
-        import os
-        return os.path.join(c.UPLOADED_FILES_DIR, c.GROUPS_TABLE_PHOTOS_DIR, str(self.id))
-
 
 @Session.model_mixin
 class ArtistMarketplaceApplication:
-    MATCHING_DEALER_FIELDS = ['email_address', 'website', 'name', 'tax_number']
+    MATCHING_DEALER_FIELDS: ClassVar = ['email_address', 'website', 'name', 'tax_number']
 
 
 @Session.model_mixin
 class Attendee:
-    consent_form_email = Column(UnicodeText)
-    comped_reason = Column(UnicodeText, default='', admin_only=True)
-    fursuiting = Column(Boolean, default=False)
-    accessibility_requests = Column(MultiChoice(c.ACCESSIBILITY_SERVICE_OPTS))
-    other_accessibility_requests = Column(UnicodeText)
-    dietary_restrictions = Column(UnicodeText)
+    consent_form_email: str = Field(sa_type=String, default='')
+    comped_reason: str = Field(sa_type=String, default='')
+    fursuiting: bool = Field(sa_type=Boolean, default=False)
+    accessibility_requests: str = Field(sa_type=MultiChoice(c.ACCESSIBILITY_SERVICE_OPTS), default='')
+    other_accessibility_requests: str = Field(sa_type=String, default='') # Not currently used
+    dietary_restrictions: str = Field(sa_type=String, default='')
 
     @classproperty
     def skip_placeholder_fields(self):
@@ -259,18 +245,8 @@ class Attendee:
             self.paid = c.NEED_NOT_PAY
             self.comped_reason = "Automated: Not Attending badge status."
 
-            if not self.is_new:
-                update_receipt(self.id, {'paid': c.NEED_NOT_PAY})
-
-    @presave_adjustment
-    def in_tow_need_not_pay(self):
-        if self.badge_type in [c.KID_IN_TOW_BADGE, c.PARENT_IN_TOW_BADGE]:
-            self.paid = c.NEED_NOT_PAY
-
-            if self.is_new and self.badge_status == c.PENDING_STATUS:
-                self.badge_status == c.COMPLETE
-            elif not self.is_new:
-                update_receipt(self.id, {'paid': c.NEED_NOT_PAY})
+            if not self.is_new and self.session:
+                update_receipt(self.id, {'paid': c.NEED_NOT_PAY}, session=self.session)
 
     def calculate_badge_cost(self, use_promo_code=False, include_price_override=True):
         # Adds overrides for a couple special cases where a badge should be free
@@ -341,6 +317,14 @@ class Attendee:
                 self.badge_type = c.ATTENDEE_BADGE
 
     @property
+    def needs_comped_reason(self):
+        return self.paid == c.NEED_NOT_PAY and not self.comped_reason and self.badge_type not in [
+        c.KID_IN_TOW_BADGE, c.PARENT_IN_TOW_BADGE, c.STAFF_BADGE] and (
+            self.age_discount == 1 or abs(self.age_discount) < self.new_badge_cost) and (
+            c.STAFF_RIBBON not in self.ribbon_ints) and (
+            not self.promo_code and not self.promo_code_code)
+
+    @property
     def cannot_abandon_badge_reason(self):
         return self.cannot_abandon_badge_check()
     
@@ -353,13 +337,6 @@ class Attendee:
         if self.badge_type in c.BADGE_TYPE_PRICES and c.AFTER_EPOCH:
             return f"Upgraded badges cannot be cancelled after the event starts. \
                 Please contact {email_only(c.REGDESK_EMAIL)} for a partial refund."
-
-        if self.art_show_applications and self.art_show_applications[0].is_valid:
-            return f"Please contact {email_only(c.ART_SHOW_EMAIL)} to cancel your art show application first."
-        if self.art_agent_apps and any(app.is_valid for app in self.art_agent_apps):
-            return "Please ask the artist you're agenting for {} first.".format(
-                "assign a new agent" if c.ONE_AGENT_PER_APP else "unassign you as an agent."
-            )
 
         reason = ""
         if c.ATTENDEE_ACCOUNTS_ENABLED and self.managers and including_last_adult:
@@ -376,12 +353,21 @@ class Attendee:
                 reason = f"As a leader of a group, you cannot {'abandon' if not self.group.cost else 'refund'} your badge."
             elif self.amount_paid:
                 reason = self.cannot_self_service_refund_reason
+                if reason and ("Refunds will open" in reason or "Refunds are no longer" in reason):
+                    return reason
 
         if reason:
             return reason + " Please {} contact us at {}{}.".format(
                 "transfer your badge instead or" if self.is_transferable else "",
                 email_only(c.REGDESK_EMAIL),
                 " to cancel your badge")
+        
+        if self.art_show_application and self.art_show_application.is_valid:
+            return f"Please contact {email_only(c.ART_SHOW_EMAIL)} to cancel your art show application first."
+        if self.art_agent_apps and any(app.is_valid for app in self.art_agent_apps):
+            return "Please ask the artist you're agenting for to {} first.".format(
+                "assign a new agent" if c.ONE_AGENT_PER_APP else "unassign you as an agent."
+            )
 
     @property
     def ribbon_labels(self):
@@ -533,6 +519,13 @@ class Attendee:
 
 @Session.model_mixin
 class AttendeeAccount:
+    @property
+    def default_group_email(self):
+        local, domain = normalize_email(self.email, split_address=True)
+        if domain not in c.SSO_EMAIL_DOMAINS:
+            return self.email
+        return ''
+    
     @property
     def pit_badge(self):
         for attendee in self.valid_attendees + self.pending_attendees:

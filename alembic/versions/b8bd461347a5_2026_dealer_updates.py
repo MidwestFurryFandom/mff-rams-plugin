@@ -1,20 +1,21 @@
-"""Add tax field for dealers
+"""2026 Dealer updates
 
-Revision ID: 1da162016924
-Revises: 6fd3a80ca4e0
-Create Date: 2018-05-17 19:18:53.592959
+Revision ID: b8bd461347a5
+Revises: c05aa8f9fd4c
+Create Date: 2026-08-01 12:19:40.100947
 
 """
 
 
 # revision identifiers, used by Alembic.
-revision = '1da162016924'
-down_revision = '6fd3a80ca4e0'
+revision = 'b8bd461347a5'
+down_revision = 'c05aa8f9fd4c'
 branch_labels = None
 depends_on = None
 
 from alembic import op
 import sqlalchemy as sa
+
 
 
 try:
@@ -51,8 +52,16 @@ sqlite_reflect_kwargs = {
 
 
 def upgrade():
-    op.add_column('group', sa.Column('tax_number', sa.Unicode(), server_default='', nullable=False))
+    op.add_column('group', sa.Column('additional_website', sa.VARCHAR(), server_default=sa.text("''::character varying"), nullable=False))
+    op.add_column('group', sa.Column('flexible_tables', sa.Boolean(), server_default='False', nullable=False))
+    op.add_column('group', sa.Column('suite_tables', sa.Integer(), server_default='0', nullable=False))
+    op.drop_column('group', 'at_con_standby_text')
+    op.drop_column('group', 'at_con_standby')
 
 
 def downgrade():
-    op.drop_column('group', 'tax_number')
+    op.add_column('group', sa.Column('at_con_standby', sa.BOOLEAN(), server_default=sa.text('false'), autoincrement=False, nullable=False))
+    op.add_column('group', sa.Column('at_con_standby_text', sa.VARCHAR(), server_default=sa.text("''::character varying"), autoincrement=False, nullable=False))
+    op.drop_column('group', 'suite_tables')
+    op.drop_column('group', 'flexible_tables')
+    op.drop_column('group', 'additional_website')

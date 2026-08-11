@@ -1,20 +1,21 @@
-"""Add tax field for dealers
+"""Update social media field
 
-Revision ID: 1da162016924
-Revises: 6fd3a80ca4e0
-Create Date: 2018-05-17 19:18:53.592959
+Revision ID: c05aa8f9fd4c
+Revises: 3bf0accd7df9
+Create Date: 2026-07-29 21:18:04.085791
 
 """
 
 
 # revision identifiers, used by Alembic.
-revision = '1da162016924'
-down_revision = '6fd3a80ca4e0'
+revision = 'c05aa8f9fd4c'
+down_revision = '3bf0accd7df9'
 branch_labels = None
 depends_on = None
 
 from alembic import op
 import sqlalchemy as sa
+from sqlalchemy.dialects import postgresql
 
 
 try:
@@ -51,8 +52,14 @@ sqlite_reflect_kwargs = {
 
 
 def upgrade():
-    op.add_column('group', sa.Column('tax_number', sa.Unicode(), server_default='', nullable=False))
+    op.drop_column('group', 'social_media')
+    op.add_column('group', sa.Column('social_media', postgresql.JSONB(astext_type=sa.Text()), server_default='{}', nullable=False))
+    op.drop_column('group', 'table_photo_content_type')
+    op.drop_column('group', 'table_photo_filename')
 
 
 def downgrade():
-    op.drop_column('group', 'tax_number')
+    op.add_column('group', sa.Column('table_photo_filename', sa.VARCHAR(), server_default=sa.text("''::character varying"), autoincrement=False, nullable=False))
+    op.add_column('group', sa.Column('table_photo_content_type', sa.VARCHAR(), server_default=sa.text("''::character varying"), autoincrement=False, nullable=False))
+    op.drop_column('group', 'social_media')
+    op.add_column('group', sa.Column('social_media', sa.VARCHAR(), server_default=sa.text("''::character varying"), autoincrement=False, nullable=False))

@@ -27,7 +27,9 @@ get mffCellphoneRequired() { return (this.dealer || this.badge_type == {{ c.STAF
 {% block age %}
   <div class="col-sm" x-init="$watch('birthdate', (value) => toggleConsentFormEmail($data))">
     {% call form_macros.input(personal_info.birthdate, admin_text=attendee.age_group_conf.desc, alpine_model="birthdate", required_if="!badge_placeholder") %}
+    {% if not admin_area %}
     <div x-show="consent_form">{{ form_macros.input(personal_info.consent_form_email, required_if="consent_form && !badge_placeholder") }}</div>
+    {% endif %}
     {% endcall %}
   </div>
 
@@ -50,6 +52,7 @@ get mffCellphoneRequired() { return (this.dealer || this.badge_type == {{ c.STAF
   <div class="col-sm">
     {% call form_macros.input(personal_info.email, value=attendee_email, required_if="emailRequired", **{':disabled':'copy_email'}) %}
       {% if is_prereg_dealer %}
+        <div class="form-text">Do not use Furfest Staff email addresses.</div>
         {{ form_macros.input(personal_info.copy_email, **{'x-model.boolean':'copy_email'}) }}
       {% endif %}
     {% endcall %}

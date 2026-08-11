@@ -1,14 +1,17 @@
 import cherrypy
+import logging
 from cherrypy.lib.static import serve_file
 from collections import defaultdict
-from pockets.autolog import log
 from sqlalchemy import func
 from sqlalchemy.sql.expression import literal
 
 from uber.config import c
 from uber.decorators import all_renderable, csv_file, public
+from uber.files import FileService
 from uber.models import Attendee, Group
 from uber.utils import localized_now
+
+log = logging.getLogger(__name__)
 
 
 def get_dict_sum(dict_to_sum):
@@ -184,8 +187,7 @@ class Root:
             'Badge Name',
             'Badge Number',
             'Email',
-            'Desired Accommodations',
-            'Other Desired Accommodations'
+            'Desired Accommodations'
         ])
 
         accessibility_request_attendees = session.query(Attendee).filter(Attendee.accessibility_requests != '').all()
@@ -195,20 +197,8 @@ class Root:
                 attendee.badge_printed_name,
                 attendee.badge_num,
                 attendee.email,
-                ", ".join(attendee.accessibility_requests_labels),
-                attendee.other_accessibility_requests
+                ", ".join(attendee.accessibility_requests_labels)
             ])
-
-    @public
-    def view_table_photo(self, session, id):
-        group = session.group(id)
-        cherrypy.response.headers['Cache-Control'] = 'no-store'
-
-        return serve_file(
-            group.table_photo_filepath,
-            disposition="attachment",
-            name=group.table_photo_download_filename if session.current_admin_account() else group.table_photo_filename,
-            content_type=group.table_photo_content_type)
 
     @csv_file
     def full_dealer_report(self, out, session):
@@ -217,10 +207,13 @@ class Root:
             'Dealer Name',
             'Email',
             'Tables',
+            'Suite Tables',
+            'Flexible Tables?',
             'Badges',
             'Status',
             'Amount Paid',
             'Website URL',
+            'Additional Website URL',
             'Wares',
             'Wares - Other',
             'Description',
@@ -231,20 +224,20 @@ class Root:
             'Power Request Info',
             'Location Preference',
             'Location',
-            'Social Media Info',
+            'Social Media URL 1',
+            'Social Media URL 2',
+            'Social Media URL 3',
             'Review Notes',
             'MFF Alumni?',
             'Art Show?',
             'Adult Content?',
             'IP Issues?',
             'IP Issues Desc',
-            'Other 2025 Events',
+            'Other 2026 Events',
             'Table Setup Photo',
             'Shipping Boxes?',
             'Vehicle Access?',
             'Display Height',
-            'At Con Standby?',
-            'At-Con Contact Info',
             'Socials Checked?',
             'Table Seen?',
             'IP Concerns',
@@ -253,16 +246,20 @@ class Root:
         dealer_groups = session.query(Group).filter(Group.is_dealer == True).all()
         for group in dealer_groups:
             if group.is_dealer:
+                table_photo = FileService.get_existing_files(session, group, and_flags=['table_photo'])
                 full_name = group.leader.full_name if group.leader else ''
                 out.writerow([
                     group.name,
                     full_name,
                     group.leader.email if group.leader else '',
                     group.tables,
+                    group.suite_tables,
+                    group.flexible_tables,
                     group.badges,
                     group.status_label,
                     group.amount_paid,
                     group.website,
+                    group.additional_website,
                     group.categories_labels,
                     group.categories_text,
                     group.description,
@@ -273,7 +270,9 @@ class Root:
                     group.power_usage,
                     group.location_preference_label,
                     group.location,
-                    group.social_media,
+                    group.get_social_media_url(1),
+                    group.get_social_media_url(2),
+                    group.get_social_media_url(3),
                     group.review_notes,
                     group.mff_alumni,
                     group.art_show_intent,
@@ -281,12 +280,10 @@ class Root:
                     group.ip_issues_label,
                     group.ip_issues_text,
                     group.other_cons,
-                    f"{c.URL_BASE}/mff_reports/view_table_photo?id={group.id}" if group.table_photo_filename else '',
+                    f"{c.URL_BASE}/services/download_file?id={table_photo.id}" if table_photo else '',
                     group.shipping_boxes,
                     group.vehicle_access,
                     group.display_height,
-                    group.at_con_standby,
-                    group.at_con_standby_text,
                     group.socials_checked,
                     group.table_seen,
                     group.ip_concerns,
@@ -458,7 +455,10 @@ class Root:
             'Business Name',
             'Dealer Name',
             'Tables',
+            'Suite Tables',
+            'Flexible Tables?',
             'Website URL',
+            'Additional Website URL',
             'Email',
             'Wares',
             'Wares - Other',
@@ -469,14 +469,16 @@ class Root:
             'Power Requested',
             'Power Request Info',
             'Location Preference',
-            'Social Media Info',
+            'Social Media URL 1',
+            'Social Media URL 2',
+            'Social Media URL 3',
             'Review Notes',
             'MFF Alumni?',
             'Art Show?',
             'Adult Content?',
             'IP Issues?',
             'IP Issues Desc',
-            'Other 2025 Events',
+            'Other 2026 Events',
             'Table Setup Photo',
             'Socials Checked?',
             'Table Seen?',
@@ -486,12 +488,16 @@ class Root:
         dealer_groups = session.query(Group).filter(Group.is_dealer == True).all()
         for group in dealer_groups:
             if group.is_dealer and group.status_label == 'Pending Approval':
+                table_photo = FileService.get_existing_files(session, group, and_flags=['table_photo'])
                 full_name = group.leader.full_name if group.leader else ''
                 out.writerow([
                     group.name,
                     full_name,
                     group.tables,
+                    group.suite_tables,
+                    group.flexible_tables,
                     group.website,
+                    group.additional_website,
                     group.leader.email if group.leader else '',
                     group.categories_labels,
                     group.categories_text,
@@ -502,7 +508,9 @@ class Root:
                     group.power,
                     group.power_usage,
                     group.location_preference_label,
-                    group.social_media,
+                    group.get_social_media_url(1),
+                    group.get_social_media_url(2),
+                    group.get_social_media_url(3),
                     group.review_notes,
                     group.mff_alumni,
                     group.art_show_intent,
@@ -510,7 +518,7 @@ class Root:
                     group.ip_issues_label,
                     group.ip_issues_text,
                     group.other_cons,
-                    f"{c.URL_BASE}/mff_reports/view_table_photo?id={group.id}" if group.table_photo_filename else '',
+                    f"{c.URL_BASE}/services/download_file?id={table_photo.id}" if table_photo else '',
                     group.socials_checked,
                     group.table_seen,
                     group.ip_concerns,

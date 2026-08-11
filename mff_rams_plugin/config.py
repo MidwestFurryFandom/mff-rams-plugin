@@ -1,12 +1,14 @@
+import logging
+
 from collections import defaultdict
 from datetime import timedelta
-from pockets.autolog import log
-from pockets import listify
 from pathlib import Path
 
 from uber.config import c, Config, dynamic, parse_config, request_cached_property
 from uber.menu import MenuItem
-from uber.utils import localized_now
+from uber.utils import localized_now, listify
+
+log = logging.getLogger(__name__)
 
 config = parse_config("mff_rams_plugin", Path(__file__).parents[0])
 c.include_plugin_config(config)
@@ -100,12 +102,12 @@ class ExtraConfig:
     @request_cached_property
     @dynamic
     def SPONSOR_BADGE_COUNT(self):
-        return self.get_badge_count_by_type(c.SPONSOR_BADGE)
+        return self.get_badge_count_by_type(c.SPONSOR_BADGE) + self.get_comped_promo_codes(self.SPONSOR_BADGE)
 
     @request_cached_property
     @dynamic
     def SHINY_BADGE_COUNT(self):
-        return self.get_badge_count_by_type(c.SHINY_BADGE)
+        return self.get_badge_count_by_type(c.SHINY_BADGE) + self.get_comped_promo_codes(self.SHINY_BADGE)
 
     @property
     def PREREG_BADGE_TYPES(self):
@@ -140,7 +142,7 @@ class ExtraConfig:
 
         with Session() as session:
             account = session.current_attendee_account()
-            cart = PreregCart(listify(PreregCart.unpaid_preregs.values()))
+            cart = PreregCart(list(PreregCart.unpaid_preregs.values()))
             pit_in_cart = any([a for a in cart.attendees if a.badge_type == c.PARENT_IN_TOW_BADGE])
             paid_minors_in_cart = any([a for a in cart.attendees if a.birthdate and a.age_now_or_at_con < 18 \
                                        and a.total_cost_if_valid])

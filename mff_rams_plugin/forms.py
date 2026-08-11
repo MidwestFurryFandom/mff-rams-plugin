@@ -1,13 +1,14 @@
+import logging
 from markupsafe import Markup
 from wtforms import (BooleanField, DecimalField, EmailField, Form, FormField,
                      HiddenField, SelectField, SelectMultipleField, IntegerField,
                      StringField, FileField, TextAreaField)
-from pockets.autolog import log
 
 from uber.config import c
-from uber.forms import TableInfo, CustomValidation, MultiCheckbox, MagForm, IntSelect, SwitchInput, NumberInputGroup, HiddenIntField
+from uber.forms import TableInfo, CustomValidation, MultiCheckbox, MagForm, IntSelect, SwitchInput, NumberInputGroup, FileUploadField
 from uber.custom_tags import popup_link, format_currency, pluralize, table_prices
 
+log = logging.getLogger(__name__)
 
 @MagForm.form_mixin
 class PersonalInfo:
@@ -22,16 +23,22 @@ class PersonalInfo:
 @MagForm.form_mixin
 class OtherInfo:
     promo_code = StringField('Registration Code', description="A discount code or an art show agent code.")
-    accessibility_requests = SelectMultipleField('Accommodations Desired',
+    accessibility_requests = SelectMultipleField('To help us coordinate services that require advance planning, please indicate if you will need any of the following:',
                                                  choices=c.ACCESSIBILITY_SERVICE_OPTS, coerce=int, widget=MultiCheckbox())
-    other_accessibility_requests = StringField('What other accommodations do you need?')
     fursuiting = BooleanField('I plan on fursuiting at the event.', widget=SwitchInput(), description="This is just to help us prepare; it's okay if your plans change!")
 
     def staffing_desc(self):
         return ""
 
     def requested_accessibility_services_label(self):
-        return "I have an accessibility request."
+        return "I plan to use Accessibility Services."
+    
+    def accessibility_requests_desc(self):
+        return Markup("""Note: Responses are for planning purposes only. Availability may be limited.
+                      <br/><br/>We offer a wide range of Accessibility Services designed to support different needs during the convention.
+                      Most services do not require advance notice. Please visit our
+                      <a href="https://www.furfest.org/attend/accessibility" target="_blank">webpage</a> and
+                      <a href="https://www.furfest.org/attend/accessibility/faq" target="_blank">FAQ</a> for more information.""")
 
 
 @MagForm.form_mixin
@@ -50,7 +57,6 @@ class StaffingInfo:
 
 @MagForm.form_mixin
 class BadgeExtras:
-    field_aliases = {'badge_type': ['badge_type_single']}
     field_validation, new_or_changed_validation = CustomValidation(), CustomValidation()
     has_restrictions = BooleanField("I have a dietary restriction that needs accommodating for convention-sponsored meals.")
     dietary_restrictions = StringField("Dietary Restriction(s)")
@@ -78,8 +84,22 @@ class Consents:
         return ""
 
 
+class DealerSocialMedia(MagForm):
+    platform_1 = SelectField('Platform 1', default=0,
+                             coerce=int, choices=[(0, 'None')] + c.DEALER_SOCIAL_MEDIA_OPTS)
+    username_1 = StringField('Username')
+    platform_2 = SelectField('Platform 2', default=0,
+                             coerce=int, choices=[(0, 'None')] + c.DEALER_SOCIAL_MEDIA_OPTS)
+    username_2 = StringField('Username')
+    platform_3 = SelectField('Platform 3', default=0,
+                             coerce=int, choices=[(0, 'None')] + c.DEALER_SOCIAL_MEDIA_OPTS)
+    username_3 = StringField('Username')
+
+
 @MagForm.form_mixin
 class TableInfo:
+    suite_tables = IntegerField('Suite Tables', description="Number of tables requested to be provided in suite. Default is zero.")
+    flexible_tables = BooleanField('I am willing to purchase less tables than my initial request to assist in the Dealer Selection process.')
     power = IntegerField('Power Level', widget=IntSelect(), description="Final cost for power is subject to change.")
     power_usage = TextAreaField('Power Usage', description="Please provide a listing of what devices you will be using.")
     location_preference = SelectField('Location Preference', default=0, coerce=int,
@@ -89,14 +109,18 @@ class TableInfo:
                              If you have an Illinois Business license please provide the number here. Note that this 
                              number is in the format 1234-5678; it is not your Federal Tax ID or any other Tax ID number 
                              you may have.""", render_kw={'pattern': "[0-9]{4}-[0-9]{4}", 'title': "1234-5678"})
+    additional_website = StringField('Optional Additional Website',
+                                     description="""If you have an additional website that shows your merchandise or provides more information about you as a Dealer,
+                                     you may include it here. This site must be publicly viewable (no passwords or login required).
+                                     It is used only for Dealer selection and is not required to submit your application.""")
     review_notes = TextAreaField('Review Notes', description="""
                                  Please provide any additional information which you feel could assist in our selection process. 
                                  This could include additional links other than your website or more detailed merchandise 
                                  descriptions.""")
     description = StringField('Merchandise Description',
-                              description="This will be used both for dealer selection (if necessary) and in all dealer listings.")
-    social_media = TextAreaField("Social Media Details",
-                                 description="Please list any social media accounts you use that should be included in the review process. Applications without any social media accounts listed are less likely to be considered.")
+                              description="This will be published publicly on our Dealer Listing webpage as a description of your company and what you are selling.")
+    social_media = FormField(DealerSocialMedia, "Social Media",
+                             description="Please list up to three social media accounts you use that should be included in the review process. Applications without any social media accounts listed are less likely to be considered.")
     mff_alumni = BooleanField('I have vended at Midwest FurFest before.')
     art_show_intent = BooleanField('I plan to apply to the Midwest FurFest Art Show.')
     adult_content = SelectField('Selling 18+ Content?', coerce=int, choices=[(0, 'Please select an option')] + c.DEALER_ADULT_OPTS)
@@ -106,16 +130,20 @@ class TableInfo:
     ip_issues_text = StringField('How did you handle past IP issues?')
     other_cons = StringField(f'Other Conventions in {c.EVENT_YEAR}',
                              description=f"Please list any events that you've vended at within {c.EVENT_YEAR}.")
-    table_photo = FileField('Table Setup', render_kw={'accept': "image/*"})
-    shipping_boxes = BooleanField('I plan on or may be shipping boxes or pallets to the convention center.')
+    table_photo = FileUploadField('Table Setup (max 5MB)', delete_existing=True, render_kw={'accept': "image/*"})
+    shipping_boxes = BooleanField('I plan on or may be shipping boxes or pallets to the convention center and/or require additional information to do so.')
     agreed_to_dealer_policies = BooleanField(Markup(f'I have read and agree to the Midwest FurFest policies for dealers.'))
     agreed_to_ip_policy = BooleanField(Markup(f'<strong>I have read and agree to the Midwest FurFest IP policies for dealers.</strong>'))
     vehicle_access = BooleanField('I will need vehicle access for load-in.')
     display_height = StringField('Display Height')
-    at_con_standby = BooleanField('Please add me to the on site stand-by list if my application is waitlisted. \
-                                  I will be available to be contacted if a spot becomes available on short term notice at the convention.')
-    at_con_standby_text = TextAreaField('On-site Contact Info',
-                                        description="Please provide the quickest way to contact you on-site.")
+
+    def website_desc(self):
+        return "Your Company/Artist Website you want us to publish publicly on our Dealer listing webpage. Please ensure the link works correctly."
+    
+    def special_needs_desc(self):
+        return f"""There are no guarantees that we can accommodate all special requests, but we will do our best.
+        (Examples: Close to Bathrooms, Low Noise Area, Placed near other Dealer etc.).
+        Also please be aware of this IMPORTANT NOTICE that Table Sharing is NO LONGER permitted for the {c.EVENT_YEAR} Dealers Den."""
 
     def agreed_to_dealer_policies_label(self):
         return Markup(f"""
@@ -128,9 +156,10 @@ class TableInfo:
                       </strong>""")
     
     def display_height_desc(self):
-        return Markup(f"""Estimated height of your entire Dealer Display (including all signage) from floor to top.
-                      <br/>Please be sure to read our new guidelines on display height limitations in the
-                      <a href="https://www.furfest.org/vendors/dealers/information" target="_blank">Dealers Agreement</a>.""")
+        return Markup(f"""Estimated height of your display including signage and banners.
+                      Please review our policies on display height restrictions
+                      <a href="https://www.furfest.org/vendors/dealers/information" target="_blank">HERE</a> if you have not already done so.
+                      """)
     
     def table_photo_desc(self):
         return Markup(f"""Please upload a photo of what your Dealer Display looks like, from within the past year,
@@ -152,6 +181,12 @@ class TableInfo:
 
     def tables_desc(self):
         return ""
+
+
+@MagForm.form_mixin
+class ContactInfo:
+    def email_address_desc(self):
+        return "Do not use Furfest Staff email addresses."
 
 
 @MagForm.form_mixin

@@ -1,7 +1,6 @@
 import re
 
 from datetime import date
-from pockets import classproperty
 from wtforms import validators
 from wtforms.validators import ValidationError, StopValidation
 
@@ -50,10 +49,25 @@ def no_approval_without_power_fee(group):
         return "Please set a power fee. To provide free power, turn off automatic recalculation."
 
 
+@validation.Group
+def social_media_1(group):
+    if group.social_media['platform_1'] and not group.social_media['username_1']:
+        return ('social_media-username_1', 'Please enter your username for social media platform 1, or select None.')
+
+
+@validation.Group
+def social_media_2(group):
+    if group.social_media['platform_2'] and not group.social_media['username_2']:
+        return ('social_media-username_2', 'Please enter your username for social media platform 2, or select None.')
+
+
+@validation.Group
+def social_media_3(group):
+    if group.social_media['platform_3'] and not group.social_media['username_3']:
+        return ('social_media-username_3', 'Please enter your username for social media platform 3, or select None.')
+
+
 @validation.Attendee
 def need_comped_reason(attendee):
-    if attendee.paid == c.NEED_NOT_PAY and not attendee.comped_reason and attendee.badge_type not in [
-        c.KID_IN_TOW_BADGE, c.PARENT_IN_TOW_BADGE, c.STAFF_BADGE] and abs(attendee.age_discount) < attendee.new_badge_cost and (
-            c.STAFF_RIBBON not in attendee.ribbon_ints) and (
-            not attendee.promo_code and not attendee.promo_code_code):
+    if attendee.needs_comped_reason:
         return ('comped_reason', 'You must enter a reason for comping this attendee\'s badge.')
