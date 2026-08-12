@@ -85,7 +85,8 @@ class Group:
 
     @cached_classproperty
     def import_fields(cls):
-        return ['power', 'power_fee', 'power_usage', 'tax_number', 'review_notes']
+        return ['power', 'power_fee', 'power_usage', 'tax_number', 'mff_alumni',
+                'adult_content', 'ip_issues', 'ip_issues_text', 'vehicle_access', 'display_height']
 
     @presave_adjustment
     def guest_groups_approved(self):
@@ -227,7 +228,7 @@ class Attendee:
 
     @cached_classproperty
     def import_fields(cls):
-        return ['comped_reason', 'fursuiting']
+        return ['comped_reason', 'fursuiting', 'dietary_restrictions']
 
     @presave_adjustment
     def save_group_cost(self):
