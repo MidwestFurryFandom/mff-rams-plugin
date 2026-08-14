@@ -15,13 +15,15 @@ Your registration confirmation number is <strong>{{ attendee.id }}</strong>. {% 
 Your account holder can update your contact information, change your badge name, or upgrade your registration level by <a href="{{ c.URL_BASE }}/preregistration/homepage" target="_blank">logging into their account</a>.
 {% else %}
 You can update your contact information, change your badge name, upgrade your registration level, or add additional registrations by <a href="{{ c.URL_BASE }}/preregistration/homepage" target="_blank">logging into your account</a> using the account email address {{ attendee.managers[0].email }}.
+
+In addition, if you have purchased more than one badge, please double-check that the correct badge has been designated as the "Account Owner." This information will be used to send important year-end tax information, if applicable. You may change the designated account owner by logging into your account and clicking "Account Settings."
 {% endif %}
 {% else %}
 You can update your contact information, change your badge name, or upgrade your registration level by clicking <a href="{{ c.URL_BASE }}/preregistration/confirm?id={{ attendee.id }}">here</a>.
 {% endif %}
 <br/> <br/>
 
-Badges are not mailed out before the event. Your badge will be available for pickup when you arrive at {{ c.EVENT_NAME }}.  Simply bring a photo ID to {% if attendee.group %}the Dealers Den Operations table outside the Dealers Den{% else %}registration in Hall A on the first floor of the Donald E. Stephens Convention Center{% endif %}, where you can pick up your badge.{% if not attendee.group %} Location and hours of registration can be found on our website at <a href="https://www.furfest.org/attend/register" target="_blank">https://www.furfest.org/attend/register</a>.{% endif %}
+Badges are not mailed out before the event. Your badge will be available for pickup when you arrive at {{ c.EVENT_NAME }}.  Simply bring a photo ID to {% if attendee.group %}the Dealers Den Operations table inside the Dealers Den{% else %}registration in Hall F on the first floor of the Donald E. Stephens Convention Center{% endif %}, where you can pick up your badge.{% if not attendee.group %} Location and hours of registration can be found on our website at <a href="https://www.furfest.org/attend/register" target="_blank">https://www.furfest.org/attend/register</a>.{% endif %}
 
 {% include "emails/reg_workflow/reg_notes.html" %}
 
