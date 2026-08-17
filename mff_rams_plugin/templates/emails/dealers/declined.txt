@@ -1,6 +1,6 @@
 {{ group.leader.first_name }},
 
-Unfortunately, with the huge number of excellent, talented, exciting dealers that have applied this year, we have had to make some hard decisions and cannot fit everyone we would have liked in the Dealer Den. We have far more applications than any kind of reasonable waitlist, so we are cancelling those dealers past 75 on the waitlist, which includes yours. This is in no way a reflection on your suitability or talent, but we want you to know so you can plan accordingly.
+Unfortunately, with the huge number of excellent, talented, exciting dealers that have applied this year, we have had to make some hard decisions and cannot fit everyone we would have liked in the Dealers Den. We have far more applications than any kind of reasonable waitlist, so we are cancelling those dealers past 50 on the waitlist, which includes {{ group.name }}. This is in no way a reflection on your suitability or talent, but we want you to know so you can plan accordingly.
 
 If you wish to withdraw from the {{ c.EVENT_NAME }} hotel room lottery, please fill out our service request form: https://jira.furfest.org/servicedesk/customer/portal/4/create/43
 
