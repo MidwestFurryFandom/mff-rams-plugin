@@ -1,3 +1,4 @@
+{% set staff_lottery = account.hotel_eligible_staff and c.STAFF_HOTEL_LOTTERY_OPEN %}
 <html>
 <head></head>
 <body>
@@ -5,12 +6,12 @@
 <p>Greetings!</p>
 
 <p>
-    The {{ c.EVENT_NAME }} hotel lottery is NOW OPEN! Please take the time to read about how to enter the lottery below.
+    The {{ c.EVENT_NAME }} {% if staff_lottery %}staff{% else %}attendee{% endif %} hotel lottery is NOW OPEN! Please take the time to read about how to enter the lottery below.
 </p>
 
 <p>
-    The hotel lottery will end at 
-    {{ c.HOTEL_LOTTERY_FORM_DEADLINE|datetime_local }}. Being first doesn't matter for the lottery, so please take your time when entering!</p>
+    The {% if staff_lottery %}staff{% else %}attendee{% endif %} hotel lottery will end at 
+    {% if staff_lottery %}{{ c.HOTEL_LOTTERY_STAFF_DEADLINE|datetime_local }}{% else %}{{ c.HOTEL_LOTTERY_FORM_DEADLINE|datetime_local }}{% endif %}. Being first doesn't matter for the lottery, so please take your time when entering!</p>
 
 <p style="margin-bottom:0px;"><strong>To enter the hotel room lottery:</strong></p>
 <ol>
@@ -30,7 +31,14 @@
     </ul>
     <li>If you're entering the room or suite lottery, complete all the steps entering the details of your lottery.</li>
     {% if account.hotel_eligible_dealers %}
-        <li>When entering the lottery as a dealer, you are entitled to space in the dealers block. Make sure to <strong>include the "Crowne Plaza" as a hotel option</strong> to be included in the dealers block. Also remember, you or another dealer must be the primary contact on the hotel room (the "group leader") to qualify for the dealer block.</li>
+        <li>
+            When entering the lottery as a dealer, you are entitled to space in the dealers block.
+            <li>Make sure to include the "Crowne Plaza" as a hotel option. Doing so will add you to both the Crowne Plaza dealers and attendee blocks.</li>
+            <li>Your entry will be processed in the preference order you specify.  If you would prefer a hotel over the Crowne Plaza, rank accordingly.</li>
+            <li>Please note: While we hold enough rooms in total for dealers to stay at the Crowne Plaza, there are a finite number of king and queen rooms. Please strongly consider selecting both room types for your entry.</li>
+            <li>It is still possible for your entry to result in a no-award in certain situations, such as requiring an extended stay. In this case, please reach out after results are published and we will work with you.</li>
+            <li>Remember, you or another dealer must be the primary contact on the hotel room (the "group leader") to qualify for the dealer block.</li>
+        </li>
     {% endif %}
     <li>If you're joining a room group, you will be shown the policies for room groups. Read them carefully, then click "Continue". Look up the group using its confirmation number and the group leader's email address, then confirm that you want to join that group.</li>
     <li>Once you have completed your entry, you will get an entry confirmation to your email address with all the information you submitted, along with your lottery confirmation number. If you completed a room or suite entry, you will also be able to create a room group.</li>
@@ -39,10 +47,13 @@
 
 <p>Once you have finished registering, you can now relax and we'll let you know if you were selected soon after the lottery closes!</p>
 
-<p>Full instructions, hotel lottery FAQs and a list of the hotels, along with pricing, can be found <a href="{{ c.HOTEL_LOTTERY_FAQ_URL }}" target="_blank">on our convention website.</a>
-<br/>If you have questions about your registration, please reach out to {{ c.REGDESK_EMAIL|email_only|email_to_link }}
-{% if account.hotel_eligible_dealers %}<br/>If you have questions about your dealers application, please reach out to {{ c.MARKETPLACE_EMAIL|email_only|email_to_link }}{% endif %}
-<br/>If you have questions about the hotel lottery, please reach out to {{ c.HOTEL_LOTTERY_EMAIL|email_only|email_to_link }}
+<p>
+    Full instructions, hotel lottery FAQs and a list of the hotels, along with pricing, can be found <a href="{{ c.HOTEL_LOTTERY_FAQ_URL }}" target="_blank">on our convention website.</a>
+    <ul>
+        <li>If you have questions about your registration, please reach out to {{ c.REGDESK_EMAIL|email_only|email_to_link }}</li>
+        {% if account.hotel_eligible_dealers %}<li>If you have questions about your dealers application, please reach out to {{ c.MARKETPLACE_EMAIL|email_only|email_to_link }}</li>{% endif %}
+        <li>If you have questions about the hotel lottery, please reach out to {{ c.HOTEL_LOTTERY_EMAIL|email_only|email_to_link }}</li>
+    </ul>
 <br/>Thank you again!</p>
 
 </body>
