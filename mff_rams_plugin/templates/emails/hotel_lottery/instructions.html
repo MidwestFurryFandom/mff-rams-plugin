@@ -1,4 +1,3 @@
-{% set staff_lottery = account.hotel_eligible_staff and c.STAFF_HOTEL_LOTTERY_OPEN %}
 <html>
 <head></head>
 <body>
@@ -6,12 +5,12 @@
 <p>Greetings!</p>
 
 <p>
-    The {{ c.EVENT_NAME }} {% if staff_lottery %}staff{% else %}attendee{% endif %} hotel lottery is NOW OPEN! Please take the time to read about how to enter the lottery below.
+    The {{ c.EVENT_NAME }} attendee hotel lottery is NOW OPEN! Please take the time to read about how to enter the lottery below.
 </p>
 
 <p>
-    The {% if staff_lottery %}staff{% else %}attendee{% endif %} hotel lottery will end at 
-    {% if staff_lottery %}{{ c.HOTEL_LOTTERY_STAFF_DEADLINE|datetime_local }}{% else %}{{ c.HOTEL_LOTTERY_FORM_DEADLINE|datetime_local }}{% endif %}. Being first doesn't matter for the lottery, so please take your time when entering!</p>
+    The attendee hotel lottery will end at 
+    {{ c.HOTEL_LOTTERY_FORM_DEADLINE|datetime_local }}. Being first doesn't matter for the lottery, so please take your time when entering!</p>
 
 <p style="margin-bottom:0px;"><strong>To enter the hotel room lottery:</strong></p>
 <ol>
