@@ -18,7 +18,7 @@ c.MENU.append_menu_item(
         MenuItem(name='Promo Codes', href='../promo_codes/index'),
         MenuItem(name='Escalation Tickets', href='../reg_admin/escalation_tickets'),
         MenuItem(name='Automated Transactions', href='../reg_admin/automated_transactions'),
-        MenuItem(name='Attendees Without Accounts', href='../reg_admin/orphaned_attendees'),
+        MenuItem(name='Attendee Accounts', href='../reg_admin/attendee_accounts'),
         MenuItem(name='Manage Workstations', href='../reg_admin/manage_workstations'),
         MenuItem(name='Checkins Per Hour', href='../reg_reports/checkins_by_hour')
     ])

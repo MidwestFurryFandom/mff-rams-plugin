@@ -24,36 +24,35 @@ AutomatedEmailFixture(
     allow_at_the_con=True)
 
 
-MarketplaceEmailFixture(
-        'Payment Now Due for your Midwest FurFest Dealer Group and Registrations',
-        'dealers/payment_ready.txt',
-        "lambda g: g.status in c.DEALER_ACCEPTED_STATUSES and days_after(30, g.approved)() and g.is_unpaid",
-        'dealer_reg_payment_reminder')
+if c.DEALER_PAYMENT_DUE:
+    MarketplaceEmailFixture(
+            'Payment Now Due for your Midwest FurFest Dealer Group and Registrations',
+            'dealers/payment_ready.txt',
+            "lambda g: g.status in c.DEALER_ACCEPTED_STATUSES and days_after(30, g.approved)() and g.is_unpaid",
+            'dealer_reg_payment_reminder')
 
 
-MarketplaceEmailFixture(
-    f'Your {c.EVENT_NAME} ({c.EVENT_DATE}) Dealer registration is due in one week',
-    'dealers/payment_reminder.txt',
-    "lambda g: g.status in [c.APPROVED, c.SHARED] and days_before(7, g.dealer_payment_due, 2)() and g.is_unpaid",
-    'dealer_reg_payment_reminder_due_soon')
+    MarketplaceEmailFixture(
+        f'Your {c.EVENT_NAME} ({c.EVENT_DATE}) Dealer registration is due in one week',
+        'dealers/payment_reminder.txt',
+        "lambda g: g.status in [c.APPROVED, c.SHARED] and days_before(7, g.dealer_payment_due, 2)() and g.is_unpaid",
+        'dealer_reg_payment_reminder_due_soon')
 
-MarketplaceEmailFixture(
-    f'Last chance to pay for your {c.EVENT_NAME} ({c.EVENT_DATE}) Dealer registration',
-    'dealers/payment_reminder_final.txt',
-    "lambda g: g.status in [c.APPROVED, c.SHARED] and days_before(2, g.dealer_payment_due)() and g.is_unpaid",
-    'dealer_reg_payment_reminder_last_chance')
 
-MarketplaceEmailFixture(
-    f'Your {c.EVENT_NAME} ({c.EVENT_DATE}) dealer application has been waitlisted',
-    'dealers/pending_waitlisted.txt',
-    "lambda g: g.status == c.WAITLISTED and (not c.DEALER_REG_DEADLINE or g.registered < c.DEALER_REG_DEADLINE)",
-    'dealer_pending_now_waitlisted')
+    MarketplaceEmailFixture(
+        f'Last chance to pay for your {c.EVENT_NAME} ({c.EVENT_DATE}) Dealer registration',
+        'dealers/payment_reminder_final.txt',
+        "lambda g: g.status in [c.APPROVED, c.SHARED] and days_before(2, g.dealer_payment_due)() and g.is_unpaid",
+        'dealer_reg_payment_reminder_last_chance')
 
-MarketplaceEmailFixture(
-    f'Your {c.EVENT_NAME} ({c.EVENT_DATE}) dealer application has been declined',
-    'dealers/declined.txt',
-    "lambda g: g.status == c.DECLINED",
-    'dealer_pending_declined')
+
+AutomatedEmailFixture(
+        Attendee,
+        f'{c.EVENT_NAME} Dealers Waitlist Has Ended',
+        'dealers/badge_converted.html', None,
+        'dealer_waitlist_exhausted',
+        sender=c.MARKETPLACE_EMAIL,
+    )
 
 ArtShowAppEmailFixture(
     f'{c.EVENT_NAME} Charity Donations needed',
@@ -80,13 +79,13 @@ AutomatedEmailFixture(
     'hotel_lottery/lottery_phone.html',
     "lambda a: a.cellphone == '' and a.attendee and a.attendee.cellphone == '' and a.status == c.COMPLETE and a.current_step == (a.last_step - 5) and a.entry_type != c.GROUP_ENTRY",
     'lottery_phone',
-    sender=c.HOTELS_EMAIL,
+    sender=c.HOTEL_LOTTERY_EMAIL,
 )
 
 AutomatedEmailFixture(
     AttendeeAccount,
     f'{c.EVENT_NAME} Hotel Lottery Instructions',
     'hotel_lottery/instructions.html',
-    "lambda aa: aa.hotel_eligible_attendees and c.AFTER_HOTEL_LOTTERY_FORM_START and (len(aa.hotel_eligible_staff) != len(aa.hotel_eligible_attendees))",
+    "lambda aa: aa.hotel_eligible_staff and c.AFTER_HOTEL_LOTTERY_STAFF_START or aa.hotel_eligible_attendees and c.AFTER_HOTEL_LOTTERY_FORM_START",
     'hotel_lottery_instructions',
-    sender=c.HOTELS_EMAIL)
+    sender=c.HOTEL_LOTTERY_EMAIL)
