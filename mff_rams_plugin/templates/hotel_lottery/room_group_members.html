@@ -1,3 +1,5 @@
+{% set app_editable = not application.locked %}
+
 {% if application.valid_group_members %}
     Here are the members of your {{ c.HOTEL_LOTTERY_GROUP_TERM|lower }}:
     <table class="table table-sm table-borderless">
