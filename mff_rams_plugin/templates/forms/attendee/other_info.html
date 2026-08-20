@@ -19,6 +19,6 @@ requested_accessibility_services: {{ other_info.requested_accessibility_services
 </div>
 <div class="row g-3 mb-3" x-show="requested_accessibility_services">
     <div class="col">
-        {{ form_macros.input(other_info.accessibility_requests, required_if="requested_accessibility_services") }}
+        {{ form_macros.input(other_info.accessibility_requests) }}
     </div>
 {% endblock %}

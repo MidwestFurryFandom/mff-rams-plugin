@@ -84,12 +84,6 @@ def not_same_cellphone_ec(form, field):
     return
 
 
-OtherInfo.field_validation.required_fields.update({
-    'accessibility_requests': ("Please select one or more accessbility accommodations.",
-                               'requested_accessibility_services')
-})
-
-
 PreregOtherInfo.field_validation.required_fields['group_name'] = (
     "Please confirm your table name.", 'group_name', lambda x: x.form.model.is_dealer)
 
