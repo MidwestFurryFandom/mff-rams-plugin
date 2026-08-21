@@ -35,7 +35,7 @@
           <td>
               {{ group.status_label }}
           </td>
-          <td><a href="{{ group.website }}" target="_blank">{{ group.website }}</a></td>
+          <td><a href="{% if 'http' not in group.website %}https://{% endif %}{{ group.website }}" target="_blank">{{ group.website }}</a></td>
           <td data-order="{{ group.badges_purchased }}" data-search="{{ group.badges_purchased }}"> {{ group.badges_purchased }} / {{ group.badges }} </td>
           <td>{{ group.tables_repr }}</td>
           <td>{{ group.power_label[:6] if group.power > 0 else "No power" }}
