@@ -130,6 +130,11 @@ class Group:
             if not self.social_media.get('platform_' + num, None):
                 self.social_media['username_' + num] = ''
 
+    @presave_adjustment
+    def set_none_location(self):
+        if not self.location_preference:
+            self.location_preference = c.NONE
+
     def get_social_media_url(self, num):
         num = str(num)
         platform = self.social_media.get('platform_' + num, None)
