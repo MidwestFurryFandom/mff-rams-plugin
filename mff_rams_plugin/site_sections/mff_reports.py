@@ -526,5 +526,8 @@ class Root:
                     group.table_seen,
                     group.ip_concerns,
                     group.other_concerns,
+                    group.display_height,
+                    group.vehicle_access,
+                    group.shipping_boxes,
                 ])
 
