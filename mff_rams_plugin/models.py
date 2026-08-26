@@ -139,7 +139,10 @@ class Group:
         num = str(num)
         platform = self.social_media.get('platform_' + num, None)
         if platform:
-            return c.DEALER_SOCIAL_MEDIA_URLS[platform] + self.social_media['username_' + num]
+            username = self.social_media['username_' + num]
+            if 'http' in username or '.com' in username:
+                return username
+            return c.DEALER_SOCIAL_MEDIA_URLS[platform] + username
         return ''
 
     @property
