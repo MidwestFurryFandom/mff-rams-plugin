@@ -235,15 +235,15 @@ class Root:
             'IP Issues Desc',
             'Other 2026 Events',
             'Table Setup Photo',
-            'Shipping Boxes?',
-            'Vehicle Access?',
-            'Display Height',
             'Socials Checked?',
             'Table Seen?',
             'IP Concerns',
-            'Other Concerns'
+            'Other Concerns',
+            'Display Height',
+            'Vehicle Access?',
+            'Shipping Boxes?',
         ])
-        dealer_groups = session.query(Group).filter(Group.is_dealer == True).all()
+        dealer_groups = session.query(Group).filter(Group.is_dealer == True).order_by(Group.registered).all()
         for group in dealer_groups:
             if group.is_dealer:
                 table_photo = FileService.get_existing_files(session, group, and_flags=['table_photo'])
@@ -281,13 +281,13 @@ class Root:
                     group.ip_issues_text,
                     group.other_cons,
                     f"{c.URL_BASE}/services/download_file?id={table_photo.id}" if table_photo else '',
-                    group.shipping_boxes,
-                    group.vehicle_access,
-                    group.display_height,
                     group.socials_checked,
                     group.table_seen,
                     group.ip_concerns,
                     group.other_concerns,
+                    group.display_height,
+                    group.vehicle_access,
+                    group.shipping_boxes,
                 ])
 
     @csv_file
@@ -483,9 +483,12 @@ class Root:
             'Socials Checked?',
             'Table Seen?',
             'IP Concerns',
-            'Other Concerns'
+            'Other Concerns',
+            'Display Height',
+            'Vehicle Access?',
+            'Shipping Boxes?',
         ])
-        dealer_groups = session.query(Group).filter(Group.is_dealer == True).all()
+        dealer_groups = session.query(Group).filter(Group.is_dealer == True).order_by(Group.registered).all()
         for group in dealer_groups:
             if group.is_dealer and group.status_label == 'Pending Approval':
                 table_photo = FileService.get_existing_files(session, group, and_flags=['table_photo'])
