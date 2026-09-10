@@ -6,9 +6,11 @@ With the huge number of excellent, talented, exciting dealers that have applied 
 
 At this time, {{ group.name }} has been placed on the Dealers Den waitlist.
 
-If tables become available and {{ group.name }} is accepted from the waitlist, you will be notified.
+If tables become available and {{ group.name }} is accepted from the waitlist, you will be notified.{% if c.DEALER_BADGE_PRICE == c.INITIAL_ATTENDEE and group.leader %} If you would like to attend regardless of your {{ c.DEALER_APP_TERM }} status, you can purchase your badge here: {{ c.URL_BASE }}/preregistration/purchase_dealer_badge?id={{ group.leader.id }}{% if c.AFTER_MARKETPLACE_REG_START and c.BEFORE_MARKETPLACE_DEADLINE %}
 
-If you are not able to make it to the event due to being waitlisted and subsequently wish to withdraw from the {{ c.EVENT_NAME }} hotel room lottery, please fill out our service request form: https://jira.furfest.org/servicedesk/customer/portal/4/create/43
+If instead you'd like to be considered for our Artist Marketplace, you can apply using this link: {{ c.URL_BASE }}/marketplace/apply?attendee_id={{ group.leader.id }}
+
+{% endif %}{% endif %}If you are not able to make it to the event due to being waitlisted and subsequently wish to withdraw from the {{ c.EVENT_NAME }} hotel room lottery, please fill out our service request form: https://jira.furfest.org/servicedesk/customer/portal/4/create/43
 
 Please create an account if you do not already have one and include your 10 digit lottery confirmation number for fastest service.
 
