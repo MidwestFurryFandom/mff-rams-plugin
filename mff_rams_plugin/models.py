@@ -147,7 +147,8 @@ class Group:
 
     @property
     def default_power_fee(self):
-        return c.POWER_PRICES.get(int(self.power or -1), None)
+        power_level = -1 if self.power is None else int(self.power)
+        return c.POWER_PRICES.get(power_level, None)
     
     def convert_to_shared(self, session):
         self.tables = 0
