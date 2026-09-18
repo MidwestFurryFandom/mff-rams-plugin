@@ -165,12 +165,17 @@ class Group:
     @property
     def dealer_payment_due(self):
         if self.approved:
+            approval_date = None
             if c.SIGNNOW_DEALER_FOLDER_ID or self.terms_conditions_doc:
                 if not self.terms_conditions_doc:
                     return
-                return self.terms_conditions_doc.created + timedelta(c.DEALER_PAYMENT_DAYS)
+                approval_date = self.terms_conditions_doc.created
             else:
-                return self.approved + timedelta(c.DEALER_PAYMENT_DAYS)
+                approval_date = self.approved
+
+            if not c.DEALER_PAYMENT_DUE or approval_date > c.DEALER_PAYMENT_DUE:
+                return approval_date + timedelta(c.DEALER_PAYMENT_DAYS)
+            return c.DEALER_PAYMENT_DUE
 
     @property
     def dealer_payment_is_late(self):
