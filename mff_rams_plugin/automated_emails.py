@@ -25,12 +25,11 @@ AutomatedEmailFixture(
 
 
 if c.DEALER_PAYMENT_DUE:
-    MarketplaceEmailFixture(
-            'Payment Now Due for your Midwest FurFest Dealer Group and Registrations',
-            'dealers/payment_ready.txt',
-            "lambda g: g.status in c.DEALER_ACCEPTED_STATUSES and days_after(30, g.approved)() and g.is_unpaid",
-            'dealer_reg_payment_reminder')
-
+    #MarketplaceEmailFixture(
+    #        'Payment Now Due for your Midwest FurFest Dealer Group and Registrations',
+    #        'dealers/payment_ready.txt',
+    #        "lambda g: g.status in c.DEALER_ACCEPTED_STATUSES and days_after(30, g.approved)() and g.is_unpaid",
+    #        'dealer_reg_payment_reminder')
 
     MarketplaceEmailFixture(
         f'Your {c.EVENT_NAME} ({c.EVENT_DATE}) Dealer registration is due in one week',
@@ -38,10 +37,9 @@ if c.DEALER_PAYMENT_DUE:
         "lambda g: g.status in [c.APPROVED, c.SHARED] and days_before(7, g.dealer_payment_due, 2)() and g.is_unpaid",
         'dealer_reg_payment_reminder_due_soon')
 
-
     MarketplaceEmailFixture(
         f'Last chance to pay for your {c.EVENT_NAME} ({c.EVENT_DATE}) Dealer registration',
-        'dealers/payment_reminder_final.txt',
+        'dealers/payment_reminder.txt',
         "lambda g: g.status in [c.APPROVED, c.SHARED] and days_before(2, g.dealer_payment_due)() and g.is_unpaid",
         'dealer_reg_payment_reminder_last_chance')
 
