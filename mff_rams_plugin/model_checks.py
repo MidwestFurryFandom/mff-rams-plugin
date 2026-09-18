@@ -69,5 +69,5 @@ def social_media_3(group):
 
 @validation.Attendee
 def need_comped_reason(attendee):
-    if attendee.needs_comped_reason:
+    if attendee.paid == c.NEED_NOT_PAY and attendee.needs_comped_reason:
         return ('comped_reason', 'You must enter a reason for comping this attendee\'s badge.')

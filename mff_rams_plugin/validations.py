@@ -57,7 +57,7 @@ def attendee_age_checks(form, field):
 
 @PersonalInfo.field_validation('birthdate')
 def no_dealers_under_18(form, field):
-    if form.model.is_dealer and get_age_from_birthday(field.data, c.NOW_OR_AT_CON) < 18:
+    if form.model.is_dealer and field.data and get_age_from_birthday(field.data, c.NOW_OR_AT_CON) < 18:
         raise ValidationError("You cannot apply as a dealer if you are under 18.")
 
 

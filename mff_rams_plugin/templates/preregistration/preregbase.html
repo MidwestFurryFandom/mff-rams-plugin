@@ -1,7 +1,11 @@
 {% extends "uber/templates/preregistration/preregbase.html" %}
 
-{% block footer_text %}
-Contact Us &lt;<a href="mailto:info@furfest.org" target="_blank">info@furfest.org</a>&gt; 
-| <a href="{{ c.PRIVACY_POLICY_URL }}" target="_blank">Privacy Policy</a>
-| <a href="https://www.furfest.org/attend/register" target="_blank">Pickup & Refund Information</a>
+{% block footer %}
+<footer class="text-muted text-center mt-auto">
+    <div class="card"><div class="card-footer">
+        Contact Us &lt;<a href="mailto:info@furfest.org" target="_blank">info@furfest.org</a>&gt; 
+        | <a href="{{ c.PRIVACY_POLICY_URL }}" target="_blank">Privacy Policy</a>
+        | <a href="https://www.furfest.org/attend/register" target="_blank">Pickup & Refund Information</a>
+    </div></div>
+</footer>
 {% endblock %}

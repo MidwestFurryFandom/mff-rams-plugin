@@ -2,15 +2,16 @@
 
 {% block x_data %}
 {{ super() }}
-needs_comped_reason: {{ attendee.needs_comped_reason|tojson }},
-get compedReason() { return this.paid == {{ c.NEED_NOT_PAY|tojson }} && this.needs_comped_reason && this.badge_type != {{ c.STAFF_BADGE|tojson }} && !this.badge_ribbons.includes({{ c.STAFF_RIBBON|tojson }}) }
+get compedReason() { return this.paid == {{ c.NEED_NOT_PAY|tojson }} && !{{ [c.STAFF_BADGE, c.PARENT_IN_TOW_BADGE, c.KID_IN_TOW_BADGE]|tojson }}.includes(this.badge_type) && !this.badge_ribbons.includes({{ c.STAFF_RIBBON|tojson }}) }
 {% endblock %}
 
 {% block paid_status %}
 {{ super() }}
+{% if attendee.badge_cost_with_promo_code > 0 %}
 </div>
 <div class="row g-3 mb-3">
     <div class="col-sm-6" x-show="compedReason">
-        {{ form_macros.input(badge_flags.comped_reason, admin_text="Enter a reason for this badge being comped, if they are not staff.", required_if="compedReason") }}
+        {{ form_macros.input(badge_flags.comped_reason, admin_text="Enter a reason for this badge being comped, if you are not applying a promo code.", required_if="compedReason") }}
     </div>
+{% endif %}
 {% endblock %}
