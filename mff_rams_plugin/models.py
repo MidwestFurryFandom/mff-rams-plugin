@@ -3,6 +3,7 @@ import math
 
 from datetime import timedelta
 from markupsafe import Markup
+from pytz import UTC
 from sqlalchemy import and_, or_, not_, String
 from sqlalchemy.types import Boolean, Integer, Numeric
 from sqlalchemy.dialects.postgresql.json import JSONB
@@ -175,7 +176,7 @@ class Group:
 
             if not c.DEALER_PAYMENT_DUE or approval_date > c.DEALER_PAYMENT_DUE:
                 return approval_date + timedelta(c.DEALER_PAYMENT_DAYS)
-            return c.DEALER_PAYMENT_DUE
+            return c.DEALER_PAYMENT_DUE.astimezone(UTC)
 
     @property
     def dealer_payment_is_late(self):
