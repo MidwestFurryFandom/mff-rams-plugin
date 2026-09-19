@@ -174,7 +174,7 @@ class Group:
             else:
                 approval_date = self.approved
 
-            if not c.DEALER_PAYMENT_DUE or approval_date > c.DEALER_PAYMENT_DUE:
+            if not c.DEALER_PAYMENT_DUE or approval_date < c.DEALER_PAYMENT_DUE:
                 return approval_date + timedelta(c.DEALER_PAYMENT_DAYS)
             return c.DEALER_PAYMENT_DUE.astimezone(UTC)
 
