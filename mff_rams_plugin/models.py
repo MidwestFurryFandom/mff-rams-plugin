@@ -165,12 +165,17 @@ class Group:
     @property
     def dealer_payment_due(self):
         if self.approved:
+            approval_date = None
             if c.SIGNNOW_DEALER_FOLDER_ID or self.terms_conditions_doc:
                 if not self.terms_conditions_doc:
                     return
-                return self.terms_conditions_doc.created + timedelta(c.DEALER_PAYMENT_DAYS)
+                approval_date = self.terms_conditions_doc.created
             else:
-                return self.approved + timedelta(c.DEALER_PAYMENT_DAYS)
+                approval_date = self.approved
+
+            if not c.DEALER_PAYMENT_DUE or approval_date > c.DEALER_PAYMENT_DUE:
+                return approval_date + timedelta(c.DEALER_PAYMENT_DAYS)
+            return c.DEALER_PAYMENT_DUE
 
     @property
     def dealer_payment_is_late(self):
@@ -329,11 +334,10 @@ class Attendee:
 
     @property
     def needs_comped_reason(self):
-        return self.paid == c.NEED_NOT_PAY and not self.comped_reason and self.badge_type not in [
-        c.KID_IN_TOW_BADGE, c.PARENT_IN_TOW_BADGE, c.STAFF_BADGE] and (
-            self.age_discount == 1 or abs(self.age_discount) < self.new_badge_cost) and (
-            c.STAFF_RIBBON not in self.ribbon_ints) and (
-            not self.promo_code and not self.promo_code_code)
+        return not self.comped_reason and self.badge_type not in [
+            c.KID_IN_TOW_BADGE, c.PARENT_IN_TOW_BADGE, c.STAFF_BADGE] and abs(self.age_discount) < self.new_badge_cost and (
+                c.STAFF_RIBBON not in self.ribbon_ints) and (
+                    not self.promo_code and not self.promo_code_code and not self.promo_code_code_val)
 
     @property
     def cannot_abandon_badge_reason(self):
@@ -562,4 +566,6 @@ class AttendeeAccount:
 
     @property
     def hotel_eligible_staff(self):
-        return [a for a in self.hotel_eligible_attendees if a.badge_type == c.STAFF_BADGE or c.STAFF_RIBBON in a.ribbon_ints]
+        return [a for a in self.valid_attendees if (a.badge_type == c.STAFF_BADGE or c.STAFF_RIBBON in a.ribbon_ints)
+                and not a.is_unassigned and  a.badge_status not in [c.REFUNDED_STATUS, c.NOT_ATTENDING,
+                                                                    c.DEFERRED_STATUS, c.WATCHED_STATUS]]

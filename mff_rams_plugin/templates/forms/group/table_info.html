@@ -94,7 +94,7 @@ get hadIpIssues() { return this.ip_issues == '{{ c.YES_ISSUES }}' },
                 (group.social_media.platform_3, group.social_media.username_3)
                 ]
               %}
-            {% for platform, username in social_media_tuples|rejectattr(0, 'equalto', 0) %}
+            {% for platform, username in social_media_tuples|selectattr(0) %}
             {% if loop.first %}<div class="d-flex gap-2 mb-3">{% endif %}
             <a href="{{ c.DEALER_SOCIAL_MEDIA_URLS[platform] }}{{ username }}" target="_blank">View {{ c.DEALER_SOCIAL_MEDIAS[platform] }} <i class="fa fa-external-link"></i></a>
             {% if loop.last %}</div>{% endif %}
