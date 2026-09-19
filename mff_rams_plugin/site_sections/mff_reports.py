@@ -9,7 +9,7 @@ from uber.config import c
 from uber.decorators import all_renderable, csv_file, public
 from uber.files import FileService
 from uber.models import Attendee, Group
-from uber.utils import localized_now
+from uber.utils import localized_now, date_trunc_day
 
 log = logging.getLogger(__name__)
 
@@ -44,18 +44,13 @@ class RegistrationDataOneYear:
     def query_current_year(self, session):
         self.event_name = c.EVENT_NAME_AND_YEAR
 
-        # TODO: we're hacking the timezone info out of ESCHATON (final day of event). probably not the right thing to do
-        self.end_date = c.DATES['ESCHATON'].replace(hour=0, minute=0,
-                                                    second=0,
-                                                    microsecond=0,
-                                                    tzinfo=None)
+        self.end_date = c.ESCHATON.replace(hour=0, minute=0, second=0, microsecond=0)
 
         # return registrations where people actually paid money
         # exclude: dealers
         reg_per_day = session.query(
-            func.date_trunc(literal('day'), Attendee.registered),
-            func.count(
-                func.date_trunc(literal('day'), Attendee.registered))
+            date_trunc_day(Attendee.registered),
+            func.count(date_trunc_day(Attendee.registered))
         ) \
             .outerjoin(Attendee.group) \
             .filter(
@@ -67,8 +62,8 @@ class RegistrationDataOneYear:
                 # if they're an attendee, make sure they're check-in-able
             )
         ) \
-            .group_by(func.date_trunc(literal('day'), Attendee.registered)) \
-            .order_by(func.date_trunc(literal('day'), Attendee.registered)) \
+            .group_by(date_trunc_day(Attendee.registered)) \
+            .order_by(date_trunc_day(Attendee.registered)) \
             .all()  # noqa: E711
 
         # now, convert the query's data into the format we need.
