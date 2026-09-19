@@ -44,7 +44,7 @@
           <td>{{ group.cost|format_currency }}</td>
           <td>{{ group.amount_unpaid|format_currency }}
             {% if group.amount_unpaid and group.dealer_payment_is_late %}
-            (PAYMENT OVERDUE: {{ group.dealer_payment_due|datetime_local }})
+            (PAYMENT OVERDUE: {{ group.dealer_payment_due|datetime }})
             {% endif %}
           </td>
           <td>{{ (group.amount_paid / 100)|format_currency }}</td>
