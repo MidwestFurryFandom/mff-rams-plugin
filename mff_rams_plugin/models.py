@@ -13,7 +13,7 @@ from typing import ClassVar
 from uber.models import Session
 from uber.badge_funcs import get_real_badge_type
 from uber.config import c
-from uber.utils import add_opt, localized_now, localize_datetime, remove_opt, normalize_email
+from uber.utils import add_opt, localized_now, remove_opt, normalize_email
 from uber.models.types import (Choice, MultiChoice, DefaultColumn as Column, default_relationship as relationship,
                                DefaultField as Field, DefaultRelationship as Relationship)
 from uber.decorators import cached_classproperty, classproperty, presave_adjustment
@@ -170,18 +170,18 @@ class Group:
             if c.SIGNNOW_DEALER_FOLDER_ID or self.terms_conditions_doc:
                 if not self.terms_conditions_doc:
                     return
-                approval_date = self.terms_conditions_doc.created
+                approval_date = self.terms_conditions_doc.created.astimezone(c.EVENT_TIMEZONE)
             else:
-                approval_date = self.approved
+                approval_date = self.approved.astimezone(c.EVENT_TIMEZONE)
 
             if not c.DEALER_PAYMENT_DUE or approval_date < c.DEALER_PAYMENT_DUE:
                 return approval_date + timedelta(c.DEALER_PAYMENT_DAYS)
-            return c.DEALER_PAYMENT_DUE.astimezone(UTC)
+            return c.DEALER_PAYMENT_DUE
 
     @property
     def dealer_payment_is_late(self):
         if self.dealer_payment_due:
-            return localized_now() > localize_datetime(self.dealer_payment_due)
+            return localized_now() > self.dealer_payment_due
 
     @presave_adjustment
     def dealers_add_badges(self):
