@@ -200,6 +200,11 @@ class AdminTableInfo:
 
 
 @MagForm.form_mixin
+class AdminGroupInfo:
+    suite_tables = IntegerField('Suite Tables', description="Number of tables requested to be provided in suite. Default is zero.")
+
+
+@MagForm.form_mixin
 class ArtistMarketplaceForm:
     def terms_accepted_label(self):
         return Markup(
