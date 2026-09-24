@@ -51,18 +51,27 @@ def no_approval_without_power_fee(group):
 
 @validation.Group
 def social_media_1(group):
+    if not group.social_media.get('platform_1', None):
+        return
+
     if group.social_media['platform_1'] and not group.social_media['username_1']:
         return ('social_media-username_1', 'Please enter your username for social media platform 1, or select None.')
 
 
 @validation.Group
 def social_media_2(group):
+    if not group.social_media.get('platform_2', None):
+        return
+
     if group.social_media['platform_2'] and not group.social_media['username_2']:
         return ('social_media-username_2', 'Please enter your username for social media platform 2, or select None.')
 
 
 @validation.Group
 def social_media_3(group):
+    if not group.social_media.get('platform_3', None):
+        return
+
     if group.social_media['platform_3'] and not group.social_media['username_3']:
         return ('social_media-username_3', 'Please enter your username for social media platform 3, or select None.')
 

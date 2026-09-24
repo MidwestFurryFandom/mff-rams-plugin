@@ -174,9 +174,7 @@ class Group:
             else:
                 approval_date = self.approved.astimezone(c.EVENT_TIMEZONE)
 
-            if not c.DEALER_PAYMENT_DUE or approval_date > c.DEALER_PAYMENT_DUE:
-                return approval_date + timedelta(c.DEALER_PAYMENT_DAYS)
-            return c.DEALER_PAYMENT_DUE
+            return approval_date.replace(hour=23, minute=59, second=59, microsecond=59) + timedelta(c.DEALER_PAYMENT_DAYS)
 
     @property
     def dealer_payment_is_late(self):
