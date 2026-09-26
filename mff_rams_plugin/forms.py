@@ -208,8 +208,8 @@ class AdminGroupInfo:
 class ArtistMarketplaceForm:
     def terms_accepted_label(self):
         return Markup(
-            "I have read both the <a href='https://www.furfest.org/vendors/menagerie/rules' target='_blank'>General Rules for the Artist Alley</a> "
-            "and the <a href='https://www.furfest.org/vendors/menagerie/marketplace' target='_blank'>Specific Rules for the Artist Marketplace</a>, "
+            "I have read both the <a href='https://www.furfest.org/vendors/alley/rules' target='_blank'>Alley and Marketplace Rules</a> "
+            "and the <a href='https://www.furfest.org/vendors/alley/marketplace' target='_blank'>Artist Marketplace Info Page</a>, "
             "and by submitting this form, I agree to be bound by the terms and conditions of the Rules. I understand that, if I am selected to "
             f"receive a space in the Artist Marketplace, a non-refundable fee of ${c.ARTIST_MARKETPLACE_FEE} is required to secure my space. "
             "Further, I agree to defend, indemnify, and hold harmless Midwest Furry Fandom, Inc., including its officers, employees, and agents, "
