@@ -8,7 +8,7 @@ from sqlalchemy.sql.expression import literal
 from uber.config import c
 from uber.decorators import all_renderable, csv_file, public
 from uber.files import FileService
-from uber.models import Attendee, Group
+from uber.models import Attendee, Group, ArtistMarketplaceApplication
 from uber.utils import localized_now, date_trunc_day
 
 log = logging.getLogger(__name__)
@@ -294,7 +294,7 @@ class Root:
             'Location'
         ])
         dealer_groups = session.query(Group).filter(Group.is_dealer == True,
-                                                    Group.status.in_([c.APPROVED, c.SHARED])).all()
+                                                    Group.status.in_(c.DEALER_ACCEPTED_STATUSES)).all()
         for group in dealer_groups:
             out.writerow([
                 group.name,
@@ -311,8 +311,9 @@ class Root:
             'Business Name',
             'Group Status'
         ])
+        undeclined_statuses = c.DEALER_ACCEPTED_STATUSES + [c.UNAPPROVED, c.WAITLISTED]
         dealers = session.query(Attendee).join(Attendee.group).filter(
-            Group.is_dealer == True, Group.status.in_([c.UNAPPROVED, c.APPROVED, c.SHARED, c.WAITLISTED]))
+            Group.is_dealer == True, Group.status.in_(undeclined_statuses))
         for dealer in dealers:
             if dealer.is_dealer and dealer.first_name:
                 out.writerow([
@@ -323,7 +324,39 @@ class Root:
                 ])
 
     @csv_file
-    def illinois_department_of_revenue_report(self, out, session):
+    def illinois_department_of_revenue_marketplace_report(self, out, session):
+        out.writerow([
+            'Business Name',
+            'Point of Contact',
+            'Street Address',
+            'Street Address (2)',
+            'City',
+            'Region',
+            'Zip',
+            'Country',
+            'Email',
+            'Phone Number',
+            'Tax Number'
+        ])
+        marketplace_apps = session.query(ArtistMarketplaceApplication).filter(ArtistMarketplaceApplication.status == c.ACCEPTED
+                                                                              ).join(ArtistMarketplaceApplication.attendee)
+        for app in marketplace_apps:
+            out.writerow([
+                app.name,
+                app.attendee.full_name,
+                app.attendee.address1,
+                app.attendee.address2,
+                app.attendee.city,
+                app.attendee.region,
+                app.attendee.zip_code,
+                app.attendee.country,
+                app.email_address,
+                app.attendee.cellphone,
+                app.tax_number
+            ])
+
+    @csv_file
+    def illinois_department_of_revenue_dealer_report(self, out, session):
         out.writerow([
             'Business Name',
             'Point of Contact',
@@ -338,7 +371,7 @@ class Root:
             'Tax Number'
         ])
         dealer_groups = session.query(Group).filter(Group.is_dealer == True,
-                                                    Group.status.in_([c.APPROVED, c.SHARED])).all()
+                                                    Group.status.in_(c.DEALER_ACCEPTED_STATUSES)).all()
         for group in dealer_groups:
             out.writerow([
                 group.name,
