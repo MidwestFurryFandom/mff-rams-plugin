@@ -1,6 +1,9 @@
-{% extends 'uber/templates/group_admin/dealers.html' %}
+{% extends 'uber/templates/group_admin/dealer.html' %}
 
 {% block table %}
+<div class="d-flex justify-content-end mb-3">
+  <a href="../mff_reports/dealer_locations" class="btn btn-secondary" target="_blank">Dealer Power & Location Report <i class="fa fa-external-link"></i></a>
+</div>
 <table class="table table-striped datatable" data-info="false">
     <thead>
       <tr>
@@ -11,6 +14,7 @@
         <th>Badges{{ macros.popup_link("../static_views/badgeCounts.html") }}</th>
         <th>Tables</th>
         <th>Power Request</th>
+        <th>Location</th>
         <th>Cost</th>
         <th>Owed</th>
         <th>Paid</th>
@@ -19,7 +23,7 @@
       </tr>
     </thead>
     <tbody>
-  {% for group in all_groups if group.is_dealer and (show_all or (group.status not in [c.DECLINED, c.IMPORTED, c.CANCELLED])) %}
+  {% for group in groups if group.is_dealer and (show_all or (group.status not in [c.DECLINED, c.IMPORTED, c.CANCELLED])) %}
       <tr{% if group.status in [c.DECLINED, c.CANCELLED] %} class="danger"{% endif %}>
           <td style="text-align:left" data-order="{{ group.name }}" data-search="{{ group.name }}"> 
             <a href="form?id={{ group.id }}">{{ group.name|default('?????', boolean=True) }}</a></td>
@@ -41,6 +45,7 @@
           <td>{{ group.power_label[:6] if group.power > 0 else "No power" }}
             {% if group.power >= 1 %} for {{ group.power_usage }}{% endif %}
            </td>
+           <td>{{ 'N/A' if group.status not in c.DEALER_ACCEPTED_STATUSES else group.location or 'None' }}</td>
           <td>{{ group.cost|format_currency }}</td>
           <td>{{ group.amount_unpaid|format_currency }}
             {% if group.amount_unpaid and group.dealer_payment_is_late %}

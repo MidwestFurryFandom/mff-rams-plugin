@@ -2,7 +2,7 @@ import cherrypy
 import logging
 from cherrypy.lib.static import serve_file
 from collections import defaultdict
-from sqlalchemy import func
+from sqlalchemy import func, or_
 from sqlalchemy.sql.expression import literal
 
 from uber.config import c
@@ -194,6 +194,12 @@ class Root:
                 attendee.email,
                 ", ".join(attendee.accessibility_requests_labels)
             ])
+
+    def dealer_locations(self, session):
+        return {
+            'groups': session.query(Group).filter(Group.is_dealer == True, Group.status.in_(c.DEALER_ACCEPTED_STATUSES)
+                                                  ).order_by(Group.location)
+        }
 
     @csv_file
     def full_dealer_report(self, out, session):
