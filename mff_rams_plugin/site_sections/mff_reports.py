@@ -195,6 +195,27 @@ class Root:
                 ", ".join(attendee.accessibility_requests_labels)
             ])
 
+    @csv_file
+    def mff_food_restrictions_report(self, out, session):
+        out.writerow([
+            'Full Name',
+            'Badge Name',
+            'Badge #',
+            'Email',
+            'Food Restrictions'
+        ])
+
+        food_restriction_attendees = session.query(Attendee).filter(
+            Attendee.dietary_restrictions != '',
+            or_(Attendee.badge_type.in_([c.STAFF_BADGE, c.SPONSOR_BADGE, c.SHINY_BADGE]),
+                Attendee.ribbon.contains(c.STAFF_RIBBON)))
+
+        for attendee in food_restriction_attendees:
+            out.writerow([
+                attendee.full_name, attendee.badge_printed_name, attendee.badge_num, attendee.email,
+                attendee.dietary_restrictions
+            ])
+
     def dealer_locations(self, session):
         return {
             'groups': session.query(Group).filter(Group.is_dealer == True, Group.status.in_(c.DEALER_ACCEPTED_STATUSES)
