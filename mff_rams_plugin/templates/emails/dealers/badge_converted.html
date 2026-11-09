@@ -6,8 +6,7 @@
 
 <p>
   {% if closing_waitlist %}Sadly, {{ c.EVENT_NAME }} is no longer accepting dealer groups from the waitlist. {% if attendee.paid == c.NOT_PAID %}Although{% else %}Therefore,{% endif %} your group ({{ group.name }}) was cancelled due to being on the waitlist
-  {% else %}{% if attendee.paid == c.NOT_PAID %}Although{% else %}Unfortunately,{% endif %} your group ({{ group.name }}) {{ 'cancelled their ' + c.DEALER_APP_TERM if group.status == c.CANCELLED else 'was cancelled due to being over 50 spots down on the waitlist' }}{% endif %}
-  {% if attendee.paid == c.NOT_PAID %}, we hope that you will still want to come and enjoy all that {{ c.EVENT_NAME }} has to offer!{% else %}.{% endif %}
+  {% else %}{% if attendee.paid == c.NOT_PAID %}Although{% else %}Unfortunately,{% endif %} your group ({{ group.name }}) {{ 'cancelled their ' + c.DEALER_APP_TERM if group.status == c.CANCELLED else 'was cancelled due to being over 50 spots down on the waitlist' }}{% endif %}{% if attendee.paid == c.NOT_PAID %}, we hope that you will still want to come and enjoy all that {{ c.EVENT_NAME }} has to offer!{% else %}.{% endif %}
 
   {% if attendee.paid == c.HAS_PAID %}<br/><br/>Since you have already purchased a badge, there is nothing more you need to do.
   {% elif attendee.paid != c.NOT_PAID %}<br/><br/>This did not affect your existing badge.{% else %}Therefore, we have reserved a badge for you.{% endif %}
