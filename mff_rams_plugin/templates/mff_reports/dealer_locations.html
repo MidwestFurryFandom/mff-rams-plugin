@@ -1,0 +1,30 @@
+{% extends 'static_views/static_base.html' %}
+
+{% set no_print = True %}
+{% include 'art_show_common/print.html' with context %}
+
+{% block page %}
+<div class="card-body p-0 m-0">
+    <h3 align="center">Dealer Power & Location Report -- {{ now_localized()|datetime("%m/%d/%Y, %-I:%M%p") }}</h3>
+    <table class="table table-striped table-bordered" style="margin: 20px; width: calc(100% - 40px);">
+        <thead>
+            <tr>
+                <th>Group Name</th>
+                <th>Tables</th>
+                <th>Power Request</th>
+                <th>Location</th>
+            </tr>
+        </thead>
+        {% for group in groups %}
+        <tr>
+            <td>{{ group.name }}</td>
+            <td>{{ group.tables if group.tables < 5 else group.tables_repr.split(' ')[-1] }}</td>
+            <td>{{ group.power_label[:6] if group.power > 0 else "No power" }}
+            {% if group.power >= 1 %} for {{ group.power_usage }}{% endif %}
+            </td>
+            <td>{{ group.location or "<em>No Location Set</em>"|safe }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</div>
+{% endblock %}
