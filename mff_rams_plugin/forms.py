@@ -175,9 +175,11 @@ class TableInfo:
             return locked_fields
 
         if group.status in c.DEALER_EDITABLE_STATUSES:
-            locked_fields.append('power')
+            return locked_fields + ['power']
+
+        social_media_fields = [f'social_media-{key}' for key in self.social_media._fields.keys()]
         
-        return locked_fields
+        return locked_fields + list(self._fields.keys()) + social_media_fields
 
     def tables_desc(self):
         return ""
