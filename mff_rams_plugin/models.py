@@ -407,6 +407,10 @@ class Attendee:
             return self.badge_type_label
 
     @property
+    def shift_signups_start(self):
+        return c.SHIFTS_CREATED if self.badge_type == c.STAFF_BADGE or c.STAFF_RIBBON in self.ribbon_ints else c.VOLUNTEER_SIGNUPS_START
+
+    @property
     def attendance_type(self):
         if self.badge_type == c.ONE_DAY_BADGE or self.is_presold_oneday:
             return c.SINGLE_DAY
