@@ -1,0 +1,29 @@
+{% if attendee.shifts %}
+    <table width="95%" align="center">
+    <tr style="font-weight:bold">
+        <td>Job</td>
+        <td>Dept</td>
+        <td>Start</td>
+        <td>Hours</td>
+        {% if c.SHIFT_WEIGHTING_ENABLED %}<td>Weight</td>{% endif %}
+        <td>Worked</td>
+    </tr>
+    {% for shift in attendee.shifts|sortBy('job.start_time') %}
+        <tr>
+            <td>{{ shift.job.name }}</td>
+            <td>{{ shift.job.department_name }}</td>
+            <td>{{ shift.job.start_time|datetime_local("%A %-I:%M %p") }}</td>
+            <td>{{ shift.job.duration / 60 }}</td>
+            {% if c.SHIFT_WEIGHTING_ENABLED %}<td>(x{{ shift.job.weight }})</td>{% endif %}
+            <td>__________</td>
+        </tr>
+        {% if shift.job.description %}
+            <tr>
+                <td colspan="5" align="center" valign="top" style="padding-top:0px"><i>{{ shift.job.description }}</i><br/><br/></td>
+            </tr>
+        {% endif %}
+    {% endfor %}
+    </table>
+{% elif attendee.takes_shifts %}
+    <h3>You have not signed up for any shifts.</h3>
+{% endif %}
