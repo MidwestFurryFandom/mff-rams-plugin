@@ -1,0 +1,30 @@
+<html>
+<head></head>
+<body>
+
+<p>
+    {{ attendee.first_name }},
+    <br/>Thanks for signing up for shifts! You are currently signed up to work in the following departments:
+    <br/>{{ attendee.depts_where_working|map(attribute='name')|readable_join }}
+</p>
+
+<p>
+    Not all departments at {{ c.EVENT_NAME }} use online shift signups. If you work in a department not listed above,
+    you may receive a separate schedule from the department director or assistant director(s).
+    You may also be scheduled for specific all-hands times outside of the shifts you signed up for, so please review your schedule carefully.
+</p>
+
+<p>
+    You can view your schedule below,
+    <a href="{{ c.URL_BASE }}/staffing/printable?id={{ attendee.id }}" target="_blank">download a printable version of your schedule</a>,
+    or <a href="{{ c.URL_BASE }}/staffing/shifts_ical?id={{ attendee.id }}">download an .ics file</a>
+    to import into your personal calendar. Note that this file is static, so changes to your shift schedule will not automatically appear.
+</p>
+
+<br><br>
+{% include "staffing/printable_schedule.html" %}
+
+<br> {{ email_signature|linebreaksbr }}
+
+</body>
+</html>
